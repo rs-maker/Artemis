@@ -17,7 +17,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import de.tum.in.www1.artemis.security.SecurityUtils;
 import de.tum.in.www1.artemis.web.rest.CourseResource;
 
 /**
@@ -90,6 +89,6 @@ public class AppStartupRunner implements ApplicationRunner {
         // [Make the calls]
 
         // TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-        SecurityUtils.clearAuthorizationObject();
+        context.setAuthentication(null);
     }
 }
