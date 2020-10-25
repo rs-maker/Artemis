@@ -1,0 +1,29 @@
+version: '2'
+
+networks:
+    artemis:
+        driver: "bridge"
+        ipam:
+            driver: default
+            config:
+                -   subnet: 172.20.24.0/24
+
+services:
+    artemis-app:
+        build: ../../artemis
+        environment:
+            - _JAVA_OPTIONS=-Xmx512m -Xms256m
+            - SPRING_PROFILES_ACTIVE=artemis,local,jenkins,gitlab,dev
+        env_file:
+            - config/Artemis/artemis.env
+        volumes:
+        -   ./config/Artemis:/config
+        hostname: artemis
+        networks:
+            artemis:
+                ipv4_address: 172.20.24.2
+
+    artemis-mysql:
+        extends:
+            file: mysql.yml
+            service: artemis-mysql

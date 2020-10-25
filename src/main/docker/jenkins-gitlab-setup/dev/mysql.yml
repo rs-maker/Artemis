@@ -1,0 +1,16 @@
+version: '2'
+
+volumes:
+    mysql_data:
+services:
+    artemis-mysql:
+        image: mysql:8.0.21
+        volumes:
+            - mysql_data:/var/lib/mysql
+        ports:
+            - 127.0.0.1:3306:3306
+        networks:
+            - artemis
+        env_file:
+            - config/mysql/mysql.env
+        command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp

@@ -2,6 +2,7 @@ FROM jenkins/jenkins:lts
 
  LABEL description="Jenkins with maven, python3.6 and gcc libraries pre-installed for Artemis"
 
+ USER jenkins
  USER root
 
  RUN apt update
