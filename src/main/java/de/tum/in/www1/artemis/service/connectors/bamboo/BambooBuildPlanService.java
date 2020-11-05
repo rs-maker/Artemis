@@ -142,8 +142,9 @@ public class BambooBuildPlanService {
             checkoutTask = createCheckoutTask(assignmentPath, testPath);
         }
         Stage defaultStage = new Stage("Default Stage");
-        Job defaultJob = new Job("Default Job", new BambooKey("JOB1")).cleanWorkingDirectory(true);
+        Job defaultJob = new Job("Default Job", new BambooKey("JOB1")).cleanWorkingDirectory(false);
 
+        var cleanTask = new CleanWorkingDirectoryTask();
         /*
          * We need the profiles to not run the jobs within Docker containers in the dev-setup as the Bamboo server itself runs in a Docker container when developing.
          */
@@ -168,13 +169,15 @@ public class BambooBuildPlanService {
 
                 if (!sequentialBuildRuns) {
                     return defaultStage
-                            .jobs(defaultJob.tasks(checkoutTask, new MavenTask().goal("clean test").jdk("JDK").executableLabel("Maven 3").description("Tests").hasTests(true)));
+                            .jobs(defaultJob.tasks(checkoutTask, new MavenTask().goal("clean test").jdk("JDK").executableLabel("Maven 3").description("Tests").hasTests(true))
+                                    .finalTasks(cleanTask));
                 }
                 else {
                     return defaultStage.jobs(defaultJob.tasks(checkoutTask,
                             new MavenTask().goal("clean test").workingSubdirectory("structural").jdk("JDK").executableLabel("Maven 3").description("Structural tests")
                                     .hasTests(true),
-                            new MavenTask().goal("clean test").workingSubdirectory("behavior").jdk("JDK").executableLabel("Maven 3").description("Behavior tests").hasTests(true)));
+                            new MavenTask().goal("clean test").workingSubdirectory("behavior").jdk("JDK").executableLabel("Maven 3").description("Behavior tests").hasTests(true))
+                            .finalTasks(cleanTask));
                 }
             }
             case PYTHON, C -> {
@@ -198,9 +201,10 @@ public class BambooBuildPlanService {
             defaultJob.dockerConfiguration(dockerConfigurationImageNameFor(programmingLanguage));
         }
         final var testParserTask = new TestParserTask(TestParserTaskProperties.TestType.JUNIT).resultDirectories(resultDirectories);
+        final var cleanTask = new CleanWorkingDirectoryTask();
         var tasks = readScriptTasksFromTemplate(programmingLanguage, sequentialBuildRuns);
         tasks.add(0, checkoutTask);
-        return defaultStage.jobs(defaultJob.tasks(tasks.toArray(new Task[0])).finalTasks(testParserTask));
+        return defaultStage.jobs(defaultJob.tasks(tasks.toArray(new Task[0])).finalTasks(testParserTask, cleanTask));
     }
 
     private Plan createDefaultBuildPlan(String planKey, String planDescription, String projectKey, String projectName, String repositoryName, String vcsTestRepositorySlug,
