@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import de.tum.in.www1.artemis.domain.Course;
 import de.tum.in.www1.artemis.domain.DomainObject;
+import de.tum.in.www1.artemis.domain.GradeStep;
 import de.tum.in.www1.artemis.domain.User;
 
 @Entity
@@ -115,6 +116,11 @@ public class Exam extends DomainObject {
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "exam_user", joinColumns = @JoinColumn(name = "exam_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "student_id", referencedColumnName = "id"))
     private Set<User> registeredUsers = new HashSet<>();
+
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @JsonIgnoreProperties("course")
+    private Set<GradeStep> courseGradeSteps = new HashSet<>();
 
     @Transient
     private Long numberOfRegisteredUsersTransient;
@@ -327,6 +333,14 @@ public class Exam extends DomainObject {
     public Exam removeRegisteredUser(User user) {
         this.registeredUsers.remove(user);
         return this;
+    }
+
+    public Set<GradeStep> getCourseGradeSteps() {
+        return courseGradeSteps;
+    }
+
+    public void setCourseGradeSteps(Set<GradeStep> courseGradeSteps) {
+        this.courseGradeSteps = courseGradeSteps;
     }
 
     public Long getNumberOfRegisteredUsers() {

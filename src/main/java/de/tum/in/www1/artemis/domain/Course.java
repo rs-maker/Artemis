@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import de.tum.in.www1.artemis.config.Constants;
+import de.tum.in.www1.artemis.domain.enumeration.CourseGradeType;
 import de.tum.in.www1.artemis.domain.enumeration.Language;
 import de.tum.in.www1.artemis.domain.exam.Exam;
 import de.tum.in.www1.artemis.domain.view.QuizView;
@@ -121,6 +122,10 @@ public class Course extends DomainObject {
     @Column(name = "presentation_score")
     private Integer presentationScore;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "course_grade_type")
+    private CourseGradeType courseGradeType = CourseGradeType.NONE; // default, must be overridden
+
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JsonIgnoreProperties("course")
@@ -143,6 +148,11 @@ public class Course extends DomainObject {
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JsonIgnoreProperties("course")
     private Set<Exam> exams = new HashSet<>();
+
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @JsonIgnoreProperties("course")
+    private Set<GradeStep> courseGradeSteps = new HashSet<>();
 
     // NOTE: Helpers variable names must be different from Getter name, so that Jackson ignores the @Transient annotation, but Hibernate still respects it
     @Transient
@@ -341,6 +351,14 @@ public class Course extends DomainObject {
         this.presentationScore = presentationScore;
     }
 
+    public CourseGradeType getCourseGradeType() {
+        return courseGradeType;
+    }
+
+    public void setCourseGradeType(CourseGradeType courseGradeType) {
+        this.courseGradeType = courseGradeType;
+    }
+
     public Set<Exercise> getExercises() {
         return exercises;
     }
@@ -488,5 +506,13 @@ public class Course extends DomainObject {
     public void removeLearningGoal(LearningGoal learningGoal) {
         this.learningGoals.remove(learningGoal);
         learningGoal.setCourse(null);
+    }
+
+    public Set<GradeStep> getCourseGradeSteps() {
+        return courseGradeSteps;
+    }
+
+    public void setCourseGradeSteps(Set<GradeStep> courseGradeSteps) {
+        this.courseGradeSteps = courseGradeSteps;
     }
 }
