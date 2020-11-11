@@ -1,29 +1,6 @@
 package de.tum.in.www1.artemis.service.connectors.gitlab;
 
-import static org.gitlab4j.api.models.AccessLevel.*;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.*;
-
-import javax.annotation.PostConstruct;
-
-import org.gitlab4j.api.GitLabApi;
-import org.gitlab4j.api.GitLabApiException;
-import org.gitlab4j.api.models.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-
 import com.fasterxml.jackson.databind.JsonNode;
-
 import de.tum.in.www1.artemis.domain.Commit;
 import de.tum.in.www1.artemis.domain.ProgrammingExercise;
 import de.tum.in.www1.artemis.domain.User;
@@ -37,6 +14,28 @@ import de.tum.in.www1.artemis.service.connectors.AbstractVersionControlService;
 import de.tum.in.www1.artemis.service.connectors.ConnectorHealth;
 import de.tum.in.www1.artemis.service.connectors.gitlab.dto.GitLabPushNotificationDTO;
 import de.tum.in.www1.artemis.service.util.UrlUtils;
+import org.gitlab4j.api.GitLabApi;
+import org.gitlab4j.api.GitLabApiException;
+import org.gitlab4j.api.models.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import javax.annotation.PostConstruct;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.time.Duration;
+import java.util.*;
+
+import static org.gitlab4j.api.models.AccessLevel.*;
 
 @Profile("gitlab")
 @Service
@@ -70,13 +69,16 @@ public class GitLabService extends AbstractVersionControlService {
 
     private final UrlService urlService;
 
+    private final TaskScheduler threadPoolTaskScheduler;
+
     public GitLabService(UserService userService, @Qualifier("gitlabRestTemplate") RestTemplate restTemplate, GitLabApi gitlab,
-            GitLabUserManagementService gitLabUserManagementService, UrlService urlService) {
+                         GitLabUserManagementService gitLabUserManagementService, UrlService urlService, @Qualifier("taskScheduler") TaskScheduler threadPoolTaskScheduler) {
         this.userService = userService;
         this.restTemplate = restTemplate;
         this.gitlab = gitlab;
         this.gitLabUserManagementService = gitLabUserManagementService;
         this.urlService = urlService;
+        this.threadPoolTaskScheduler = threadPoolTaskScheduler;
     }
 
     @PostConstruct
@@ -102,12 +104,14 @@ public class GitLabService extends AbstractVersionControlService {
             }
         }
 
-        try {
-            protectBranch("master", repositoryUrl);
-        }
-        catch (GitLabException ex) {
-            log.warn("Could not protect branch (but will still continue) due to the following reason: ", ex);
-        }
+        threadPoolTaskScheduler.scheduleWithFixedDelay(() -> {
+            //Async because https://github.com/ls1intum/Artemis/issues/2349
+            try {
+                protectBranch("master", repositoryUrl);
+            } catch (Exception ex) {
+                log.warn("Could not protect branch (but will still continue) due to the following reason: ", ex);
+            }
+        }, Duration.ofSeconds(20));
     }
 
     @Override
@@ -425,7 +429,7 @@ public class GitLabService extends AbstractVersionControlService {
         GROUPS("groups"), NAMESPACES("namespaces", "<groupId>"), DELETE_GROUP("groups", "<groupId>"), DELETE_PROJECT("projects", "<projectId>"), PROJECTS("projects"),
         GET_PROJECT("projects", "<projectId>"), FORK("projects", "<projectId>", "fork"), HEALTH("-", "liveness");
 
-        private List<String> pathSegments;
+        private final List<String> pathSegments;
 
         Endpoints(String... pathSegments) {
             this.pathSegments = Arrays.asList(pathSegments);
