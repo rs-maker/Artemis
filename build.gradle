@@ -91,7 +91,7 @@ springBoot {
 // Execute the test cases: ./gradlew executeTests
 
 test {
-    jvmArgs "-Xmx4096m -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+    jvmArgs "-Xmx2048m -XX:MaxPermSize=1024 -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
     useJUnitPlatform()
     exclude "**/*IT*", "**/*IntTest*", "**/*CucumberIT*"
     testLogging.showStandardStreams = true
