@@ -56,4 +56,7 @@ public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
 
     @EntityGraph(type = LOAD, attributePaths = { "studentParticipations", "studentParticipations.student", "studentParticipations.submissions" })
     Optional<Exercise> findWithEagerStudentParticipationsStudentAndSubmissionsById(Long exerciseId);
+
+    @Query("select distinct exercise from Exercise exercise left join fetch exercise.tutorScores where exercise.id = :#{#exerciseId}")
+    Optional<Exercise> findByIdWithEagerTutorScores(@Param("exerciseId") Long exerciseId);
 }
