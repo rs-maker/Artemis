@@ -45,11 +45,13 @@ public class AssessmentService {
 
     private final SubmissionService submissionService;
 
+    private final TutorScoreService tutorScoreService;
+
     private final Logger log = LoggerFactory.getLogger(AssessmentService.class);
 
     public AssessmentService(ComplaintResponseService complaintResponseService, ComplaintRepository complaintRepository, FeedbackRepository feedbackRepository,
-            ResultRepository resultRepository, StudentParticipationRepository studentParticipationRepository, ResultService resultService, SubmissionService submissionService,
-            SubmissionRepository submissionRepository, ExamService examService, GradingCriterionService gradingCriterionService, UserService userService) {
+                             ResultRepository resultRepository, StudentParticipationRepository studentParticipationRepository, ResultService resultService, SubmissionService submissionService,
+                             SubmissionRepository submissionRepository, ExamService examService, GradingCriterionService gradingCriterionService, UserService userService, TutorScoreService tutorScoreService) {
         this.complaintResponseService = complaintResponseService;
         this.complaintRepository = complaintRepository;
         this.feedbackRepository = feedbackRepository;
@@ -61,6 +63,7 @@ public class AssessmentService {
         this.examService = examService;
         this.gradingCriterionService = gradingCriterionService;
         this.userService = userService;
+        this.tutorScoreService = tutorScoreService;
     }
 
     Result submitResult(Result result, Exercise exercise, Double calculatedScore) {
@@ -302,6 +305,10 @@ public class AssessmentService {
         result.setRatedIfNotExceeded(exercise.getDueDate(), submissionDate);
         result.setCompletionDate(ZonedDateTime.now());
         Double calculatedScore = calculateTotalScore(result.getFeedbacks());
+
+        // add assessment to tutor scores
+        tutorScoreService.updateResult(result);
+
         return submitResult(result, exercise, calculatedScore);
     }
 
@@ -319,6 +326,11 @@ public class AssessmentService {
         Result result = submission.getResult();
         if (result == null) {
             result = submissionService.setNewResult(submission);
+        }
+
+        // remove from tutor scores if not first assessment
+        if (result.getScore() != null) {
+            tutorScoreService.removeResult(result);
         }
 
         result.setHasComplaint(false);

@@ -41,14 +41,17 @@ public class ComplaintService {
 
     private ExamService examService;
 
+    private TutorScoreService tutorScoreService;
+
     public ComplaintService(ComplaintRepository complaintRepository, ResultRepository resultRepository, ResultService resultService, CourseService courseService,
-            ExamService examService, UserService userService) {
+            ExamService examService, UserService userService, TutorScoreService tutorScoreService) {
         this.complaintRepository = complaintRepository;
         this.resultRepository = resultRepository;
         this.resultService = resultService;
         this.courseService = courseService;
         this.examService = examService;
         this.userService = userService;
+        this.tutorScoreService = tutorScoreService;
     }
 
     /**
@@ -113,6 +116,9 @@ public class ComplaintService {
         }
 
         resultRepository.save(originalResult);
+
+        // add complaint to tutor scores
+        tutorScoreService.addComplaintOrFeedbackRequest(complaint);
 
         return complaintRepository.save(complaint);
     }

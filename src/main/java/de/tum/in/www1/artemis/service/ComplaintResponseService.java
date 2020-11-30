@@ -34,12 +34,15 @@ public class ComplaintResponseService {
 
     private AuthorizationCheckService authorizationCheckService;
 
+    private TutorScoreService tutorScoreService;
+
     public ComplaintResponseService(ComplaintRepository complaintRepository, ComplaintResponseRepository complaintResponseRepository, UserService userService,
-            AuthorizationCheckService authorizationCheckService) {
+            AuthorizationCheckService authorizationCheckService, TutorScoreService tutorScoreService) {
         this.complaintRepository = complaintRepository;
         this.complaintResponseRepository = complaintResponseRepository;
         this.userService = userService;
         this.authorizationCheckService = authorizationCheckService;
+        this.tutorScoreService = tutorScoreService;
     }
 
     /**
@@ -87,6 +90,10 @@ public class ComplaintResponseService {
         // make sure the original complaint from the database is connected to the complaint response as we take it out later one and
         // potential changes on the client side (e.g. remove student id) should not be saved
         complaintResponse.setComplaint(originalComplaint);
+
+        // add complaint response to tutor scores
+        tutorScoreService.addComplaintResponseOrAnsweredFeedbackRequest(complaintResponse);
+
         return complaintResponseRepository.save(complaintResponse);
     }
 

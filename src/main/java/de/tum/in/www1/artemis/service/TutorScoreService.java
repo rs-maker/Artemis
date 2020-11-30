@@ -97,7 +97,7 @@ public class TutorScoreService {
             return;
         }
 
-        var exercise = exerciseRepository.findById(participation.getExercise().getId());
+        var exercise = exerciseRepository.findByIdWithEagerTutorScores(participation.getExercise().getId());
 
         var existingTutorScore = findTutorScoreFromExercise(exercise.get(), deletedResult.getAssessor());
 
@@ -132,7 +132,7 @@ public class TutorScoreService {
         }
 
         // make all tests but mine pass -> exercise not in db leads to foreign key exception in tests
-        var exercise = exerciseRepository.findById(participation.getExercise().getId());
+        var exercise = exerciseRepository.findByIdWithEagerTutorScores(participation.getExercise().getId());
         Double maxScore = 0.0;
 
         if (exercise.get().getMaxScore() != null) {
@@ -215,9 +215,9 @@ public class TutorScoreService {
      * @param complaintResponse ComplaintResponse
      */
     public void addComplaintResponseOrAnsweredFeedbackRequest(ComplaintResponse complaintResponse) {
-        var exercise = complaintResponse.getComplaint().getResult().getParticipation().getExercise();
+        var exercise = exerciseRepository.findByIdWithEagerTutorScores(complaintResponse.getComplaint().getResult().getParticipation().getExercise().getId());
         var complaint = complaintResponse.getComplaint();
-        var optionalTutorScore = findTutorScoreFromExercise(exercise, complaintResponse.getReviewer());
+        var optionalTutorScore = findTutorScoreFromExercise(exercise.get(), complaintResponse.getReviewer());
 
         TutorScore tutorScore;
 
@@ -225,17 +225,17 @@ public class TutorScoreService {
             tutorScore = optionalTutorScore.get();
         }
         else {
-            tutorScore = new TutorScore(complaintResponse.getReviewer(), exercise, 0, 0);
+            tutorScore = new TutorScore(complaintResponse.getReviewer(), exercise.get(), 0, 0);
         }
 
         if (complaint.getComplaintType() == ComplaintType.COMPLAINT) {
             tutorScore.setComplaintResponses(tutorScore.getComplaintResponses() + 1);
-            tutorScore.setComplaintResponsesPoints(tutorScore.getComplaintResponsesPoints() + exercise.getMaxScore());
+            tutorScore.setComplaintResponsesPoints(tutorScore.getComplaintResponsesPoints() + exercise.get().getMaxScore());
         }
 
         if (complaint.getComplaintType() == ComplaintType.MORE_FEEDBACK) {
             tutorScore.setAnsweredFeedbackRequests(tutorScore.getAnsweredFeedbackRequests() + 1);
-            tutorScore.setAnsweredFeedbackRequestsPoints(tutorScore.getAnsweredFeedbackRequestsPoints() + exercise.getMaxScore());
+            tutorScore.setAnsweredFeedbackRequestsPoints(tutorScore.getAnsweredFeedbackRequestsPoints() + exercise.get().getMaxScore());
             tutorScore.setNotAnsweredFeedbackRequests(tutorScore.getNotAnsweredFeedbackRequests() - 1);
         }
 
@@ -248,8 +248,8 @@ public class TutorScoreService {
      * @param complaint Complaint
      */
     public void removeComplaintOrFeedbackRequest(Complaint complaint) {
-        var exercise = complaint.getResult().getParticipation().getExercise();
-        var optionalTutorScore = findTutorScoreFromExercise(exercise, complaint.getResult().getAssessor());
+        var exercise = exerciseRepository.findByIdWithEagerTutorScores(complaint.getResult().getParticipation().getExercise().getId());
+        var optionalTutorScore = findTutorScoreFromExercise(exercise.get(), complaint.getResult().getAssessor());
 
         if (optionalTutorScore.isEmpty()) {
             return;
@@ -260,7 +260,7 @@ public class TutorScoreService {
         if (complaint.getComplaintType() == ComplaintType.COMPLAINT) {
             if (tutorScore.getAllComplaints() > 0) {
                 tutorScore.setAllComplaints(tutorScore.getAllComplaints() - 1);
-                tutorScore.setComplaintsPoints(tutorScore.getComplaintsPoints() - exercise.getMaxScore());
+                tutorScore.setComplaintsPoints(tutorScore.getComplaintsPoints() - exercise.get().getMaxScore());
             }
 
             if (Boolean.TRUE.equals(complaint.isAccepted())) {
@@ -274,7 +274,7 @@ public class TutorScoreService {
         if (complaint.getComplaintType() == ComplaintType.MORE_FEEDBACK) {
             if (tutorScore.getAllFeedbackRequests() > 0) {
                 tutorScore.setAllFeedbackRequests(tutorScore.getAllFeedbackRequests() - 1);
-                tutorScore.setFeedbackRequestsPoints(tutorScore.getFeedbackRequestsPoints() - exercise.getMaxScore());
+                tutorScore.setFeedbackRequestsPoints(tutorScore.getFeedbackRequestsPoints() - exercise.get().getMaxScore());
             }
 
             if (!Boolean.TRUE.equals(complaint.isAccepted())) {
@@ -293,9 +293,9 @@ public class TutorScoreService {
      * @param complaintResponse ComplaintResponse
      */
     public void removeComplaintResponseOrAnsweredFeedbackRequest(ComplaintResponse complaintResponse) {
-        var exercise = complaintResponse.getComplaint().getResult().getParticipation().getExercise();
+        var exercise = exerciseRepository.findByIdWithEagerTutorScores(complaintResponse.getComplaint().getResult().getParticipation().getExercise().getId());
         var complaint = complaintResponse.getComplaint();
-        var optionalTutorScore = findTutorScoreFromExercise(exercise, complaintResponse.getReviewer());
+        var optionalTutorScore = findTutorScoreFromExercise(exercise.get(), complaintResponse.getReviewer());
 
         if (optionalTutorScore.isEmpty()) {
             return;
@@ -306,14 +306,14 @@ public class TutorScoreService {
         if (complaint.getComplaintType() == ComplaintType.COMPLAINT) {
             if (tutorScore.getComplaintResponses() > 0) {
                 tutorScore.setComplaintResponses(tutorScore.getComplaintResponses() - 1);
-                tutorScore.setComplaintResponsesPoints(tutorScore.getComplaintResponsesPoints() - exercise.getMaxScore());
+                tutorScore.setComplaintResponsesPoints(tutorScore.getComplaintResponsesPoints() - exercise.get().getMaxScore());
             }
         }
 
         if (complaint.getComplaintType() == ComplaintType.MORE_FEEDBACK) {
             if (tutorScore.getAnsweredFeedbackRequests() > 0) {
                 tutorScore.setAnsweredFeedbackRequests(tutorScore.getAnsweredFeedbackRequests() - 1);
-                tutorScore.setAnsweredFeedbackRequestsPoints(tutorScore.getAnsweredFeedbackRequestsPoints() - exercise.getMaxScore());
+                tutorScore.setAnsweredFeedbackRequestsPoints(tutorScore.getAnsweredFeedbackRequestsPoints() - exercise.get().getMaxScore());
             }
         }
 

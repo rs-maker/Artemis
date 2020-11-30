@@ -19,12 +19,15 @@ public class ProgrammingAssessmentService extends AssessmentService {
 
     private final UserService userService;
 
+    private final TutorScoreService tutorScoreService;
+
     public ProgrammingAssessmentService(ComplaintResponseService complaintResponseService, ComplaintRepository complaintRepository, FeedbackRepository feedbackRepository,
-            ResultRepository resultRepository, StudentParticipationRepository studentParticipationRepository, ResultService resultService, SubmissionService submissionService,
-            SubmissionRepository submissionRepository, ExamService examService, UserService userService, GradingCriterionService gradingCriterionService) {
+                                        ResultRepository resultRepository, StudentParticipationRepository studentParticipationRepository, ResultService resultService, SubmissionService submissionService,
+                                        SubmissionRepository submissionRepository, ExamService examService, UserService userService, GradingCriterionService gradingCriterionService, TutorScoreService tutorScoreService) {
         super(complaintResponseService, complaintRepository, feedbackRepository, resultRepository, studentParticipationRepository, resultService, submissionService,
-                submissionRepository, examService, gradingCriterionService, userService);
+                submissionRepository, examService, gradingCriterionService, userService, tutorScoreService);
         this.userService = userService;
+        this.tutorScoreService = tutorScoreService;
     }
 
     /**
@@ -36,6 +39,11 @@ public class ProgrammingAssessmentService extends AssessmentService {
      */
     public Result saveManualAssessment(Result result) {
         result.setHasFeedback(!result.getFeedbacks().isEmpty());
+
+        // remove from tutor scores if already has manual assessment
+        if (result.getAssessor() != null) {
+            tutorScoreService.removeResult(result);
+        }
 
         User user = userService.getUserWithGroupsAndAuthorities();
         result.setHasComplaint(false);
