@@ -45,13 +45,15 @@ public class AssessmentService {
 
     private final SubmissionService submissionService;
 
+    private final LtiService ltiService;
+
     private final TutorScoreService tutorScoreService;
 
     private final Logger log = LoggerFactory.getLogger(AssessmentService.class);
 
     public AssessmentService(ComplaintResponseService complaintResponseService, ComplaintRepository complaintRepository, FeedbackRepository feedbackRepository,
             ResultRepository resultRepository, StudentParticipationRepository studentParticipationRepository, ResultService resultService, SubmissionService submissionService,
-            SubmissionRepository submissionRepository, ExamService examService, GradingCriterionService gradingCriterionService, UserService userService,
+            SubmissionRepository submissionRepository, ExamService examService, GradingCriterionService gradingCriterionService, UserService userService, LtiService ltiService, 
             TutorScoreService tutorScoreService) {
         this.complaintResponseService = complaintResponseService;
         this.complaintRepository = complaintRepository;
@@ -64,6 +66,7 @@ public class AssessmentService {
         this.examService = examService;
         this.gradingCriterionService = gradingCriterionService;
         this.userService = userService;
+        this.ltiService = ltiService;
         this.tutorScoreService = tutorScoreService;
     }
 
@@ -200,8 +203,9 @@ public class AssessmentService {
                 .orElseThrow(() -> new BadRequestAlertException("Participation could not be found", "participation", "notfound"));
         Result result = submission.getResult();
 
-        /** For programming exercises we need to delete the submission of the manual result as well, as for each new manual result a new submission will be generated.
-        *  The CascadeType.REMOVE of {@link Submission#result} will delete also the result and the corresponding feedbacks {@link Result#feedbacks}.
+        /*
+         * For programming exercises we need to delete the submission of the manual result as well, as for each new manual result a new submission will be generated. The
+         * CascadeType.REMOVE of {@link Submission#result} will delete also the result and the corresponding feedbacks {@link Result#feedbacks}.
          */
         if (participation instanceof ProgrammingExerciseStudentParticipation) {
             participation.removeSubmissions(submission);
@@ -306,11 +310,14 @@ public class AssessmentService {
         result.setRatedIfNotExceeded(exercise.getDueDate(), submissionDate);
         result.setCompletionDate(ZonedDateTime.now());
         Double calculatedScore = calculateTotalScore(result.getFeedbacks());
+        result = submitResult(result, exercise, calculatedScore);
 
         // add assessment to tutor scores
         tutorScoreService.updateResult(result);
 
-        return submitResult(result, exercise, calculatedScore);
+        // Note: we always need to report the result (independent of the assessment due date) over LTI, otherwise it might never become visible in the external system
+        ltiService.onNewResult((StudentParticipation) result.getParticipation());
+        return result;
     }
 
     /**
