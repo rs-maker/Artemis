@@ -1,29 +1,5 @@
 package de.tum.in.www1.artemis.service;
 
-import static de.tum.in.www1.artemis.domain.enumeration.BuildPlanType.SOLUTION;
-import static de.tum.in.www1.artemis.domain.enumeration.BuildPlanType.TEMPLATE;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.ZonedDateTime;
-import java.util.*;
-
-import javax.annotation.Nullable;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import de.tum.in.www1.artemis.ResourceLoaderService;
 import de.tum.in.www1.artemis.config.Constants;
 import de.tum.in.www1.artemis.domain.*;
@@ -45,6 +21,29 @@ import de.tum.in.www1.artemis.service.util.structureoraclegenerator.OracleGenera
 import de.tum.in.www1.artemis.web.rest.dto.PageableSearchDTO;
 import de.tum.in.www1.artemis.web.rest.dto.SearchResultPageDTO;
 import de.tum.in.www1.artemis.web.rest.errors.EntityNotFoundException;
+import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.gitlab4j.api.GitLabApiException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Nullable;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.ZonedDateTime;
+import java.util.*;
+
+import static de.tum.in.www1.artemis.domain.enumeration.BuildPlanType.SOLUTION;
+import static de.tum.in.www1.artemis.domain.enumeration.BuildPlanType.TEMPLATE;
 
 @Service
 public class ProgrammingExerciseService {
@@ -983,5 +982,24 @@ public class ProgrammingExerciseService {
         if (exercise instanceof ProgrammingExercise && (((ProgrammingExercise) exercise).getTestRepositoryUrl()).contains("artemislocalhost")) {
             ((ProgrammingExercise) exercise).setIsLocalSimulation(true);
         }
+    }
+
+    public void checkIfProgrammingExerciseSolutionWasReleased(ProgrammingExercise updatedProgrammingExercise) throws CouldNotReleaseExercise {
+        ProgrammingExercise oldExercise = programmingExerciseRepository.getOne(updatedProgrammingExercise.getId());
+        if (!oldExercise.getReleased() && updatedProgrammingExercise.getReleased()) {
+            if (versionControlService.isPresent()) {
+                try {
+                    versionControlService.get().releaseSolutionFor(updatedProgrammingExercise);
+                } catch (GitLabApiException ex) {
+                    log.warn("Could not release exercise, updating users so group is created", ex);
+                    userService.updateUserVersionCrotrollUsers();
+                    throw new CouldNotReleaseExercise();
+                }
+            }
+        }
+    }
+
+    public static class CouldNotReleaseExercise extends Exception {
+
     }
 }

@@ -1,23 +1,5 @@
 package de.tum.in.www1.artemis.service.connectors.gitlab;
 
-import static org.gitlab4j.api.models.AccessLevel.GUEST;
-import static org.gitlab4j.api.models.AccessLevel.MAINTAINER;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.gitlab4j.api.GitLabApi;
-import org.gitlab4j.api.GitLabApiException;
-import org.gitlab4j.api.models.AccessLevel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Service;
-
 import de.tum.in.www1.artemis.domain.Course;
 import de.tum.in.www1.artemis.domain.ProgrammingExercise;
 import de.tum.in.www1.artemis.domain.User;
@@ -25,6 +7,25 @@ import de.tum.in.www1.artemis.repository.ProgrammingExerciseRepository;
 import de.tum.in.www1.artemis.repository.UserRepository;
 import de.tum.in.www1.artemis.service.UserService;
 import de.tum.in.www1.artemis.service.connectors.VcsUserManagementService;
+import org.gitlab4j.api.GitLabApi;
+import org.gitlab4j.api.GitLabApiException;
+import org.gitlab4j.api.models.AccessLevel;
+import org.gitlab4j.api.models.Group;
+import org.gitlab4j.api.models.GroupParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.gitlab4j.api.models.AccessLevel.GUEST;
+import static org.gitlab4j.api.models.AccessLevel.MAINTAINER;
 
 @Service
 @Profile("gitlab")
@@ -78,55 +79,99 @@ public class GitLabUserManagementService implements VcsUserManagementService {
 
             // Add as member to new groups
             if (addedGroups != null && !addedGroups.isEmpty()) {
-                final var exercisesWithAddedGroups = programmingExerciseRepository.findAllByInstructorOrTAGroupNameIn(addedGroups);
-                for (final var exercise : exercisesWithAddedGroups) {
-                    final var accessLevel = addedGroups.contains(exercise.getCourseViaExerciseGroupOrCourseMember().getInstructorGroupName()) ? MAINTAINER : GUEST;
-                    try {
-                        gitlab.getGroupApi().addMember(exercise.getProjectKey(), gitlabUser.getId(), accessLevel);
-                    }
-                    catch (GitLabApiException ex) {
-                        // if user is already member of group in GitLab, ignore the exception
-                        // to synchronize the "membership" with artemis
-                        if ("Member already exists".equalsIgnoreCase(ex.getMessage())) {
-                            continue;
-                        }
-                    }
+                addUserToGroupAndCreateIfNotExisting(addedGroups, gitlabUser);
 
-                }
+                addUsersOfInstructorGroupToTheirStudentsRepositories(addedGroups, gitlabUser);
             }
 
             // Update/remove old groups
             if (removedGroups != null && !removedGroups.isEmpty()) {
-                final var exercisesWithOutdatedGroups = programmingExerciseRepository.findAllByInstructorOrTAGroupNameIn(removedGroups);
-                for (final var exercise : exercisesWithOutdatedGroups) {
-                    // If the the user is still in another group for the exercise (TA -> INSTRUCTOR or INSTRUCTOR -> TA),
-                    // then we have to add him as a member with the new access level
-                    final var course = exercise.getCourseViaExerciseGroupOrCourseMember();
-                    if (user.getGroups().contains(course.getInstructorGroupName())) {
-                        gitlab.getGroupApi().updateMember(exercise.getProjectKey(), gitlabUser.getId(), MAINTAINER);
-                    }
-                    else if (user.getGroups().contains(course.getTeachingAssistantGroupName())) {
-                        gitlab.getGroupApi().updateMember(exercise.getProjectKey(), gitlabUser.getId(), GUEST);
-                    }
-                    else {
-                        // If the user is not a member of any relevant group any more, we can remove him from the exercise
-                        try {
-                            gitlab.getGroupApi().removeMember(exercise.getProjectKey(), gitlabUser.getId());
-                        }
-                        catch (GitLabApiException e) {
-                            // If user membership to group is missing on Gitlab, ignore the exception
-                            // and let artemis synchronize with GitLab groups
-                            if (e.getHttpStatus() == 404) {
-                                continue;
-                            }
-                        }
+                removeUserFromGroup(removedGroups, gitlabUser);
+                removeUsersFromReposTheyShouldNotHaveAccessToAnyMore(user, removedGroups, gitlabUser);
+            }
+        } catch (GitLabApiException e) {
+            throw new GitLabException("Error while trying to update user in GitLab: " + user, e);
+        }
+    }
 
+    private void removeUserFromGroup(Set<String> removedGroups, org.gitlab4j.api.models.User gitlabUser) {
+        for (final String group : removedGroups) {
+            try {
+                gitlab.getGroupApi().removeMember(group, gitlabUser.getId());
+            } catch (GitLabApiException ex) {
+                log.warn("User {} could not be removed from his group {}", gitlabUser.getName(), group, ex);
+            }
+        }
+    }
+
+    private void addUserToGroupAndCreateIfNotExisting(Set<String> addedGroups, org.gitlab4j.api.models.User gitlabUser) throws GitLabApiException {
+        for (final String group : addedGroups) {
+            try {
+                Group gitLabGroup = getGroupByName(group);
+                if (gitLabGroup == null) {
+                    GroupParams groupParams = new GroupParams()
+                        .withName(group)
+                        .withPath(group)
+                        .withVisibility("private")
+                        .withEmailsDisabled(true);
+
+                    gitlab.getGroupApi().createGroup(groupParams);
+                }
+                //Add some point setting the Level according to user authorities might be interesting
+                gitlab.getGroupApi().addMember(group, gitlabUser.getId(), GUEST);
+            } catch (GitLabApiException ex) {
+                log.warn("User {} could not be added to his group {}", gitlabUser.getName(), group, ex);
+            }
+        }
+    }
+
+    private Group getGroupByName(String group) {
+        try {
+            return gitlab.getGroupApi().getGroup(group);
+        } catch (Exception ignored) {
+            log.debug("Group {} could not be fetched", group);
+            return null;
+        }
+    }
+
+    private void removeUsersFromReposTheyShouldNotHaveAccessToAnyMore(User user, Set<String> removedGroups, org.gitlab4j.api.models.User gitlabUser) throws GitLabApiException {
+        final var exercisesWithOutdatedGroups = programmingExerciseRepository.findAllByInstructorOrTAGroupNameIn(removedGroups);
+        for (final var exercise : exercisesWithOutdatedGroups) {
+            // If the the user is still in another group for the exercise (TA -> INSTRUCTOR or INSTRUCTOR -> TA),
+            // then we have to add him as a member with the new access level
+            final var course = exercise.getCourseViaExerciseGroupOrCourseMember();
+            if (user.getGroups().contains(course.getInstructorGroupName())) {
+                gitlab.getGroupApi().updateMember(exercise.getProjectKey(), gitlabUser.getId(), MAINTAINER);
+            } else if (user.getGroups().contains(course.getTeachingAssistantGroupName())) {
+                gitlab.getGroupApi().updateMember(exercise.getProjectKey(), gitlabUser.getId(), GUEST);
+            } else {
+                // If the user is not a member of any relevant group any more, we can remove him from the exercise
+                try {
+                    gitlab.getGroupApi().removeMember(exercise.getProjectKey(), gitlabUser.getId());
+                } catch (GitLabApiException ex) {
+                    // If user membership to group is missing on Gitlab, ignore the exception
+                    // and let artemis synchronize with GitLab groups
+                    if (ex.getHttpStatus() != 404) {
+                        log.error("Gitlab Exception when removing a user " + gitlabUser.getId() + " to a group " + exercise.getProjectKey() + ": " + ex.getMessage(), ex);
                     }
                 }
             }
         }
-        catch (GitLabApiException e) {
-            throw new GitLabException("Error while trying to update user in GitLab: " + user, e);
+    }
+
+    private void addUsersOfInstructorGroupToTheirStudentsRepositories(Set<String> addedGroups, org.gitlab4j.api.models.User gitlabUser) {
+        final var exercisesWithAddedGroups = programmingExerciseRepository.findAllByInstructorOrTAGroupNameIn(addedGroups);
+        for (final var exercise : exercisesWithAddedGroups) {
+            final var accessLevel = addedGroups.contains(exercise.getCourseViaExerciseGroupOrCourseMember().getInstructorGroupName()) ? MAINTAINER : GUEST;
+            try {
+                gitlab.getGroupApi().addMember(exercise.getProjectKey(), gitlabUser.getId(), accessLevel);
+            } catch (GitLabApiException ex) {
+                // if user is already member of group in GitLab, ignore the exception to synchronize the "membership" with artemis
+                // ignore other errors
+                if (!"Member already exists".equalsIgnoreCase(ex.getMessage())) {
+                    log.error("Gitlab Exception when adding a user " + gitlabUser.getId() + " to a group " + exercise.getProjectKey() + ": " + ex.getMessage(), ex);
+                }
+            }
         }
     }
 

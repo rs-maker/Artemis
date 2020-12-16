@@ -1,13 +1,18 @@
 package de.tum.in.www1.artemis.service.connectors.gitlab;
 
-import static org.gitlab4j.api.models.AccessLevel.*;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.*;
-
-import javax.annotation.PostConstruct;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import de.tum.in.www1.artemis.domain.Commit;
+import de.tum.in.www1.artemis.domain.User;
+import de.tum.in.www1.artemis.domain.*;
+import de.tum.in.www1.artemis.domain.enumeration.InitializationState;
+import de.tum.in.www1.artemis.domain.participation.ProgrammingExerciseParticipation;
+import de.tum.in.www1.artemis.exception.VersionControlException;
+import de.tum.in.www1.artemis.service.UrlService;
+import de.tum.in.www1.artemis.service.UserService;
+import de.tum.in.www1.artemis.service.connectors.AbstractVersionControlService;
+import de.tum.in.www1.artemis.service.connectors.ConnectorHealth;
+import de.tum.in.www1.artemis.service.connectors.gitlab.dto.GitLabPushNotificationDTO;
+import de.tum.in.www1.artemis.service.util.UrlUtils;
 import org.gitlab4j.api.GitLabApi;
 import org.gitlab4j.api.GitLabApiException;
 import org.gitlab4j.api.models.*;
@@ -22,21 +27,12 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import javax.annotation.PostConstruct;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
 
-import de.tum.in.www1.artemis.domain.Commit;
-import de.tum.in.www1.artemis.domain.ProgrammingExercise;
-import de.tum.in.www1.artemis.domain.User;
-import de.tum.in.www1.artemis.domain.VcsRepositoryUrl;
-import de.tum.in.www1.artemis.domain.enumeration.InitializationState;
-import de.tum.in.www1.artemis.domain.participation.ProgrammingExerciseParticipation;
-import de.tum.in.www1.artemis.exception.VersionControlException;
-import de.tum.in.www1.artemis.service.UrlService;
-import de.tum.in.www1.artemis.service.UserService;
-import de.tum.in.www1.artemis.service.connectors.AbstractVersionControlService;
-import de.tum.in.www1.artemis.service.connectors.ConnectorHealth;
-import de.tum.in.www1.artemis.service.connectors.gitlab.dto.GitLabPushNotificationDTO;
-import de.tum.in.www1.artemis.service.util.UrlUtils;
+import static org.gitlab4j.api.models.AccessLevel.*;
 
 @Profile("gitlab")
 @Service
@@ -104,11 +100,21 @@ public class GitLabService extends AbstractVersionControlService {
 
         try {
             protectBranch("master", repositoryUrl);
-        }
-        catch (GitLabException ex) {
+        } catch (GitLabException ex) {
             log.warn("Could not protect branch (but will still continue) due to the following reason: ", ex);
         }
     }
+
+    @Override
+    public void releaseSolutionFor(ProgrammingExercise programmingExercise) throws GitLabApiException {
+        String solutionRepositoryUrl = programmingExercise.getSolutionRepositoryUrl();
+        Course courseViaExerciseGroupOrCourseMember = programmingExercise.getCourseViaExerciseGroupOrCourseMember();
+        String studentGroupName = courseViaExerciseGroupOrCourseMember.getStudentGroupName();
+
+        Group group = gitlab.getGroupApi().getGroup(studentGroupName);
+        gitlab.getProjectApi().shareProject(solutionRepositoryUrl, group.getId(), GUEST, null);
+    }
+
 
     @Override
     public void addMemberToRepository(URL repositoryUrl, User user) {
@@ -117,13 +123,11 @@ public class GitLabService extends AbstractVersionControlService {
 
         try {
             gitlab.getProjectApi().addMember(repositoryId, userId, DEVELOPER);
-        }
-        catch (GitLabApiException e) {
+        } catch (GitLabApiException e) {
             if (e.getValidationErrors().containsKey("access_level")
-                    && e.getValidationErrors().get("access_level").stream().anyMatch(s -> s.contains("should be greater than or equal to"))) {
+                && e.getValidationErrors().get("access_level").stream().anyMatch(s -> s.contains("should be greater than or equal to"))) {
                 log.warn("Member already has the requested permissions! Permission stays the same");
-            }
-            else {
+            } else {
                 throw new GitLabException("Error while trying to add user to repository: " + user.getLogin() + " to repo " + repositoryUrl, e);
             }
         }
@@ -425,7 +429,7 @@ public class GitLabService extends AbstractVersionControlService {
         GROUPS("groups"), NAMESPACES("namespaces", "<groupId>"), DELETE_GROUP("groups", "<groupId>"), DELETE_PROJECT("projects", "<projectId>"), PROJECTS("projects"),
         GET_PROJECT("projects", "<projectId>"), FORK("projects", "<projectId>", "fork"), HEALTH("-", "liveness");
 
-        private List<String> pathSegments;
+        private final List<String> pathSegments;
 
         Endpoints(String... pathSegments) {
             this.pathSegments = Arrays.asList(pathSegments);
