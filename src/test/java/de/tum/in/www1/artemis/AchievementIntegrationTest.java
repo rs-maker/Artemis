@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import de.tum.in.www1.artemis.domain.*;
+import de.tum.in.www1.artemis.domain.enumeration.AchievementType;
 import de.tum.in.www1.artemis.domain.modeling.ModelingExercise;
 import de.tum.in.www1.artemis.repository.*;
 import de.tum.in.www1.artemis.service.AchievementService;
@@ -34,9 +35,6 @@ public class AchievementIntegrationTest extends AbstractSpringIntegrationBambooB
 
     @Autowired
     UserRepository userRepository;
-
-    @Autowired
-    AchievementRepository achievementRepository;
 
     @Autowired
     CourseRepository courseRepository;
@@ -65,6 +63,11 @@ public class AchievementIntegrationTest extends AbstractSpringIntegrationBambooB
         instructor.setGroups(new HashSet<>(Arrays.asList("instructor")));
         firstCourse = database.addCourseWithModelingAndTextAndFileUploadExercise();
         firstCourse.setAchievementsEnabled(true);
+        var activeAchievements = new HashSet<AchievementType>();
+        activeAchievements.add(AchievementType.POINT);
+        activeAchievements.add(AchievementType.TIME);
+        activeAchievements.add(AchievementType.PROGRESS);
+        firstCourse.setActiveAchievements(activeAchievements);
         courseRepository.save(firstCourse);
         secondCourse = database.addCourseWithModelingAndTextAndFileUploadExercise();
         firstExercise = (ModelingExercise) firstCourse.getExercises().stream().findFirst().get();
@@ -126,8 +129,8 @@ public class AchievementIntegrationTest extends AbstractSpringIntegrationBambooB
     }
 
     private void initTest() throws Exception {
-        var allAchievements = achievementRepository.findAllByCourseId(firstCourse.getId());
-        allAchievements.addAll(achievementRepository.findAllByCourseId(secondCourse.getId()));
+        var allAchievements = achievementService.findAllByCourseId(firstCourse.getId());
+        allAchievements.addAll(achievementService.findAllByCourseId(secondCourse.getId()));
 
         for (Achievement achievement : allAchievements) {
             student.addAchievement(achievement);
