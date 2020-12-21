@@ -1,5 +1,6 @@
 package de.tum.in.www1.artemis.web.rest;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import de.tum.in.www1.artemis.domain.Achievement;
 import de.tum.in.www1.artemis.domain.Course;
 import de.tum.in.www1.artemis.domain.User;
+import de.tum.in.www1.artemis.domain.enumeration.AchievementRank;
 import de.tum.in.www1.artemis.domain.enumeration.AchievementType;
 import de.tum.in.www1.artemis.repository.AchievementRepository;
 import de.tum.in.www1.artemis.service.AchievementService;
@@ -65,7 +67,16 @@ public class AchievementResource {
     public ResponseEntity<Set<Achievement>> getEarnedAchievementsForUserInCourse(@PathVariable Long courseId) {
         User user = userService.getUserWithGroupsAndAuthorities();
         log.debug("REST request to get earned achievements for user : {} in course : {}", user.getLogin(), courseId);
-        Set<Achievement> achievements = achievementService.findAllByUserIdAndCourseId(user.getId(), courseId);
+        // Set<Achievement> achievements = achievementService.findAllByUserIdAndCourseId(user.getId(), courseId);
+        Set<Achievement> achievements = new HashSet<>();
+        achievements.add(new Achievement("Supersonic", "Hand in your submission within 1 day(s) after the release of an exercise", "calendar-check", AchievementRank.GOLD,
+                AchievementType.TIME, 1L, 50L, null, null));
+        achievements.add(new Achievement("Roadrunner", "Hand in your submission within 2 days after the release of an exercise", "calendar-check", AchievementRank.SILVER,
+                AchievementType.TIME, 2L, 50L, null, null));
+        achievements.add(new Achievement("Mastermind", "Solve at least 10 exercises", "tasks", AchievementRank.GOLD, AchievementType.PROGRESS, 10L, 50L, null, null));
+        achievements.add(new Achievement("First Steps", "Solve your first exercise", "tasks", AchievementRank.UNRANKED, AchievementType.PROGRESS, 1L, 50L, null, null));
+        achievements
+                .add(new Achievement("Bull's Eye", "Score 100 percent of the points in an exercise", "award", AchievementRank.GOLD, AchievementType.POINT, 100L, null, null, null));
         achievementService.prepareForClient(achievements);
         return ResponseEntity.ok(achievements);
     }
