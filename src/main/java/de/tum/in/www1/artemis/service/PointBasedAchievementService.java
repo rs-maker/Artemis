@@ -60,7 +60,7 @@ public class PointBasedAchievementService {
      */
     public void generateAchievements(Course course) {
         Set<Achievement> achievementsToSave = new HashSet<>();
-        achievementsToSave.add(new Achievement("Point Master", "Score " + PERCENT_GOLD + " percent of the points in an exercise", "award", AchievementRank.GOLD,
+        achievementsToSave.add(new Achievement("Bull's Eye", "Score " + PERCENT_GOLD + " percent of the points in an exercise", "award", AchievementRank.GOLD,
                 AchievementType.POINT, PERCENT_GOLD, null, course, null));
         achievementsToSave.add(new Achievement("Point Intermediate", "Score at least" + PERCENT_SILVER + " percent of the points in an exercise", "award", AchievementRank.SILVER,
                 AchievementType.POINT, PERCENT_SILVER, null, course, null));

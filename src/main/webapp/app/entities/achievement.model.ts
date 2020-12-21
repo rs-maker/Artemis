@@ -10,7 +10,7 @@ export enum AchievementRank {
 export enum AchievementType {
     POINT = 'POINT',
     TIME = 'TIME',
-    PROGRESS = 'PROGRESSS',
+    PROGRESS = 'PROGRESS',
 }
 
 export class Achievement implements BaseEntity {
@@ -20,6 +20,21 @@ export class Achievement implements BaseEntity {
     icon?: string;
     rank?: AchievementRank;
     type?: AchievementType;
+    successCriteria?: number;
+    minScoreToQualify?: number;
+
+    constructor() {}
+}
+
+export class AchievementConfiguration {
+    isActive?: boolean;
+    icon?: string;
+    type?: string;
+    successCriteriaUnranked?: number;
+    successCriteriaBronze?: number;
+    successCriteriaSilver?: number;
+    successCriteriaGold?: number;
+    minScore?: number;
 
     constructor() {}
 }

@@ -1,8 +1,15 @@
 {
     "artemisApp": {
         "achievements": {
+            "pageTitle": "Achievements",
+            "active": "Aktiv",
             "title": "Titel",
-            "description": "Beschreibung"
+            "type": "Typ",
+            "description": "Beschreibung",
+            "configure": "Konfiguration der Achievements",
+            "pointDescription": "Anzahl der Punkte in Prozent",
+            "timeDescription": "Anzahl der Tage innerhalb der die Abgabe erfolgen muss",
+            "progressDescription": "Anzahl der Abgaben gesamt"
         }
     }
 }

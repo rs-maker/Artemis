@@ -16,6 +16,7 @@ import { RatingListComponent } from 'app/exercises/shared/rating/rating-list/rat
 import { LearningGoalManagementComponent } from 'app/course/learning-goals/learning-goal-management/learning-goal-management.component';
 import { CreateLearningGoalComponent } from 'app/course/learning-goals/create-learning-goal/create-learning-goal.component';
 import { EditLearningGoalComponent } from 'app/course/learning-goals/edit-learning-goal/edit-learning-goal.component';
+import { AchievementsManagementComponent } from 'app/achievements/achievements-management.component';
 
 @Injectable({ providedIn: 'root' })
 export class CourseResolve implements Resolve<Course> {
@@ -102,6 +103,15 @@ export const courseManagementState: Routes = [
                 data: {
                     authorities: [Authority.INSTRUCTOR, Authority.ADMIN],
                     pageTitle: 'artemisApp.ratingList.pageTitle',
+                },
+                canActivate: [UserRouteAccessService],
+            },
+            {
+                path: 'achievements',
+                component: AchievementsManagementComponent,
+                data: {
+                    authorities: [Authority.INSTRUCTOR, Authority.ADMIN],
+                    pageTitle: 'artemisApp.achievements.pageTitle',
                 },
                 canActivate: [UserRouteAccessService],
             },

@@ -1,0 +1,69 @@
+<div class="grading-table-layout">
+    <div>
+        <div class="d-flex justify-content-between mb-3">
+            <div>
+                <h2 class="mb-1" jhiTranslate="artemisApp.achievements.configure">Configure Achievements</h2>
+            </div>
+            <button class="btn btn-primary" jhiTranslate="entity.action.save" (click)="save()">Save</button>
+        </div>
+
+        <ngx-datatable
+            id="achievementTable"
+            class="bootstrap"
+            [headerHeight]="50"
+            [limit]="20"
+            [columnMode]="'force'"
+            [footerHeight]="50"
+            [rowHeight]="'auto'"
+            [rows]="achievementConfigs"
+            [sorts]="[{ prop: 'type', dir: 'asc' }]"
+            [rowClass]="getRowClass"
+        >
+            <ngx-datatable-column name="{{ 'artemisApp.achievements.active' | translate }}" prop="isActive">
+                <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row">
+                    <jhi-table-editable-checkbox [value]="value" (onValueUpdate)="valueChanged()"></jhi-table-editable-checkbox>
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Icon" prop="icon">
+                <ng-template ngx-datatable-cell-template let-value="value">
+                    <fa-icon [icon]="value" class="mr-2"></fa-icon>
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="{{ 'artemisApp.achievements.type' | translate }}" prop="type">
+                <ng-template ngx-datatable-cell-template let-value="value">
+                    {{ value }}
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="{{ 'artemisApp.achievements.description' | translate }}" prop="type">
+                <ng-template ngx-datatable-cell-template let-value="value.toLowerCase()">
+                    {{ 'artemisApp.achievements.' + value + 'Description' | translate }}
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Unranked" prop="successCriteriaUnranked">
+                <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
+                    <jhi-table-editable-field [value]="value" (onValueUpdate)="valueChanged()"></jhi-table-editable-field>
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Bronze" prop="successCriteriaBronze">
+                <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
+                    <jhi-table-editable-field [value]="value" (onValueUpdate)="valueChanged()"></jhi-table-editable-field>
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Silver" prop="successCriteriaSilver">
+                <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
+                    <jhi-table-editable-field [value]="value" (onValueUpdate)="valueChanged()"></jhi-table-editable-field>
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Gold" prop="successCriteriaGold">
+                <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
+                    <jhi-table-editable-field [value]="value" (onValueUpdate)="valueChanged()"></jhi-table-editable-field>
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Min Score" prop="minScore">
+                <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
+                    <jhi-table-editable-field *ngIf="row.type != achievementType.POINT" [value]="value" (onValueUpdate)="valueChanged()"></jhi-table-editable-field>
+                </ng-template>
+            </ngx-datatable-column>
+        </ngx-datatable>
+    </div>
+</div>

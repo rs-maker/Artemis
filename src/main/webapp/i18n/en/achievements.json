@@ -1,8 +1,15 @@
 {
     "artemisApp": {
         "achievements": {
+            "pageTitle": "Achievements",
+            "active": "Active",
             "title": "Title",
-            "description": "Description"
+            "type": "Type",
+            "description": "Description",
+            "configure": "Configure Achievements",
+            "pointDescription": "Score in percent",
+            "timeDescription": "Number of days within which the submission must be made",
+            "progressDescription": "Total number of submissions"
         }
     }
 }

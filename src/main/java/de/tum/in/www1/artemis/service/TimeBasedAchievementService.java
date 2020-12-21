@@ -69,7 +69,7 @@ public class TimeBasedAchievementService {
      */
     public void generateAchievements(Course course) {
         Set<Achievement> achievementsToSave = new HashSet<>();
-        achievementsToSave.add(new Achievement("Time Master", "Hand in your submission within " + DAYS_GOLD + " day(s) after the release of an exercise", "calendar-check",
+        achievementsToSave.add(new Achievement("Roadrunner", "Hand in your submission within " + DAYS_GOLD + " day(s) after the release of an exercise", "calendar-check",
                 AchievementRank.GOLD, AchievementType.TIME, DAYS_GOLD, MIN_SCORE_TO_QUALIFY, course, null));
         achievementsToSave.add(new Achievement("Time Intermediate", "Hand in your submission within " + DAYS_SILVER + " days after the release of an exercise", "calendar-check",
                 AchievementRank.SILVER, AchievementType.TIME, DAYS_SILVER, MIN_SCORE_TO_QUALIFY, course, null));

@@ -34,7 +34,7 @@ import { ExerciseUnitComponent } from './course-lectures/exercise-unit/exercise-
 import { AttachmentUnitComponent } from './course-lectures/attachment-unit/attachment-unit.component';
 import { VideoUnitComponent } from './course-lectures/video-unit/video-unit.component';
 import { ArtemisSharedPipesModule } from 'app/shared/pipes/shared-pipes.module';
-import { AchievementsComponent } from 'app/achievements/achievements.component';
+import { AchievementsModule } from 'app/achievements/achievements.module';
 import { TextUnitComponent } from './course-lectures/text-unit/text-unit.component';
 import { ArtemisMarkdownEditorModule } from 'app/shared/markdown-editor/markdown-editor.module';
 import { RatingModule } from 'app/exercises/shared/rating/rating.module';
@@ -61,6 +61,7 @@ import { ArtemisLearningGoalsModule } from 'app/course/learning-goals/learning-g
         ArtemisProgrammingExerciseInstructionsRenderModule,
         ArtemisTeamModule,
         RatingModule,
+        AchievementsModule,
         ArtemisLearningGoalsModule,
     ],
     declarations: [
@@ -84,7 +85,6 @@ import { ArtemisLearningGoalsModule } from 'app/course/learning-goals/learning-g
         AttachmentUnitComponent,
         VideoUnitComponent,
         TextUnitComponent,
-        AchievementsComponent,
         CourseLearningGoalsComponent,
     ],
     exports: [ExerciseActionButtonComponent, ExerciseDetailsStudentActionsComponent, ExerciseUnitComponent, AttachmentUnitComponent, VideoUnitComponent, TextUnitComponent],
