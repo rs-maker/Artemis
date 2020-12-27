@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.function.Predicate;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,9 +19,6 @@ import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-
-import com.google.common.base.Predicates;
-
 import io.github.jhipster.config.JHipsterConstants;
 import io.github.jhipster.config.JHipsterProperties;
 import io.github.jhipster.config.apidoc.customizer.SwaggerCustomizer;
@@ -31,7 +29,7 @@ public class OpenApiConfiguration {
 
     @Bean
     public SwaggerCustomizer noApiFirstCustomizer() {
-        return docket -> docket.select().apis(Predicates.not(RequestHandlerSelectors.basePackage("de.tum.in.www1.artemis.web.api")));
+        return docket -> docket.select().apis(Predicate.not(RequestHandlerSelectors.basePackage("de.tum.in.www1.artemis.web.api")));
     }
 
     @Bean
@@ -42,7 +40,7 @@ public class OpenApiConfiguration {
         ApiInfo apiInfo = new ApiInfo("API First " + properties.getTitle(), properties.getDescription(), properties.getVersion(), properties.getTermsOfServiceUrl(), contact,
                 properties.getLicense(), properties.getLicenseUrl(), new ArrayList<>());
 
-        return new Docket(DocumentationType.SWAGGER_2).groupName("openapi").host(properties.getHost()).protocols(new HashSet<>(Arrays.asList(properties.getProtocols())))
+        return new Docket(DocumentationType.OAS_30).groupName("openapi").host(properties.getHost()).protocols(new HashSet<>(Arrays.asList(properties.getProtocols())))
                 .apiInfo(apiInfo).useDefaultResponseMessages(properties.isUseDefaultResponseMessages()).forCodeGeneration(true)
                 .directModelSubstitute(ByteBuffer.class, String.class).genericModelSubstitutes(ResponseEntity.class).ignoredParameterTypes(Pageable.class).select()
                 .apis(RequestHandlerSelectors.basePackage("de.tum.in.www1.artemis.web.api")).paths(regex(properties.getDefaultIncludePattern())).build();

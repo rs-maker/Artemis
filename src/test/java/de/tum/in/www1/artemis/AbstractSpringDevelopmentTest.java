@@ -11,7 +11,8 @@ import de.tum.in.www1.artemis.util.RequestUtilService;
 
 @SpringBootTest(classes = ArtemisApp.class)
 @AutoConfigureMockMvc
-@ActiveProfiles({ "artemis", "dev", "scheduling", "testcontainers" })
+// The profile 'testcontainers' enables tests against production database types rather than H2, using Testcontainers
+@ActiveProfiles({ "artemis", "bamboo", "bitbucket", "jira", "ldap", "scheduling", "athene", "testcontainers" })
 @TestPropertySource(properties = "artemis.user-management.use-external=false")
 public class AbstractSpringDevelopmentTest {
 

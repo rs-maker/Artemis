@@ -8,10 +8,13 @@
 # More information on database containers: https://www.testcontainers.org/modules/databases/
 # ===================================================================
 
+# Note: we only need to override the properties in the application.yml file that need to be changed
+
 spring:
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
         driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+#        url: jdbc:tc:mysql:latest://localhost:3306/Artemis?TC_INITSCRIPT=file:src/test/resources/test-data/init-mysql.sql&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&TC_TMPFS=/testtmpfs:rw
         url: jdbc:tc:mysql:latest://localhost:3306/Artemis?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&TC_TMPFS=/testtmpfs:rw
         username: root
         password:
@@ -25,3 +28,5 @@ spring:
                 useServerPrepStmts: true
     jpa:
         database-platform: org.hibernate.dialect.MySQL8Dialect
+    liquibase:
+        enabled: true

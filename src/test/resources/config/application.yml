@@ -22,9 +22,6 @@ artemis:
     submission-export-path: exports
 
 spring:
-    profiles:
-        # Uncomment the following line to enable tests against production database type rather than H2, using Testcontainers
-        active: testcontainers
     application:
         name: Artemis
     datasource:
@@ -72,6 +69,7 @@ spring:
             hibernate.cache.hazelcast.use_lite_member: true
     liquibase:
         contexts: tests
+        enabled: false
     mail:
         host: localhost
     main:

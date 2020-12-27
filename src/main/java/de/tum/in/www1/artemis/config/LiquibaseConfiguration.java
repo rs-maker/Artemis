@@ -57,6 +57,7 @@ public class LiquibaseConfiguration {
         liquibase.setTestRollbackOnUpdate(liquibaseProperties.isTestRollbackOnUpdate());
         if (env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_NO_LIQUIBASE))) {
             liquibase.setShouldRun(false);
+            log.info("Liquibase is disabled");
         }
         else {
             liquibase.setShouldRun(liquibaseProperties.isEnabled());
