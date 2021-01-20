@@ -11,7 +11,7 @@ import { checkForMissingTranslationKey } from 'app/shared/util/utils';
     template: `
         <div class="alerts" role="alert">
             <div *ngFor="let alert of alerts" [ngClass]="setClasses(alert)">
-                <ngb-alert *ngIf="alert?.type && alert?.msg" [type]="alert.type" (close)="alert?.close(alerts)">
+                <ngb-alert *ngIf="alert && alert.type && alert.msg" [type]="alert.type" (close)="close(alert)">
                     <pre [innerHTML]="alert.msg"></pre>
                 </ngb-alert>
             </div>
@@ -132,5 +132,9 @@ export class AlertErrorComponent implements OnDestroy {
         const alert = this.alertService.addAlert(newAlert, this.alerts);
         checkForMissingTranslationKey(alert);
         this.alerts.push(alert);
+    }
+
+    close(alert: JhiAlert): void {
+        alert.close?.(this.alerts);
     }
 }

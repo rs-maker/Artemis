@@ -14,6 +14,7 @@ import { Team } from 'app/entities/team.model';
 import { DueDateStat } from 'app/course/dashboards/instructor-course-dashboard/due-date-stat.model';
 import { ExerciseGroup } from 'app/entities/exercise-group.model';
 import { LearningGoal } from 'app/entities/learningGoal.model';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 export enum DifficultyLevel {
     EASY = 'EASY',
@@ -73,7 +74,7 @@ export abstract class Exercise implements BaseEntity {
     public mode?: ExerciseMode = ExerciseMode.INDIVIDUAL; // default value
     public teamAssignmentConfig?: TeamAssignmentConfig;
     public categories?: string[];
-    public type?: ExerciseType;
+    public type: ExerciseType;
 
     public teams?: Team[];
     public studentParticipations?: StudentParticipation[];
@@ -133,34 +134,34 @@ export abstract class Exercise implements BaseEntity {
     }
 }
 
-export function getIcon(exerciseType?: ExerciseType): string {
-    if (!exerciseType) {
-        return '';
+export function getIcon(exerciseType: ExerciseType): IconProp {
+    switch (exerciseType) {
+        case ExerciseType.PROGRAMMING:
+            return 'keyboard';
+        case ExerciseType.MODELING:
+            return 'project-diagram';
+        case ExerciseType.QUIZ:
+            return 'check-double';
+        case ExerciseType.TEXT:
+            return 'font';
+        case ExerciseType.FILE_UPLOAD:
+            return 'file-upload';
     }
-    const icons = {
-        [ExerciseType.PROGRAMMING]: 'keyboard',
-        [ExerciseType.MODELING]: 'project-diagram',
-        [ExerciseType.QUIZ]: 'check-double',
-        [ExerciseType.TEXT]: 'font',
-        [ExerciseType.FILE_UPLOAD]: 'file-upload',
-    };
-
-    return icons[exerciseType];
 }
 
-export function getIconTooltip(exerciseType?: ExerciseType): string {
-    if (!exerciseType) {
-        return '';
+export function getIconTooltip(exerciseType: ExerciseType): string {
+    switch (exerciseType) {
+        case ExerciseType.PROGRAMMING:
+            return 'artemisApp.exercise.isProgramming';
+        case ExerciseType.MODELING:
+            return 'artemisApp.exercise.isModeling';
+        case ExerciseType.QUIZ:
+            return 'artemisApp.exercise.isQuiz';
+        case ExerciseType.TEXT:
+            return 'artemisApp.exercise.isText';
+        case ExerciseType.FILE_UPLOAD:
+            return 'artemisApp.exercise.isFileUpload';
     }
-    const tooltips = {
-        [ExerciseType.PROGRAMMING]: 'artemisApp.exercise.isProgramming',
-        [ExerciseType.MODELING]: 'artemisApp.exercise.isModeling',
-        [ExerciseType.QUIZ]: 'artemisApp.exercise.isQuiz',
-        [ExerciseType.TEXT]: 'artemisApp.exercise.isText',
-        [ExerciseType.FILE_UPLOAD]: 'artemisApp.exercise.isFileUpload',
-    };
-
-    return tooltips[exerciseType];
 }
 
 /**
