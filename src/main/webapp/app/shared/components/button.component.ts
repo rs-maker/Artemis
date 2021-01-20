@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { FeatureToggle } from 'app/shared/feature-toggle/feature-toggle.service';
 
 /**
@@ -52,7 +53,7 @@ export class ButtonComponent {
     @Input() btnType = ButtonType.PRIMARY;
     @Input() btnSize = ButtonSize.MEDIUM;
     // Fa-icon name.
-    @Input() icon: string;
+    @Input() icon: IconProp;
     // Translation placeholders, will be translated in the component.
     @Input() title: string;
     @Input() tooltip: string;

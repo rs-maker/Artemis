@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -32,7 +33,7 @@ export class ConfirmAutofocusModalComponent {
     template: ` <jhi-button [icon]="icon" [title]="title" [tooltip]="tooltip" [disabled]="disabled" [isLoading]="isLoading" (onClick)="onOpenConfirmationModal()"></jhi-button> `,
 })
 export class ConfirmAutofocusButtonComponent {
-    @Input() icon: string;
+    @Input() icon: IconProp;
     @Input() title: string;
     @Input() tooltip: string;
     @Input() disabled = false;
