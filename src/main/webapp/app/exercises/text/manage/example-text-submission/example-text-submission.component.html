@@ -3,7 +3,8 @@
         <div class="col-8">
             <h2>
                 <fa-icon [icon]="'arrow-left'" (click)="back()" class="guided-tour-back back-button mr-2"></fa-icon>
-                <span *ngIf="isNewSubmission">{{ 'artemisApp.exampleSubmission.createNew' | translate }} </span>{{ 'artemisApp.exampleSubmission.pageHeader' | translate }}
+                <span *ngIf="isNewSubmission">{{ 'artemisApp.exampleSubmission.createNew' | artemisTranslate }} </span
+                >{{ 'artemisApp.exampleSubmission.pageHeader' | artemisTranslate }}
                 {{ exercise?.title }}
             </h2>
         </div>
@@ -11,13 +12,13 @@
         <div class="col-4 text-right" *ngIf="isAtLeastInstructor && !readOnly && !toComplete && exercise">
             <div class="form-check col-12 align-baseline">
                 <input type="checkbox" name="usedForTutorial" id="field_usedForTutorial" [(ngModel)]="exampleSubmission.usedForTutorial" />
-                <label class="form-check-label" for="field_usedForTutorial">{{ 'artemisApp.exampleSubmission.usedForTutorial' | translate }}</label>
+                <label class="form-check-label" for="field_usedForTutorial">{{ 'artemisApp.exampleSubmission.usedForTutorial' | artemisTranslate }}</label>
             </div>
 
             <button (click)="createUpdateExampleTextSubmission()" class="btn btn-primary col-6">
                 <fa-icon [icon]="'save'"></fa-icon>
-                <span *ngIf="isNewSubmission">{{ 'artemisApp.exampleSubmission.createNewSubmission' | translate }}</span>
-                <span *ngIf="!isNewSubmission">{{ 'artemisApp.exampleSubmission.updateTextSubmission' | translate }}</span>
+                <span *ngIf="isNewSubmission">{{ 'artemisApp.exampleSubmission.createNewSubmission' | artemisTranslate }}</span>
+                <span *ngIf="!isNewSubmission">{{ 'artemisApp.exampleSubmission.updateTextSubmission' | artemisTranslate }}</span>
             </button>
         </div>
     </div>
@@ -64,15 +65,15 @@
         <div class="row justify-content-end">
             <div class="col-8 align-text-bottom text-right">
                 <h5>
-                    <strong>{{ 'artemisApp.exampleSubmission.score' | translate }}:</strong> {{ totalScore | number: '1.0-2' }} / {{ exercise.maxScore }}
+                    <strong>{{ 'artemisApp.exampleSubmission.score' | artemisTranslate }}:</strong> {{ totalScore | number: '1.0-2' }} / {{ exercise.maxScore }}
                 </h5>
             </div>
 
             <div class="col-2" *ngIf="!isNewSubmission && isAtLeastInstructor && !readOnly && !toComplete">
                 <button class="btn btn-primary col-12" (click)="saveAssessments()" [disabled]="!assessments || !assessmentsAreValid">
                     <fa-icon [icon]="'save'"></fa-icon>
-                    <span *ngIf="areNewAssessments">{{ 'artemisApp.exampleSubmission.createNewAssessment' | translate }}</span>
-                    <span *ngIf="!areNewAssessments">{{ 'artemisApp.exampleSubmission.updateAssessment' | translate }}</span>
+                    <span *ngIf="areNewAssessments">{{ 'artemisApp.exampleSubmission.createNewAssessment' | artemisTranslate }}</span>
+                    <span *ngIf="!areNewAssessments">{{ 'artemisApp.exampleSubmission.updateAssessment' | artemisTranslate }}</span>
                 </button>
             </div>
         </div>
@@ -115,7 +116,7 @@
 </div>
 
 <div class="alert alert-info mt-3" *ngIf="isNewSubmission">
-    {{ 'artemisApp.exampleSubmission.youNeedToCreate' | translate }}
+    {{ 'artemisApp.exampleSubmission.youNeedToCreate' | artemisTranslate }}
 </div>
 
 <div class="col-12 mt-3 text-assessments guided-tour-text-assessment" *ngIf="exercise && !isNewSubmission">
@@ -135,13 +136,13 @@
 
 <div class="col-12 text-right" *ngIf="toComplete">
     <button class="btn btn-primary col-3 guided-tour-check-assessment" (click)="checkAssessment()" [disabled]="!assessments || !assessmentsAreValid">
-        {{ 'artemisApp.exampleSubmission.submitAssessment' | translate }}
+        {{ 'artemisApp.exampleSubmission.submitAssessment' | artemisTranslate }}
     </button>
 </div>
 
 <div class="col-12 text-right" *ngIf="readOnly">
     <button (click)="readAndUnderstood()" class="btn btn-success col-3 guided-tour-read">
         <fa-icon [icon]="'save'"></fa-icon>
-        {{ 'artemisApp.exampleSubmission.readAndUnderstood' | translate }}
+        {{ 'artemisApp.exampleSubmission.readAndUnderstood' | artemisTranslate }}
     </button>
 </div>

@@ -2,7 +2,7 @@
     <div class="row justify-content-between">
         <div class="col-8">
             <h2>
-                <span>{{ 'artemisApp.assessment.locks.title' | translate }}</span>
+                <span>{{ 'artemisApp.assessment.locks.title' | artemisTranslate }}</span>
             </h2>
         </div>
     </div>
@@ -29,12 +29,12 @@
                         <fa-icon
                             [icon]="getIcon(submission.participation.exercise.type)"
                             placement="right"
-                            [ngbTooltip]="getIconTooltip(submission.participation.exercise.type) | translate"
+                            [ngbTooltip]="getIconTooltip(submission.participation.exercise.type) | artemisTranslate"
                             container="body"
                         ></fa-icon>
                     </td>
                     <td>{{ submission.participation.exercise.title }}</td>
-                    <td>{{ submission.submissionDate | date: 'MMM d, y HH:mm:ss' }}</td>
+                    <td>{{ submission.submissionDate | artemisDate: 'long-date' }}</td>
                     <td>{{ submission.participation.submissions?.length }}</td>
                     <td>
                         <span *ngIf="submission.latestResult?.score != undefined">{{ submission.latestResult!.score }}%</span>
@@ -53,12 +53,12 @@
                                 ]"
                                 class="btn btn-outline-secondary btn-sm mb-1"
                             >
-                                <fa-icon [icon]="'folder-open'" [fixedWidth]="true"></fa-icon>&nbsp;{{ 'artemisApp.assessment.dashboard.actions.open' | translate }}
+                                <fa-icon [icon]="'folder-open'" [fixedWidth]="true"></fa-icon>&nbsp;{{ 'artemisApp.assessment.dashboard.actions.open' | artemisTranslate }}
                             </button>
                         </span>
                         <span>
                             <button *ngIf="!submission.latestResult!.completionDate" (click)="cancelAssessment(submission)" class="btn btn-outline-secondary btn-sm mb-1">
-                                <fa-icon [icon]="'ban'" [fixedWidth]="true"></fa-icon>&nbsp;{{ 'artemisApp.assessment.dashboard.actions.cancel' | translate }}
+                                <fa-icon [icon]="'ban'" [fixedWidth]="true"></fa-icon>&nbsp;{{ 'artemisApp.assessment.dashboard.actions.cancel' | artemisTranslate }}
                             </button>
                         </span>
                     </td>

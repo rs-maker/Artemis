@@ -37,7 +37,7 @@ export enum ButtonSize {
         <button
             [ngClass]="['jhi-btn', 'btn', btnType, btnSize]"
             [type]="shouldSubmit ? 'submit' : 'button'"
-            ngbTooltip="{{ tooltip | translate }}"
+            ngbTooltip="{{ tooltip | artemisTranslate }}"
             container="body"
             (click)="onClick.emit($event)"
             [jhiFeatureToggle]="featureToggle"

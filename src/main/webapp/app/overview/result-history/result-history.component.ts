@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { MIN_POINTS_GREEN, MIN_POINTS_ORANGE } from 'app/app.constants';
 import { Result } from 'app/entities/result.model';
 
@@ -18,7 +19,7 @@ export class ResultHistoryComponent {
      * @param {Result} result
      * @return {string} icon
      */
-    resultIcon(result: Result): string {
+    resultIcon(result: Result): IconProp {
         if (result.score && result.score >= 75) {
             return 'check';
         } else {

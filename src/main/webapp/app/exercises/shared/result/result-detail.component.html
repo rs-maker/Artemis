@@ -17,13 +17,17 @@
             <div *ngIf="showScoreChart && result.participation?.exercise" class="result-score-chart">
                 <span class="result-score-chart-title"
                     ><span jhiTranslate="artemisApp.result.score">Score</span>: {{ result.score }}%
-                    <span *ngIf="resultIsPreliminary()" class="badge badge-warning" [ngbTooltip]="'artemisApp.result.preliminaryTooltip' | translate">{{
-                        'artemisApp.result.preliminary' | translate | uppercase
+                    <span *ngIf="resultIsPreliminary()" class="badge badge-warning" [ngbTooltip]="'artemisApp.result.preliminaryTooltip' | artemisTranslate">{{
+                        'artemisApp.result.preliminary' | artemisTranslate | uppercase
                     }}</span>
                 </span>
                 <div style="height: 100px"><jhi-chart [preset]="scoreChartPreset"> </jhi-chart></div>
                 <div *ngIf="showScoreChartTooltip" class="d-flex justify-content-center position-relative" style="margin-top: -10px">
-                    <div style="width: 250px; height: 20px; top: -15px; position: absolute" [ngbTooltip]="'artemisApp.result.chart.tooltip' | translate" placement="bottom"></div>
+                    <div
+                        style="width: 250px; height: 20px; top: -15px; position: absolute"
+                        [ngbTooltip]="'artemisApp.result.chart.tooltip' | artemisTranslate"
+                        placement="bottom"
+                    ></div>
                 </div>
                 <hr />
             </div>

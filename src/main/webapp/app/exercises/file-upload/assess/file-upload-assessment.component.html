@@ -29,21 +29,21 @@
 
                 <div class="card-body">
                     <div *ngIf="submission.filePath" class="mb-6 card-text">
-                        <a class="text-primary" (click)="downloadFile(submission.filePath)">{{ 'artemisApp.fileUploadAssessment.submissionFile' | translate }}</a>
+                        <a class="text-primary" (click)="downloadFile(submission.filePath)">{{ 'artemisApp.fileUploadAssessment.submissionFile' | artemisTranslate }}</a>
                         <span class="ml-2 badge badge-info">
                             {{ attachmentExtension(submission.filePath!) | uppercase }}
                         </span>
                     </div>
                     <button class="btn btn-success mt-4" (click)="addFeedback()" [disabled]="readOnly">
-                        {{ 'artemisApp.fileUploadAssessment.addFeedback' | translate }}
+                        {{ 'artemisApp.fileUploadAssessment.addFeedback' | artemisTranslate }}
                     </button>
                     <ng-container *ngIf="!busy && !notFound">
                         <div class="row mt-4">
                             <h4 class="col-12" jhiTranslate="artemisApp.assessment.detail.feedback">Feedback</h4>
-                            <div *ngIf="invalidError" class="col-12 alert alert-danger" role="alert">{{ invalidError | translate }}</div>
+                            <div *ngIf="invalidError" class="col-12 alert alert-danger" role="alert">{{ invalidError | artemisTranslate }}</div>
                             <div *ngIf="!referencedFeedback || referencedFeedback.length == 0" class="col-12 col-lg-8 col-xl-6">
                                 <div class="alert alert-secondary text-center" role="alert">
-                                    <p>{{ 'artemisApp.fileUploadAssessment.assessInstruction' | translate }}</p>
+                                    <p>{{ 'artemisApp.fileUploadAssessment.assessInstruction' | artemisTranslate }}</p>
                                 </div>
                             </div>
                             <div *ngFor="let assessment of referencedFeedback; let i = index" class="col-12 col-lg-6 col-xl-6">

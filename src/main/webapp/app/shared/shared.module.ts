@@ -18,11 +18,15 @@ import { ArtemisDurationFromSecondsPipe } from 'app/shared/pipes/artemis-duratio
 import { ChartComponent } from 'app/shared/chart/chart.component';
 import { AlertComponent } from 'app/shared/alert/alert.component';
 import { CircularProgressBarComponent } from 'app/shared/circular-progress-bar/circular-progress-bar.component';
+import { ArtemisTranslatePipe } from 'app/shared/pipes/artemis-translate.pipe';
+import { ArtemisTimeAgoPipe } from 'app/shared/pipes/artemis-time-ago.pipe';
 
 @NgModule({
     imports: [ArtemisSharedLibsModule, ArtemisSharedCommonModule, ArtemisSharedPipesModule],
     declarations: [
         ArtemisDatePipe,
+        ArtemisTranslatePipe,
+        ArtemisTimeAgoPipe,
         CircularProgressBarComponent,
         ArtemisDurationFromSecondsPipe,
         HasAnyAuthorityDirective,
@@ -55,6 +59,8 @@ import { CircularProgressBarComponent } from 'app/shared/circular-progress-bar/c
         SlideToggleComponent,
         JhiConnectionStatusComponent,
         ChartComponent,
+        ArtemisTranslatePipe,
+        ArtemisTimeAgoPipe,
     ],
     providers: [ArtemisDatePipe],
 })

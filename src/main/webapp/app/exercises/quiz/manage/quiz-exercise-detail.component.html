@@ -21,7 +21,7 @@
                     class="form-control"
                     [(ngModel)]="quizExercise.title"
                     (ngModelChange)="cacheValidation()"
-                    placeholder="{{ 'artemisApp.quizExercise.placeholder.title' | translate }}"
+                    placeholder="{{ 'artemisApp.quizExercise.placeholder.title' | artemisTranslate }}"
                 />
             </div>
             <div *ngIf="!isExamMode" class="form-group-narrow position-relative">
@@ -203,7 +203,7 @@
                                 <input
                                     minlength="3"
                                     type="text"
-                                    placeholder="{{ 'artemisApp.exercise.notificationText' | translate }}"
+                                    placeholder="{{ 'artemisApp.exercise.notificationText' | artemisTranslate }}"
                                     class="form-control flex-fill"
                                     name="notificationtText"
                                     id="field_notification_text"
@@ -221,8 +221,8 @@
                                 title="status"
                             >
                                 <option *ngFor="let option of statusOptionsPractice" [value]="option.key">
-                                    <span *ngIf="option.key === true">{{ 'artemisApp.quizExercise.quizStatus.openForPractice' | translate }}</span>
-                                    <span *ngIf="option.key === false">{{ 'artemisApp.quizExercise.quizStatus.closed' | translate }}</span>
+                                    <span *ngIf="option.key === true">{{ 'artemisApp.quizExercise.quizStatus.openForPractice' | artemisTranslate }}</span>
+                                    <span *ngIf="option.key === false">{{ 'artemisApp.quizExercise.quizStatus.closed' | artemisTranslate }}</span>
                                 </option>
                             </select>
                             <select
@@ -233,13 +233,13 @@
                                 title="status"
                             >
                                 <option *ngFor="let option of statusOptionsVisible" [value]="option.key">
-                                    <span *ngIf="option.key === true">{{ 'artemisApp.quizExercise.quizStatus.visible' | translate }}</span>
-                                    <span *ngIf="option.key === false">{{ 'artemisApp.quizExercise.quizStatus.hidden' | translate }}</span>
+                                    <span *ngIf="option.key === true">{{ 'artemisApp.quizExercise.quizStatus.visible' | artemisTranslate }}</span>
+                                    <span *ngIf="option.key === false">{{ 'artemisApp.quizExercise.quizStatus.hidden' | artemisTranslate }}</span>
                                 </option>
                             </select>
                             <select *ngIf="showDropdown === 'active'" class="form-control" title="status" disabled>
                                 <option *ngFor="let option of statusOptionsActive" [value]="option.key">
-                                    {{ 'artemisApp.quizExercise.quizStatus.active' | translate }}
+                                    {{ 'artemisApp.quizExercise.quizStatus.active' | artemisTranslate }}
                                 </option>
                             </select>
                         </div>

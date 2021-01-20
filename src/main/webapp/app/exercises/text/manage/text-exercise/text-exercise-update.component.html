@@ -32,7 +32,7 @@
         <div class="d-flex" *ngIf="!isExamMode">
             <div class="form-group flex-grow-1">
                 <jhi-date-time-picker
-                    labelName="{{ 'artemisApp.exercise.releaseDate' | translate }}"
+                    labelName="{{ 'artemisApp.exercise.releaseDate' | artemisTranslate }}"
                     [(ngModel)]="textExercise.releaseDate"
                     (valueChange)="validateDate()"
                     [error]="false"
@@ -43,22 +43,22 @@
                 <jhi-date-time-picker
                     name="dueDate"
                     [error]="textExercise.dueDateError"
-                    labelName="{{ 'artemisApp.exercise.dueDate' | translate }}"
+                    labelName="{{ 'artemisApp.exercise.dueDate' | artemisTranslate }}"
                     (valueChange)="validateDate()"
                     [(ngModel)]="textExercise.dueDate"
                 ></jhi-date-time-picker>
-                <span *ngIf="textExercise.dueDateError" class="invalid-feedback">{{ 'artemisApp.exercise.dueDateError' | translate }}</span>
+                <span *ngIf="textExercise.dueDateError" class="invalid-feedback">{{ 'artemisApp.exercise.dueDateError' | artemisTranslate }}</span>
             </div>
         </div>
         <div class="form-group" *ngIf="!isExamMode">
             <jhi-date-time-picker
                 name="assessmentDueDate"
                 [error]="textExercise.assessmentDueDateError"
-                labelName="{{ 'artemisApp.exercise.assessmentDueDate' | translate }}"
+                labelName="{{ 'artemisApp.exercise.assessmentDueDate' | artemisTranslate }}"
                 (valueChange)="validateDate()"
                 [(ngModel)]="textExercise.assessmentDueDate"
             ></jhi-date-time-picker>
-            <span *ngIf="textExercise.assessmentDueDateError" class="invalid-feedback">{{ 'artemisApp.exercise.assessmentDueDateError' | translate }}</span>
+            <span *ngIf="textExercise.assessmentDueDateError" class="invalid-feedback">{{ 'artemisApp.exercise.assessmentDueDateError' | artemisTranslate }}</span>
         </div>
         <div class="row">
             <div class="col">
@@ -152,7 +152,7 @@
                         *ngIf="exampleSubmission.usedForTutorial"
                         [icon]="'chalkboard-teacher'"
                         style="margin-left: 10px"
-                        [title]="'artemisApp.exampleSubmission.usedForTutorial' | translate"
+                        [title]="'artemisApp.exampleSubmission.usedForTutorial' | artemisTranslate"
                     ></fa-icon>
                     <fa-icon
                         *ngIf="exampleSubmission.submission?.result?.exampleResult"

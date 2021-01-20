@@ -85,7 +85,7 @@
                                             [icon]="'question-circle'"
                                             class="text-secondary ml-2"
                                             placement="bottom"
-                                            [ngbTooltip]="'artemisApp.programmingExercise.configureGrading.help.weight' | translate"
+                                            [ngbTooltip]="'artemisApp.programmingExercise.configureGrading.help.weight' | artemisTranslate"
                                             container="body"
                                         ></fa-icon>
                                     </span>
@@ -107,7 +107,7 @@
                                             [icon]="'question-circle'"
                                             class="text-secondary ml-2"
                                             placement="bottom"
-                                            [ngbTooltip]="'artemisApp.programmingExercise.configureGrading.help.bonusMultiplier' | translate"
+                                            [ngbTooltip]="'artemisApp.programmingExercise.configureGrading.help.bonusMultiplier' | artemisTranslate"
                                             container="body"
                                         ></fa-icon>
                                     </span>
@@ -129,7 +129,7 @@
                                             [icon]="'question-circle'"
                                             class="text-secondary ml-2"
                                             placement="bottom"
-                                            [ngbTooltip]="'artemisApp.programmingExercise.configureGrading.help.bonusPoints' | translate"
+                                            [ngbTooltip]="'artemisApp.programmingExercise.configureGrading.help.bonusPoints' | artemisTranslate"
                                             container="body"
                                         ></fa-icon>
                                     </span>
@@ -158,7 +158,7 @@
                                             <div class="d-flex flex-column run-after-due-date-disabled">
                                                 <pre jhiTranslate="artemisApp.programmingExercise.configureGrading.testCases.runAfterDueDateDisabled"></pre>
                                                 <a [routerLink]="['/course-management/', this.courseId, 'programming-exercises', this.exercise.id!, 'edit']" class="ml-auto">
-                                                    <jhi-button [icon]="'arrow-right'" placement="top" ngbTooltip="{{ 'entity.action.edit' | translate }}"></jhi-button>
+                                                    <jhi-button [icon]="'arrow-right'" placement="top" ngbTooltip="{{ 'entity.action.edit' | artemisTranslate }}"></jhi-button>
                                                 </a>
                                             </div>
                                         </ng-template>
@@ -201,7 +201,7 @@
                     </div>
                     <div>
                         <h2 class="mb-5">
-                            <span>{{ 'artemisApp.programmingExercise.configureGrading.charts.title' | translate }}</span>
+                            <span>{{ 'artemisApp.programmingExercise.configureGrading.charts.title' | artemisTranslate }}</span>
                             <span
                                 *ngIf="!!changedTestCaseIds.length"
                                 class="badge badge-primary"
@@ -269,7 +269,7 @@
                                             [icon]="'question-circle'"
                                             class="text-secondary ml-2"
                                             placement="bottom"
-                                            [ngbTooltip]="'artemisApp.programmingExercise.configureGrading.help.state' | translate"
+                                            [ngbTooltip]="'artemisApp.programmingExercise.configureGrading.help.state' | artemisTranslate"
                                             container="body"
                                         ></fa-icon>
                                     </span>
@@ -294,7 +294,7 @@
                                             [icon]="'question-circle'"
                                             class="text-secondary ml-2"
                                             placement="bottom"
-                                            [ngbTooltip]="'artemisApp.programmingExercise.configureGrading.help.penalty' | translate"
+                                            [ngbTooltip]="'artemisApp.programmingExercise.configureGrading.help.penalty' | artemisTranslate"
                                             container="body"
                                         ></fa-icon>
                                     </span>
@@ -319,7 +319,7 @@
                                             [icon]="'question-circle'"
                                             class="text-secondary ml-2"
                                             placement="bottom"
-                                            [ngbTooltip]="'artemisApp.programmingExercise.configureGrading.help.maxPenalty' | translate"
+                                            [ngbTooltip]="'artemisApp.programmingExercise.configureGrading.help.maxPenalty' | artemisTranslate"
                                             container="body"
                                         ></fa-icon>
                                     </span>
@@ -344,7 +344,7 @@
                                             [icon]="'question-circle'"
                                             class="text-secondary ml-2"
                                             placement="bottom"
-                                            [ngbTooltip]="'artemisApp.programmingExercise.configureGrading.help.detectedIssues' | translate"
+                                            [ngbTooltip]="'artemisApp.programmingExercise.configureGrading.help.detectedIssues' | artemisTranslate"
                                             container="body"
                                         ></fa-icon>
                                     </span>
@@ -363,7 +363,7 @@
                     </div>
                     <div>
                         <h2 class="mb-5">
-                            <span>{{ 'artemisApp.programmingExercise.configureGrading.charts.title' | translate }}</span>
+                            <span>{{ 'artemisApp.programmingExercise.configureGrading.charts.title' | artemisTranslate }}</span>
                             <span
                                 *ngIf="!!changedCategoryIds.length"
                                 class="badge badge-primary"

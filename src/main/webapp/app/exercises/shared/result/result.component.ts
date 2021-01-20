@@ -16,6 +16,7 @@ import { isModelingOrTextOrFileUpload, isParticipationInDueTime, isProgrammingOr
 import { ExerciseType } from 'app/entities/exercise.model';
 import { ResultDetailComponent } from 'app/exercises/shared/result/result-detail.component';
 import { Result } from 'app/entities/result.model';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 /**
  * Enumeration object representing the possible options that
@@ -57,7 +58,7 @@ export class ResultComponent implements OnInit, OnChanges {
 
     textColorClass: string;
     hasFeedback: boolean;
-    resultIconClass: string[];
+    resultIconClass: IconProp;
     resultString: string;
     templateStatus: ResultTemplateStatus;
     submission: Submission | undefined;
@@ -340,7 +341,7 @@ export class ResultComponent implements OnInit, OnChanges {
      * Get the icon type for the result icon as an array
      *
      */
-    getResultIconClass(): string[] {
+    getResultIconClass(): IconProp {
         const result = this.result!;
         if (result.score == undefined) {
             if (result.successful) {

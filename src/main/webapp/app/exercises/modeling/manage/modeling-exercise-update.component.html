@@ -33,7 +33,7 @@
         <div class="d-flex" *ngIf="!isExamMode">
             <div class="form-group-narrow flex-grow-1">
                 <jhi-date-time-picker
-                    labelName="{{ 'artemisApp.exercise.releaseDate' | translate }}"
+                    labelName="{{ 'artemisApp.exercise.releaseDate' | artemisTranslate }}"
                     [(ngModel)]="modelingExercise.releaseDate"
                     (valueChange)="validateDate()"
                     [error]="false"
@@ -44,22 +44,22 @@
                 <jhi-date-time-picker
                     name="dueDate"
                     [error]="modelingExercise.dueDateError"
-                    labelName="{{ 'artemisApp.exercise.dueDate' | translate }}"
+                    labelName="{{ 'artemisApp.exercise.dueDate' | artemisTranslate }}"
                     (valueChange)="validateDate()"
                     [(ngModel)]="modelingExercise.dueDate"
                 ></jhi-date-time-picker>
-                <span *ngIf="modelingExercise.dueDateError" class="invalid-feedback">{{ 'artemisApp.exercise.dueDateError' | translate }}</span>
+                <span *ngIf="modelingExercise.dueDateError" class="invalid-feedback">{{ 'artemisApp.exercise.dueDateError' | artemisTranslate }}</span>
             </div>
         </div>
         <div class="form-group-narrow" *ngIf="!isExamMode">
             <jhi-date-time-picker
                 name="assessmentDueDate"
                 [error]="modelingExercise.assessmentDueDateError"
-                labelName="{{ 'artemisApp.exercise.assessmentDueDate' | translate }}"
+                labelName="{{ 'artemisApp.exercise.assessmentDueDate' | artemisTranslate }}"
                 (valueChange)="validateDate()"
                 [(ngModel)]="modelingExercise.assessmentDueDate"
             ></jhi-date-time-picker>
-            <span *ngIf="modelingExercise.assessmentDueDateError" class="invalid-feedback">{{ 'artemisApp.exercise.assessmentDueDateError' | translate }}</span>
+            <span *ngIf="modelingExercise.assessmentDueDateError" class="invalid-feedback">{{ 'artemisApp.exercise.assessmentDueDateError' | artemisTranslate }}</span>
         </div>
         <div class="row">
             <div class="col">
@@ -105,15 +105,15 @@
                 (ngModelChange)="diagramTypeChanged()"
                 id="field_diagramType"
             >
-                <option value="ClassDiagram">{{ 'artemisApp.DiagramType.ClassDiagram' | translate }}</option>
-                <option value="ActivityDiagram">{{ 'artemisApp.DiagramType.ActivityDiagram' | translate }}</option>
-                <option value="ObjectDiagram">{{ 'artemisApp.DiagramType.ObjectDiagram' | translate }}</option>
-                <option value="UseCaseDiagram">{{ 'artemisApp.DiagramType.UseCaseDiagram' | translate }}</option>
-                <option value="CommunicationDiagram">{{ 'artemisApp.DiagramType.CommunicationDiagram' | translate }}</option>
-                <option value="ComponentDiagram">{{ 'artemisApp.DiagramType.ComponentDiagram' | translate }}</option>
-                <option value="DeploymentDiagram">{{ 'artemisApp.DiagramType.DeploymentDiagram' | translate }}</option>
-                <option value="PetriNet">{{ 'artemisApp.DiagramType.PetriNet' | translate }}</option>
-                <option value="SyntaxTree">{{ 'artemisApp.DiagramType.SyntaxTree' | translate }}</option>
+                <option value="ClassDiagram">{{ 'artemisApp.DiagramType.ClassDiagram' | artemisTranslate }}</option>
+                <option value="ActivityDiagram">{{ 'artemisApp.DiagramType.ActivityDiagram' | artemisTranslate }}</option>
+                <option value="ObjectDiagram">{{ 'artemisApp.DiagramType.ObjectDiagram' | artemisTranslate }}</option>
+                <option value="UseCaseDiagram">{{ 'artemisApp.DiagramType.UseCaseDiagram' | artemisTranslate }}</option>
+                <option value="CommunicationDiagram">{{ 'artemisApp.DiagramType.CommunicationDiagram' | artemisTranslate }}</option>
+                <option value="ComponentDiagram">{{ 'artemisApp.DiagramType.ComponentDiagram' | artemisTranslate }}</option>
+                <option value="DeploymentDiagram">{{ 'artemisApp.DiagramType.DeploymentDiagram' | artemisTranslate }}</option>
+                <option value="PetriNet">{{ 'artemisApp.DiagramType.PetriNet' | artemisTranslate }}</option>
+                <option value="SyntaxTree">{{ 'artemisApp.DiagramType.SyntaxTree' | artemisTranslate }}</option>
             </select>
         </div>
         <div

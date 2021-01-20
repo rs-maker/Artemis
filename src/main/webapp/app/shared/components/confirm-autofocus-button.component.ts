@@ -5,13 +5,13 @@ import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstra
 @Component({
     template: `
         <div class="modal-header">
-            <h4 class="modal-title">{{ title | translate }}</h4>
+            <h4 class="modal-title">{{ title | artemisTranslate }}</h4>
             <button type="button" class="close" aria-label="Close button" aria-describedby="modal-title" (click)="modal.dismiss('Cross click')">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
         <div class="modal-body">
-            <p *ngIf="translateText === true" style="white-space: pre-line">{{ text | translate }}</p>
+            <p *ngIf="translateText === true" style="white-space: pre-line">{{ text | artemisTranslate }}</p>
             <p *ngIf="translateText !== true" style="white-space: pre-line">{{ text }}</p>
         </div>
         <div class="modal-footer">

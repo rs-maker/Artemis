@@ -57,7 +57,7 @@
                     </td>
                     <td>
                         {{ submission.durationInMinutes }}
-                        {{ 'artemisApp.assessment.dashboard.minutes' | translate }}
+                        {{ 'artemisApp.assessment.dashboard.minutes' | artemisTranslate }}
                     </td>
                     <td *ngIf="exercise.isAtLeastInstructor">
                         {{ submission.participation.participantName }}
@@ -73,7 +73,7 @@
                                 [disabled]="busy"
                                 class="btn btn-outline-secondary btn-sm mb-1"
                             >
-                                <fa-icon [icon]="'folder-open'" [fixedWidth]="true"></fa-icon>&nbsp;{{ 'artemisApp.assessment.dashboard.actions.assess' | translate }}
+                                <fa-icon [icon]="'folder-open'" [fixedWidth]="true"></fa-icon>&nbsp;{{ 'artemisApp.assessment.dashboard.actions.assess' | artemisTranslate }}
                             </button>
                             <button
                                 *ngIf="submission && !submission.latestResult && exercise.exerciseGroup"
@@ -89,7 +89,7 @@
                                 [disabled]="busy"
                                 class="btn btn-outline-secondary btn-sm mb-1"
                             >
-                                <fa-icon [icon]="'folder-open'" [fixedWidth]="true"></fa-icon>&nbsp;{{ 'artemisApp.assessment.dashboard.actions.assess' | translate }}
+                                <fa-icon [icon]="'folder-open'" [fixedWidth]="true"></fa-icon>&nbsp;{{ 'artemisApp.assessment.dashboard.actions.assess' | artemisTranslate }}
                             </button>
                         </span>
                         <span *jhiHasAnyAuthority="['ROLE_ADMIN', 'ROLE_INSTRUCTOR', 'ROLE_TA']">
@@ -99,7 +99,7 @@
                                 [disabled]="busy"
                                 class="btn btn-outline-secondary btn-sm mb-1"
                             >
-                                <fa-icon [icon]="'folder-open'" [fixedWidth]="true"></fa-icon>&nbsp;{{ 'artemisApp.assessment.dashboard.actions.open' | translate }}
+                                <fa-icon [icon]="'folder-open'" [fixedWidth]="true"></fa-icon>&nbsp;{{ 'artemisApp.assessment.dashboard.actions.open' | artemisTranslate }}
                             </button>
                             <button
                                 *ngIf="submission && submission.latestResult && exercise.exerciseGroup"
@@ -115,7 +115,7 @@
                                 [disabled]="busy"
                                 class="btn btn-outline-secondary btn-sm mb-1"
                             >
-                                <fa-icon [icon]="'folder-open'" [fixedWidth]="true"></fa-icon>&nbsp;{{ 'artemisApp.assessment.dashboard.actions.open' | translate }}
+                                <fa-icon [icon]="'folder-open'" [fixedWidth]="true"></fa-icon>&nbsp;{{ 'artemisApp.assessment.dashboard.actions.open' | artemisTranslate }}
                             </button>
                         </span>
                         <span *ngIf="exercise.isAtLeastInstructor">
@@ -125,7 +125,7 @@
                                 [disabled]="busy"
                                 class="btn btn-outline-secondary btn-sm mb-1"
                             >
-                                <fa-icon [icon]="'ban'" [fixedWidth]="true"></fa-icon>&nbsp;{{ 'artemisApp.assessment.dashboard.actions.cancel' | translate }}
+                                <fa-icon [icon]="'ban'" [fixedWidth]="true"></fa-icon>&nbsp;{{ 'artemisApp.assessment.dashboard.actions.cancel' | artemisTranslate }}
                             </button>
                         </span>
                     </td>

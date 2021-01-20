@@ -2,10 +2,14 @@
     <div class="card-header" [class.color-cyan]="assessment.type == FeedbackType_AUTOMATIC">
         <fa-icon [icon]="'trash-alt'" class="float-right" (click)="delete()" *ngIf="!disabled"></fa-icon>
         <h4 *ngIf="block?.text || assessment.reference" class="card-title">
-            {{ 'artemisApp.assessment.detail.scoreFor' | translate }}
+            {{ 'artemisApp.assessment.detail.scoreFor' | artemisTranslate }}
             <span>"<span class="highlight" [ngClass]="highlightColor" [innerHTML]="sanitizedText"></span>"</span>
         </h4>
-        <span class="badge badge-secondary float-right" *ngIf="assessment.type == FeedbackType_AUTOMATIC" title="{{ 'artemisApp.assessment.automaticGenerated' | translate }}">
+        <span
+            class="badge badge-secondary float-right"
+            *ngIf="assessment.type == FeedbackType_AUTOMATIC"
+            title="{{ 'artemisApp.assessment.automaticGenerated' | artemisTranslate }}"
+        >
             <fa-icon [icon]="'robot'"></fa-icon>
             <span jhiTranslate="artemisApp.textAssessment.automatic">Automatic</span>
         </span>

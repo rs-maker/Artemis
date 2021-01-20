@@ -30,8 +30,8 @@
                     >
                         <b class="fa">SA</b>
                     </span>
-                    <ng-template #tooltipExplanationTranslate>{{ 'artemisApp.quizExercise.explanationAnswered' | translate }}</ng-template>
-                    <ng-template #tooltipNotExplanationTranslate>{{ 'artemisApp.quizExercise.explanationNotAnswered' | translate }}</ng-template>
+                    <ng-template #tooltipExplanationTranslate>{{ 'artemisApp.quizExercise.explanationAnswered' | artemisTranslate }}</ng-template>
+                    <ng-template #tooltipNotExplanationTranslate>{{ 'artemisApp.quizExercise.explanationNotAnswered' | artemisTranslate }}</ng-template>
                 </div>
             </div>
         </div>
@@ -39,7 +39,7 @@
     <div class="quiz-content container" *ngIf="exercise">
         <h4>
             {{ exercise.title }}
-            <span>[{{ exercise.maxScore }} {{ 'artemisApp.examParticipation.points' | translate }}]</span>
+            <span>[{{ exercise.maxScore }} {{ 'artemisApp.examParticipation.points' | artemisTranslate }}]</span>
         </h4>
         <div *ngFor="let question of exercise.quizQuestions; let i = index">
             <!-- TODO: Map vs Array consistency -->

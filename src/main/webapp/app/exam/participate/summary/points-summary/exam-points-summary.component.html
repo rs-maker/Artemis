@@ -1,13 +1,13 @@
 <div *ngIf="show()" style="max-width: 980px">
-    <h4>{{ 'artemisApp.exam.examSummary.points.overview' | translate }}</h4>
+    <h4>{{ 'artemisApp.exam.examSummary.points.overview' | artemisTranslate }}</h4>
     <table class="table table-striped">
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">{{ 'artemisApp.exam.examSummary.points.exercise' | translate }}</th>
-                <th scope="col">{{ 'artemisApp.exam.examSummary.points.yourPoints' | translate }}</th>
-                <th scope="col">{{ 'artemisApp.exam.examSummary.points.maxPoints' | translate }}</th>
-                <th scope="col">{{ 'artemisApp.exam.examSummary.points.bonus' | translate }}</th>
+                <th scope="col">{{ 'artemisApp.exam.examSummary.points.exercise' | artemisTranslate }}</th>
+                <th scope="col">{{ 'artemisApp.exam.examSummary.points.yourPoints' | artemisTranslate }}</th>
+                <th scope="col">{{ 'artemisApp.exam.examSummary.points.maxPoints' | artemisTranslate }}</th>
+                <th scope="col">{{ 'artemisApp.exam.examSummary.points.bonus' | artemisTranslate }}</th>
             </tr>
         </thead>
         <tbody>
@@ -27,7 +27,7 @@
                 </td>
             </tr>
             <tr>
-                <th colspan="2" class="text-right">{{ 'artemisApp.exam.examSummary.points.sum' | translate }}</th>
+                <th colspan="2" class="text-right">{{ 'artemisApp.exam.examSummary.points.sum' | artemisTranslate }}</th>
                 <td>{{ calculatePointsSum() }}</td>
                 <td>{{ calculateMaxPointsSum() }}</td>
             </tr>
