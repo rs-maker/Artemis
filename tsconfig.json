@@ -30,6 +30,7 @@
     "angularCompilerOptions": {
         "genDir": "build/resources/main/aot",
         "skipMetadataEmit" : true,
+        "strictInjectionParameters": true,
         "fullTemplateTypeCheck": true,
         "strictTemplates": true,
         "preserveWhitespaces": true
