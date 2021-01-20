@@ -101,8 +101,8 @@ export class InstructorCourseDashboardComponent implements OnInit {
      * @param denominator
      * @return {number} percentage for given numerator and denominator that is rounded towards zero
      */
-    calculatePercentage(numerator: number, denominator: number): number {
-        if (denominator === 0) {
+    calculatePercentage(numerator: number | undefined, denominator: number | undefined): number {
+        if (numerator == null || denominator == null || denominator === 0) {
             return 0;
         }
 
@@ -115,7 +115,7 @@ export class InstructorCourseDashboardComponent implements OnInit {
      * @param length Total number of participations.
      * @return {string} 'bg-danger', 'bg-warning' or 'bg-success' depending on percentage of assessed submissions.
      */
-    calculateClass(numberOfAssessments: number, length: number): string {
+    calculateClass(numberOfAssessments: number | undefined, length: number | undefined): string {
         const percentage = this.calculatePercentage(numberOfAssessments, length);
 
         if (percentage < this.MIN_POINTS_ORANGE) {
