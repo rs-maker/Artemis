@@ -72,7 +72,7 @@ export class InstructorCourseDashboardComponent implements OnInit {
             }),
             catchError((response: HttpErrorResponse) => {
                 this.onError(response.message);
-                return of(null);
+                return of(undefined);
             }),
         );
 
@@ -85,7 +85,7 @@ export class InstructorCourseDashboardComponent implements OnInit {
             }),
             catchError((response: string) => {
                 this.onError(response);
-                return of(null);
+                return of(undefined);
             }),
         );
 
@@ -102,7 +102,7 @@ export class InstructorCourseDashboardComponent implements OnInit {
      * @return {number} percentage for given numerator and denominator that is rounded towards zero
      */
     calculatePercentage(numerator: number | undefined, denominator: number | undefined): number {
-        if (numerator == null || denominator == null || denominator === 0) {
+        if (numerator == undefined || denominator == undefined || denominator === 0) {
             return 0;
         }
 
