@@ -94,12 +94,13 @@ export class CourseExerciseRowComponent implements OnInit, OnDestroy {
 
     getUrgentClass(date?: Moment) {
         if (!date) {
-            return undefined;
+            return '';
         }
         const remainingDays = date.diff(moment(), 'days');
         if (0 <= remainingDays && remainingDays < 7) {
             return 'text-danger';
         }
+        return '';
     }
 
     asProgrammingExercise(exercise: Exercise): ProgrammingExercise {

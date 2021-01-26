@@ -21,7 +21,7 @@
         </div>
     </div>
     <h4>
-        <small [ngStyle]="assessedSubmissions === submissions.length && submissions.length > 0 && { color: '#5cb85c' }">
+        <small [ngStyle]="assessedSubmissions === submissions.length && submissions.length > 0 ? { color: '#5cb85c' } : null">
             <strong>Progress: {{ (assessedSubmissions / submissions.length) * 100 | number: '0.0-0' }} % </strong>({{ assessedSubmissions }} out of
             {{ submissions.length }} submitted models assessed)
         </small>
@@ -54,7 +54,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr [ngStyle]="submission.optimal && { 'font-weight': 'bold' }" *ngFor="let submission of optimalSubmissions; let i = index">
+                <tr [ngStyle]="submission.optimal ? { 'font-weight': 'bold' } : null" *ngFor="let submission of optimalSubmissions; let i = index">
                     <td>{{ i + 1 }}</td>
                     <td>{{ submission.participation.participantName }}</td>
                     <td>
@@ -148,7 +148,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr [ngStyle]="submission.optimal && { 'font-weight': 'bold' }" *ngFor="let submission of otherSubmissions; let i = index">
+                <tr [ngStyle]="submission.optimal ? { 'font-weight': 'bold' } : null" *ngFor="let submission of otherSubmissions; let i = index">
                     <td>{{ i + 1 }}</td>
                     <td>{{ submission.participation.participantName }}</td>
                     <td>{{ submission.submissionDate | artemisDate }}</td>
