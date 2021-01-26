@@ -492,7 +492,7 @@ export class GuidedTourComponent implements AfterViewInit, OnDestroy {
      * @return style object for the rectangle beside the highlighted element
      */
     public getOverlayStyle(position: OverlayPosition) {
-        let style;
+        let style: { [klass: string]: any } = {};
 
         if (this.selectedElementRect) {
             const selectedElementTop = this.selectedElementRect.top - this.getHighlightPadding();
