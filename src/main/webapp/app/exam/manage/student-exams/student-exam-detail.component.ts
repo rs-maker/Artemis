@@ -11,6 +11,7 @@ import { ArtemisDurationFromSecondsPipe } from 'app/shared/pipes/artemis-duratio
 import { JhiAlertService } from 'ng-jhipster';
 import { round } from 'app/shared/util/utils';
 import * as moment from 'moment';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 @Component({
     selector: 'jhi-student-exam-detail',
@@ -59,7 +60,7 @@ export class StudentExamDetailComponent implements OnInit {
      * Get an icon for the type of the given exercise.
      * @param exercise {Exercise}
      */
-    exerciseIcon(exercise: Exercise): string {
+    exerciseIcon(exercise: Exercise): IconProp {
         switch (exercise.type) {
             case ExerciseType.QUIZ:
                 return 'check-double';
