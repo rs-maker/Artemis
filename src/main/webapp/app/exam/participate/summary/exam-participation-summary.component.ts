@@ -104,8 +104,8 @@ export class ExamParticipationSummaryComponent implements OnInit {
      * @param exerciseId
      * checks collapse control of exercise cards depending on exerciseId
      */
-    isCollapsed(exerciseId: number): boolean {
-        return this.collapsedExerciseIds.includes(exerciseId);
+    isCollapsed(exerciseId?: number): boolean {
+        return exerciseId ? this.collapsedExerciseIds.includes(exerciseId) : false;
     }
 
     /**
