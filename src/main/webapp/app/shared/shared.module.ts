@@ -20,6 +20,8 @@ import { AlertComponent } from 'app/shared/alert/alert.component';
 import { CircularProgressBarComponent } from 'app/shared/circular-progress-bar/circular-progress-bar.component';
 import { ArtemisTranslatePipe } from 'app/shared/pipes/artemis-translate.pipe';
 import { ArtemisTimeAgoPipe } from 'app/shared/pipes/artemis-time-ago.pipe';
+import { CustomMinDirective } from 'app/shared/validators/custom-min-validator.directive';
+import { CustomMaxDirective } from 'app/shared/validators/custom-max-validator.directive';
 
 @NgModule({
     imports: [ArtemisSharedLibsModule, ArtemisSharedCommonModule, ArtemisSharedPipesModule],
@@ -38,6 +40,8 @@ import { ArtemisTimeAgoPipe } from 'app/shared/pipes/artemis-time-ago.pipe';
         SlideToggleComponent,
         JhiConnectionStatusComponent,
         ChartComponent,
+        CustomMinDirective,
+        CustomMaxDirective,
     ],
     entryComponents: [DeleteDialogComponent],
     exports: [
@@ -61,6 +65,8 @@ import { ArtemisTimeAgoPipe } from 'app/shared/pipes/artemis-time-ago.pipe';
         ChartComponent,
         ArtemisTranslatePipe,
         ArtemisTimeAgoPipe,
+        CustomMinDirective,
+        CustomMaxDirective,
     ],
     providers: [ArtemisDatePipe],
 })
