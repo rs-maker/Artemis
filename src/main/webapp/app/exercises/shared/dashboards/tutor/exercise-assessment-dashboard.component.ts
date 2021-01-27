@@ -583,6 +583,14 @@ export class ExerciseAssessmentDashboardComponent implements OnInit, AfterViewIn
         return exercise as ProgrammingExercise;
     }
 
+    getScoreForCorrectionRound(submission: Submission, correctionRound: number) {
+        const { results } = submission;
+        if (results != undefined && results[correctionRound] != undefined) {
+            return results[correctionRound].score;
+        }
+        return undefined;
+    }
+
     /**
      * Navigates back to the tutor (exam) dashboard
      */

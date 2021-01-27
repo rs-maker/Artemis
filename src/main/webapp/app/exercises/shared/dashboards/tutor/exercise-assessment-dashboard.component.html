@@ -270,8 +270,8 @@
                                     {{ calculateSubmissionStatus(submission, correctionRound) }}
                                 </td>
                                 <td>
-                                    <span *ngIf="submission.results[correctionRound] != undefined && submission.results[correctionRound]!.score != undefined"
-                                        >{{ submission.results[correctionRound]!.score }} %</span
+                                    <span *ngIf="getScoreForCorrectionRound(submission, correctionRound) != undefined"
+                                        >{{ getScoreForCorrectionRound(submission, correctionRound) }} %</span
                                     >
                                 </td>
                                 <td *ngIf="exercise.type === ExerciseType.TEXT">
