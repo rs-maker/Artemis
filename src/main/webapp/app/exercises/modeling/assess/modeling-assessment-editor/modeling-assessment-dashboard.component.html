@@ -21,6 +21,7 @@
         </div>
     </div>
     <h4>
+        <!-- We allow null because of the ngStyle type definition: '{ [klass: string]: any } | null' -->
         <small [ngStyle]="assessedSubmissions === submissions.length && submissions.length > 0 ? { color: '#5cb85c' } : null">
             <strong>Progress: {{ (assessedSubmissions / submissions.length) * 100 | number: '0.0-0' }} % </strong>({{ assessedSubmissions }} out of
             {{ submissions.length }} submitted models assessed)
