@@ -52,7 +52,7 @@
             jhi-exercise-action-button
             buttonIcon="eye"
             [buttonLabel]="'artemisApp.exerciseActions.viewSubmissions' | artemisTranslate"
-            outlined="true"
+            [outlined]="true"
             [buttonLoading]="exercise.loading"
             *ngIf="participationStatusWrapper() === ParticipationStatus.QUIZ_SUBMITTED"
             [smallButton]="smallButtons"
@@ -62,7 +62,7 @@
             jhi-exercise-action-button
             buttonIcon="eye"
             [buttonLabel]="'artemisApp.exerciseActions.viewResults' | artemisTranslate"
-            outlined="true"
+            [outlined]="true"
             [buttonLoading]="exercise.loading"
             *ngIf="participationStatusWrapper() === ParticipationStatus.QUIZ_FINISHED && showResult"
             [smallButton]="smallButtons"
@@ -73,7 +73,7 @@
             *ngIf="exercise.isAtLeastTutor"
             buttonIcon="signal"
             [buttonLabel]="'artemisApp.exerciseActions.statistics' | artemisTranslate"
-            outlined="true"
+            [outlined]="true"
             [buttonLoading]="exercise.loading"
             [smallButton]="smallButtons"
             routerLink="/course-management/{{ courseId }}/quiz-exercises/{{ exercise.id }}/quiz-point-statistic"
@@ -125,7 +125,7 @@
                 jhi-exercise-action-button
                 buttonIcon="folder-open"
                 [buttonLabel]="'artemisApp.exerciseActions.viewSubmissions' | artemisTranslate"
-                outlined="true"
+                [outlined]="true"
                 [buttonLoading]="exercise.loading"
                 [smallButton]="smallButtons"
                 *ngIf="
@@ -141,7 +141,7 @@
                 jhi-exercise-action-button
                 buttonIcon="folder-open"
                 [buttonLabel]="'artemisApp.exerciseActions.viewResults' | artemisTranslate"
-                outlined="true"
+                [outlined]="true"
                 [buttonLoading]="exercise.loading"
                 [smallButton]="smallButtons"
                 *ngIf="
@@ -327,7 +327,7 @@
             jhi-exercise-action-button
             buttonIcon="folder-open"
             [buttonLabel]="'artemisApp.exerciseActions.viewSubmissions' | artemisTranslate"
-            outlined="true"
+            [outlined]="true"
             [buttonLoading]="exercise.loading"
             [smallButton]="smallButtons"
             [hideLabelMobile]="false"
@@ -344,7 +344,7 @@
             jhi-exercise-action-button
             buttonIcon="folder-open"
             [buttonLabel]="'artemisApp.exerciseActions.viewResults' | artemisTranslate"
-            outlined="true"
+            [outlined]="true"
             [buttonLoading]="exercise.loading"
             [smallButton]="smallButtons"
             *ngIf="
@@ -403,7 +403,7 @@
             jhi-exercise-action-button
             buttonIcon="folder-open"
             [buttonLabel]="'artemisApp.exerciseActions.viewSubmissions' | artemisTranslate"
-            outlined="true"
+            [outlined]="true"
             [buttonLoading]="exercise.loading"
             [smallButton]="smallButtons"
             [hideLabelMobile]="false"
@@ -419,7 +419,7 @@
             jhi-exercise-action-button
             buttonIcon="folder-open"
             [buttonLabel]="'artemisApp.exerciseActions.viewResults' | artemisTranslate"
-            outlined="true"
+            [outlined]="true"
             [buttonLoading]="exercise.loading"
             [smallButton]="smallButtons"
             *ngIf="
