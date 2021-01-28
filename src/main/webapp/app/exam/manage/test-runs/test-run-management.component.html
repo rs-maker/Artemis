@@ -75,9 +75,9 @@
                         <a [routerLink]="[testRun.id]">{{ testRun.id || '-' }}</a>
                     </td>
                     <td>
-                        <a> {{ testRun.user.name }}</a>
+                        <a> {{ testRun.user ? testRun.user.name : '-' }}</a>
                     </td>
-                    <td>{{ testRun.workingTime | artemisDurationFromSeconds }}</td>
+                    <td>{{ testRun.workingTime ? (testRun.workingTime | artemisDurationFromSeconds) : '-' }}</td>
                     <td>{{ (testRun.started ? 'global.generic.yes' : 'global.generic.no') | artemisTranslate }}</td>
                     <td>{{ (testRun.submitted ? 'global.generic.yes' : 'global.generic.no') | artemisTranslate }}</td>
                     <td>{{ testRun.submissionDate | artemisDate }}</td>
