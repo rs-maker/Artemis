@@ -84,7 +84,7 @@
                     <td [width]="350">
                         <div class="w-100 text-right" *ngIf="testRun.id">
                             <div class="btn-group" *ngIf="course?.isAtLeastInstructor">
-                                <ng-container *ngIf="testRun.user.id == instructor.id; else notOwnerOfTestRun">
+                                <ng-container *ngIf="testRun.user && testRun.user.id == instructor.id; else notOwnerOfTestRun">
                                     <ng-container *ngIf="!testRun.submitted; else submitted">
                                         <button class="btn btn-primary btn-sm mr-1 mb-1" [routerLink]="['../test-runs/' + testRun.id + '/conduction']">
                                             <span *ngIf="!testRun.started" jhiTranslate="artemisApp.course.startDate">Start</span>
