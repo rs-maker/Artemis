@@ -72,7 +72,7 @@
             <tbody>
                 <tr *ngFor="let testRun of testRuns; trackBy: trackId">
                     <td class="d-none d-md-table-cell">
-                        <a [routerLink]="[testRun.id]">{{ testRun.id }}</a>
+                        <a [routerLink]="[testRun.id]">{{ testRun.id || '-' }}</a>
                     </td>
                     <td>
                         <a> {{ testRun.user.name }}</a>
@@ -82,7 +82,7 @@
                     <td>{{ (testRun.submitted ? 'global.generic.yes' : 'global.generic.no') | artemisTranslate }}</td>
                     <td>{{ testRun.submissionDate | artemisDate }}</td>
                     <td [width]="350">
-                        <div class="w-100 text-right">
+                        <div class="w-100 text-right" *ngIf="testRun.id">
                             <div class="btn-group" *ngIf="course?.isAtLeastInstructor">
                                 <ng-container *ngIf="testRun.user.id == instructor.id; else notOwnerOfTestRun">
                                     <ng-container *ngIf="!testRun.submitted; else submitted">
