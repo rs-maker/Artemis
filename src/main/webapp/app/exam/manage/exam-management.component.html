@@ -71,12 +71,12 @@
                     <td>{{ exam.publishResultsDate | artemisDate }}</td>
                     <td>{{ exam.examStudentReviewStart | artemisDate }}</td>
                     <td>{{ exam.examStudentReviewEnd | artemisDate }}</td>
-                    <td>{{ exam.startDate | durationTo: exam.endDate }}</td>
+                    <td>{{ (exam.startDate ? exam.startDate : null) | durationTo: (exam.endDate ? exam.endDate : null) }}</td>
                     <td>{{ exam.numberOfRegisteredUsers }}</td>
                     <td class="text-right">
                         <div class="btn-group-vertical mr-1 mb-1" *jhiHasAnyAuthority="['ROLE_ADMIN', 'ROLE_INSTRUCTOR', 'ROLE_TA']">
                             <button
-                                *ngIf="(isAtLeastTutor && examHasFinished(exam.id)) || isAtLeastInstructor"
+                                *ngIf="(isAtLeastTutor && examHasFinished(exam.id!)) || isAtLeastInstructor"
                                 type="submit"
                                 [routerLink]="[exam.id, 'tutor-exam-dashboard']"
                                 class="btn btn-primary btn-sm mr-1 mb-1 exercise-button"
@@ -151,7 +151,7 @@
                                     [entityTitle]="exam.title"
                                     deleteQuestion="artemisApp.examManagement.delete.question"
                                     deleteConfirmationText="artemisApp.examManagement.delete.typeNameToConfirm"
-                                    (delete)="deleteExam(exam.id)"
+                                    (delete)="deleteExam(exam.id!)"
                                     [dialogError]="dialogError$"
                                 >
                                     <fa-icon [icon]="'times'"></fa-icon>
