@@ -10,6 +10,6 @@
         class="mx-auto"
         *ngFor="let learningGoal of learningGoals; index as i; trackBy: identify"
         [learningGoal]="learningGoal"
-        [learningGoalProgress]="getLearningGoalProgress(learningGoal)"
+        [learningGoalProgress]="getLearningGoalProgress(learningGoal)!"
     ></jhi-learning-goal-card>
 </div>
