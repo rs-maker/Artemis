@@ -74,8 +74,9 @@ export class ExerciseAssessmentDashboardComponent implements OnInit, AfterViewIn
     totalAssessmentPercentage = new DueDateStat();
     tutorAssessmentPercentage = 0;
     tutorParticipationStatus: TutorParticipationStatus;
+    // TODO: those data structures are not really nice, we should find a different solution
     submissionsByCorrectionRound: Map<number, Submission[]> = new Map<number, Submission[]>();
-    unassessedSubmissionByCorrectionRound?: Map<number, Submission> = new Map<number, Submission>();
+    unassessedSubmissionByCorrectionRound: Map<number, Submission> = new Map<number, Submission>();
     exampleSubmissionsToReview: ExampleSubmission[] = [];
     exampleSubmissionsToAssess: ExampleSubmission[] = [];
     exampleSubmissionsCompletedByTutor: ExampleSubmission[] = [];
@@ -144,7 +145,6 @@ export class ExerciseAssessmentDashboardComponent implements OnInit, AfterViewIn
         this.exerciseId = Number(this.route.snapshot.paramMap.get('exerciseId'));
         this.courseId = Number(this.route.snapshot.paramMap.get('courseId'));
         this.isTestRun = this.route.snapshot.url[3]?.toString() === 'test-run-tutor-dashboard';
-        this.unassessedSubmissionByCorrectionRound = new Map<number, Submission>();
 
         this.loadAll();
 
@@ -442,9 +442,7 @@ export class ExerciseAssessmentDashboardComponent implements OnInit, AfterViewIn
             (error: HttpErrorResponse) => {
                 if (error.status === 404) {
                     // there are no unassessed submission, nothing we have to worry about
-                    if (this.unassessedSubmissionByCorrectionRound) {
-                        this.unassessedSubmissionByCorrectionRound.delete(correctionRound);
-                    }
+                    this.unassessedSubmissionByCorrectionRound.delete(correctionRound);
                 } else if (error.error && error.error.errorKey === 'lockedSubmissionsLimitReached') {
                     this.submissionLockLimitReached = true;
                 } else {

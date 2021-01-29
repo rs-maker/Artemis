@@ -48,7 +48,7 @@ export class AlertComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * The recveived alert may contain a message which could not be translated.
+     * The received alert may contain a message which could not be translated.
      * We slice the wrapping 'translation-not-found[..]' and return the response.
      * @param alert which contains the alert message
      */
@@ -58,6 +58,8 @@ export class AlertComponent implements OnInit, OnDestroy {
     }
 
     close(alert: JhiAlert): void {
-        alert.close?.(this.alerts);
+        if (alert.close) {
+            alert.close(this.alerts);
+        }
     }
 }

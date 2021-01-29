@@ -143,6 +143,8 @@ export class AlertErrorComponent implements OnDestroy {
     }
 
     close(alert: JhiAlert): void {
-        alert.close?.(this.alerts);
+        if (alert.close) {
+            alert.close(this.alerts);
+        }
     }
 }
