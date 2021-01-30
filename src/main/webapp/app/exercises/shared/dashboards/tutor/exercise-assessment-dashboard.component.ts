@@ -467,7 +467,7 @@ export class ExerciseAssessmentDashboardComponent implements OnInit, AfterViewIn
      * Returns whether the example submission for the given id has already been completed
      * @param exampleSubmissionId Id of the example submission which to check for completion
      */
-    hasBeenCompletedByTutor(exampleSubmissionId: number) {
+    hasBeenCompletedByTutor(exampleSubmissionId?: number) {
         return this.exampleSubmissionsCompletedByTutor.filter((exampleSubmission) => exampleSubmission.id === exampleSubmissionId).length > 0;
     }
 

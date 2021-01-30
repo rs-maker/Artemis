@@ -46,7 +46,7 @@ export abstract class Participation implements BaseEntity {
     }
 }
 
-export const getExercise = (participation: Participation): Exercise | undefined => {
+export const getExercise = (participation: Participation | undefined): Exercise | undefined => {
     if (participation) {
         switch (participation.type) {
             case ParticipationType.PROGRAMMING:

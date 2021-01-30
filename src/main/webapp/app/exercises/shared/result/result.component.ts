@@ -47,10 +47,10 @@ export class ResultComponent implements OnInit, OnChanges {
     // make constants available to html for comparison
     readonly ResultTemplateStatus = ResultTemplateStatus;
 
-    @Input() participation: Participation;
+    @Input() participation?: Participation;
     @Input() isBuilding: boolean;
     @Input() short = false;
-    @Input() result: Result | null;
+    @Input() result: Result | undefined;
     @Input() showUngradedResults: boolean;
     @Input() showGradedBadge = false;
     @Input() showTestDetails = false;
@@ -147,13 +147,13 @@ export class ResultComponent implements OnInit, OnChanges {
             this.resultTooltip = this.buildResultTooltip();
         } else {
             // make sure that we do not display results that are 'rated=false' or that do not have a score
-            this.result = null;
+            this.result = undefined;
         }
     }
 
     private evaluateTemplateStatus() {
         // Fallback if participation is not set
-        const exercise = getExercise(this.participation);
+        const exercise = getExercise(this.participation!);
         if (!this.participation || !exercise) {
             if (!this.result) {
                 return ResultTemplateStatus.NO_RESULT;
@@ -216,10 +216,7 @@ export class ResultComponent implements OnInit, OnChanges {
     }
 
     private dateAsMoment(date: any) {
-        if (date == undefined) {
-            return null;
-        }
-        return moment.isMoment(date) ? date : moment(date);
+        return date ? (moment.isMoment(date) ? date : moment(date)) : undefined;
     }
 
     /**
@@ -245,7 +242,7 @@ export class ResultComponent implements OnInit, OnChanges {
      * Only show the 'preliminary' tooltip for programming student participation results and if the buildAndTestAfterDueDate has not passed.
      */
     buildResultTooltip() {
-        const programmingExercise = getExercise(this.participation) as ProgrammingExercise;
+        const programmingExercise = getExercise(this.participation!) as ProgrammingExercise;
         if (this.participation && isProgrammingExerciseStudentParticipation(this.participation) && isResultPreliminary(this.result!, programmingExercise)) {
             if (programmingExercise?.assessmentType !== AssessmentType.AUTOMATIC) {
                 return this.translate.instant('artemisApp.result.preliminaryTooltipSemiAutomatic');
@@ -260,10 +257,10 @@ export class ResultComponent implements OnInit, OnChanges {
     getHasFeedback(): boolean {
         if (this.submission && this.submission.submissionExerciseType === SubmissionExerciseType.PROGRAMMING && (this.submission as ProgrammingSubmission).buildFailed) {
             return true;
-        } else if (this.result!.hasFeedback === null) {
+        } else if (this.result!.hasFeedback === undefined) {
             return false;
         }
-        return this.result!.hasFeedback === true;
+        return this.result!.hasFeedback;
     }
 
     /**
@@ -277,7 +274,7 @@ export class ResultComponent implements OnInit, OnChanges {
         const modalRef = this.modalService.open(ResultDetailComponent, { keyboard: true, size: 'lg' });
         const componentInstance: ResultDetailComponent = modalRef.componentInstance;
         componentInstance.result = result;
-        const exercise = getExercise(this.participation);
+        const exercise = getExercise(this.participation!);
         componentInstance.showTestDetails = (exercise?.type === ExerciseType.PROGRAMMING && (exercise as ProgrammingExercise).showTestNamesToStudents) || this.showTestDetails;
         if (exercise) {
             componentInstance.exerciseType = exercise.type!;

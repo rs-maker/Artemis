@@ -429,7 +429,7 @@
                 </h4>
                 <fa-icon [icon]="'question-circle'" [ngbTooltip]="'artemisApp.exerciseAssessmentDashboard.moreFeedbackRequestHint' | artemisTranslate"></fa-icon>
                 <div class="table-responsive">
-                    <table class="table table-striped exercise-table" *ngIf="moreFeedbackRequests?.length > 0; else noComplaints">
+                    <table class="table table-striped exercise-table" *ngIf="moreFeedbackRequests && moreFeedbackRequests.length > 0; else noComplaints">
                         <thead>
                             <tr>
                                 <th>#</th>
