@@ -23,7 +23,7 @@ export class ExamParticipationSummaryComponent implements OnInit {
     readonly IncludedInOverallScore = IncludedInOverallScore;
 
     @Input()
-    studentExam: StudentExam;
+    studentExam?: StudentExam;
 
     @Input()
     instructorView = false;

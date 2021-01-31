@@ -30,7 +30,7 @@ import { findLatestResult } from 'app/shared/util/utils';
 })
 export class ProgrammingExerciseInstructionComponent implements OnChanges, OnDestroy {
     @Input() public exercise: ProgrammingExercise;
-    @Input() public participation: Participation;
+    @Input() public participation?: Participation;
     @Input() public exerciseHints: ExerciseHint[];
     @Input() generateHtmlEvents: Observable<void>;
     @Input() personalParticipation: boolean;

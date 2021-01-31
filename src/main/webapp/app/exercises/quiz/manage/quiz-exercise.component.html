@@ -150,7 +150,7 @@
                                 <button
                                     *ngIf="quizExercise.isAtLeastInstructor"
                                     type="submit"
-                                    (click)="exportQuizById(quizExercise.id, true)"
+                                    (click)="exportQuizById(quizExercise.id!, true)"
                                     class="btn btn-primary btn-sm mr-1 mb-1"
                                 >
                                     <fa-icon [icon]="'file-export'"></fa-icon>

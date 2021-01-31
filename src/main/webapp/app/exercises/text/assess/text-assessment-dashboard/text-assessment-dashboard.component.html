@@ -56,7 +56,7 @@
                         <jhi-result [participation]="submission.participation"></jhi-result>
                     </td>
                     <td>
-                        <ng-container *ngIf="submission.participation.submissions">
+                        <ng-container *ngIf="submission && submission.participation && submission.participation.submissions">
                             {{ submission.participation.submissions.length }}
                         </ng-container>
                     </td>

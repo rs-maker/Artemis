@@ -26,7 +26,7 @@ export class ProgrammingExerciseInstructorRepoDownloadComponent {
     readonly FeatureToggle = FeatureToggle;
 
     @Input()
-    exerciseId: number;
+    exerciseId?: number;
 
     @Input()
     repositoryType: ProgrammingExerciseInstructorRepositoryType;
