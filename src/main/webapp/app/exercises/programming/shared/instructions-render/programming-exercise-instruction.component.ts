@@ -198,7 +198,7 @@ export class ProgrammingExerciseInstructionComponent implements OnChanges, OnDes
             this.participationSubscription.unsubscribe();
         }
         this.participationSubscription = this.participationWebsocketService
-            .subscribeForLatestResultOfParticipation(this.participation.id!, this.personalParticipation, this.exercise.id!)
+            .subscribeForLatestResultOfParticipation(this.participation!.id!, this.personalParticipation, this.exercise.id!)
             .pipe(filter((result) => !!result))
             .subscribe((result: Result) => {
                 this.latestResult = result;
@@ -246,7 +246,7 @@ export class ProgrammingExerciseInstructionComponent implements OnChanges, OnDes
      * If there is no result, return undefined.
      */
     loadLatestResult(): Observable<Result | undefined> {
-        return this.programmingExerciseParticipationService.getLatestResultWithFeedback(this.participation.id!).pipe(
+        return this.programmingExerciseParticipationService.getLatestResultWithFeedback(this.participation!.id!).pipe(
             catchError(() => Observable.of(undefined)),
             flatMap((latestResult: Result) => (latestResult && !latestResult.feedbacks ? this.loadAndAttachResultDetails(latestResult) : Observable.of(latestResult))),
         );
@@ -277,10 +277,10 @@ export class ProgrammingExerciseInstructionComponent implements OnChanges, OnDes
         if (this.exercise.problemStatement) {
             return Observable.of(this.exercise.problemStatement);
         } else {
-            if (!this.participation.id) {
+            if (this.participation && !this.participation.id) {
                 return Observable.of(undefined);
             }
-            return this.repositoryFileService.get(this.participation.id, 'README.md').pipe(
+            return this.repositoryFileService.get(this.participation!.id!, 'README.md').pipe(
                 catchError(() => Observable.of(undefined)),
                 // Old readme files contain chars instead of our domain command tags - replace them when loading the file
                 map((fileObj) => fileObj && fileObj.fileContent.replace(new RegExp(/✅/, 'g'), '[task]')),
