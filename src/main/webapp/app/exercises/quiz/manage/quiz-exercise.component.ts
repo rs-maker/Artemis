@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, TrackByFunction } from '@angular/core';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { JhiAlertService, JhiEventManager } from 'ng-jhipster';
 import { QuizExercise, QuizStatus } from 'app/entities/quiz/quiz-exercise.model';
@@ -56,9 +56,10 @@ export class QuizExerciseComponent extends ExerciseComponent {
 
     /**
      * Get the id of the quiz exercise
+     * @param index the index of the quiz exercise in the iteration
      * @param item the quiz exercise of which the id should be returned
      */
-    trackId(item: QuizExercise) {
+    trackId(index: number, item: QuizExercise) {
         return item.id;
     }
 
