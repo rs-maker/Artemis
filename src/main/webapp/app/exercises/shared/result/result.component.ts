@@ -50,7 +50,7 @@ export class ResultComponent implements OnInit, OnChanges {
     @Input() participation?: Participation;
     @Input() isBuilding: boolean;
     @Input() short = false;
-    @Input() result: Result | undefined;
+    @Input() result?: Result;
     @Input() showUngradedResults: boolean;
     @Input() showGradedBadge = false;
     @Input() showTestDetails = false;
@@ -62,7 +62,7 @@ export class ResultComponent implements OnInit, OnChanges {
     resultIconClass: IconProp;
     resultString: string;
     templateStatus: ResultTemplateStatus;
-    submission: Submission | undefined;
+    submission?: Submission;
 
     resultTooltip: string;
 
@@ -167,8 +167,8 @@ export class ResultComponent implements OnInit, OnChanges {
             // Based on its submission we test if the participation is in due time of the given exercise.
 
             const inDueTime = isParticipationInDueTime(this.participation, exercise);
-            const dueDate = this.dateAsMoment(exercise.dueDate);
-            const assessmentDueDate = this.dateAsMoment(exercise.assessmentDueDate);
+            const dueDate = ResultComponent.dateAsMoment(exercise.dueDate);
+            const assessmentDueDate = ResultComponent.dateAsMoment(exercise.assessmentDueDate);
 
             if (inDueTime && initializedResultWithScore(this.result)) {
                 // Submission is in due time of exercise and has a result with score
@@ -215,8 +215,16 @@ export class ResultComponent implements OnInit, OnChanges {
         return ResultTemplateStatus.NO_RESULT;
     }
 
+<<<<<<< HEAD
     private dateAsMoment(date: any) {
         return date ? (moment.isMoment(date) ? date : moment(date)) : undefined;
+=======
+    private static dateAsMoment(date: any) {
+        if (date == undefined) {
+            return undefined;
+        }
+        return moment.isMoment(date) ? date : moment(date);
+>>>>>>> 5dc160b8dbd7700d8acd8f71a78e7ea01ec9d341
     }
 
     /**
@@ -257,10 +265,17 @@ export class ResultComponent implements OnInit, OnChanges {
     getHasFeedback(): boolean {
         if (this.submission && this.submission.submissionExerciseType === SubmissionExerciseType.PROGRAMMING && (this.submission as ProgrammingSubmission).buildFailed) {
             return true;
+<<<<<<< HEAD
         } else if (this.result!.hasFeedback === undefined) {
             return false;
         }
         return this.result!.hasFeedback;
+=======
+        } else if (this.result?.hasFeedback === undefined) {
+            return false;
+        }
+        return this.result.hasFeedback;
+>>>>>>> 5dc160b8dbd7700d8acd8f71a78e7ea01ec9d341
     }
 
     /**
