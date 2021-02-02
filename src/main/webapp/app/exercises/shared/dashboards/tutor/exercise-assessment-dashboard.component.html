@@ -123,13 +123,8 @@
         </div>
 
         <div class="col-12" *ngIf="exercise.type === ExerciseType.MODELING && exampleSolutionModel">
-            <<<<<<< HEAD
-            <h4>{{ 'artemisApp.exerciseAssessmentDashboard.exampleSolution' | artemisTranslate }}</h4>
-            <jhi-modeling-editor [umlModel]="exampleSolutionModel" [diagramType]="modelingExercise.diagramType" [readOnly]="true"> </jhi-modeling-editor>
-            =======
             <h4>{{ 'artemisApp.exerciseAssessmentDashboard.exampleSolution' | artemisTranslate }}</h4>
             <jhi-modeling-editor [umlModel]="exampleSolutionModel" [diagramType]="modelingExercise.diagramType" [readOnly]="true"></jhi-modeling-editor>
-            >>>>>>> develop
             <p class="mt-2" *ngIf="formattedSampleSolution" [innerHTML]="formattedSampleSolution"></p>
         </div>
 
