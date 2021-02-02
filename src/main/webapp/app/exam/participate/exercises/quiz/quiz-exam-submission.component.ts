@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
-import { QuizQuestionType } from 'app/entities/quiz/quiz-question.model';
+import { QuizQuestion, QuizQuestionType } from 'app/entities/quiz/quiz-question.model';
 import { MultipleChoiceQuestionComponent } from 'app/exercises/quiz/shared/questions/multiple-choice-question/multiple-choice-question.component';
 import { DragAndDropQuestionComponent } from 'app/exercises/quiz/shared/questions/drag-and-drop-question/drag-and-drop-question.component';
 import { ShortAnswerQuestionComponent } from 'app/exercises/quiz/shared/questions/short-answer-question/short-answer-question.component';
@@ -18,6 +18,7 @@ import { cloneDeep } from 'lodash';
 import { ArtemisQuizService } from 'app/shared/quiz/quiz.service';
 import { Submission } from 'app/entities/submission.model';
 import { Exercise, IncludedInOverallScore } from 'app/entities/exercise.model';
+import { ShortAnswerQuestion } from 'app/entities/quiz/short-answer-question.model';
 
 @Component({
     selector: 'jhi-quiz-submission-exam',
@@ -252,5 +253,12 @@ export class QuizExamSubmissionComponent extends ExamSubmissionComponent impleme
             shortAnswerSubmittedAnswer.submittedTexts = submittedTexts;
             this.studentSubmission.submittedAnswers!.push(shortAnswerSubmittedAnswer);
         }, this);
+    }
+
+    /**
+     * Converts a QuizQuestion into a ShortAnswerQuestion
+     */
+    asShortAnswerQuestion(question: QuizQuestion): ShortAnswerQuestion {
+        return question as ShortAnswerQuestion;
     }
 }

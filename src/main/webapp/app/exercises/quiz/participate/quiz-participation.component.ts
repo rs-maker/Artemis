@@ -28,7 +28,7 @@ import { QuizExercise } from 'app/entities/quiz/quiz-exercise.model';
 import { DragAndDropSubmittedAnswer } from 'app/entities/quiz/drag-and-drop-submitted-answer.model';
 import { QuizSubmission } from 'app/entities/quiz/quiz-submission.model';
 import { ShortAnswerQuestion } from 'app/entities/quiz/short-answer-question.model';
-import { QuizQuestionType } from 'app/entities/quiz/quiz-question.model';
+import { QuizQuestion, QuizQuestionType } from 'app/entities/quiz/quiz-question.model';
 import { MultipleChoiceSubmittedAnswer } from 'app/entities/quiz/multiple-choice-submitted-answer.model';
 import { DragAndDropQuestion } from 'app/entities/quiz/drag-and-drop-question.model';
 import { ArtemisQuizService } from 'app/shared/quiz/quiz.service';
@@ -959,5 +959,12 @@ export class QuizParticipationComponent implements OnInit, OnDestroy {
                 setTimeout(() => (this.refreshingQuiz = false), 500); // ensure min animation duration
             },
         );
+    }
+
+    /**
+     * Converts a QuizQuestion into a ShortAnswerQuestion
+     */
+    asShortAnswerQuestion(question: QuizQuestion): ShortAnswerQuestion {
+        return question as ShortAnswerQuestion;
     }
 }

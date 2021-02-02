@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import * as moment from 'moment';
-import { QuizQuestionType } from 'app/entities/quiz/quiz-question.model';
+import { QuizQuestion, QuizQuestionType } from 'app/entities/quiz/quiz-question.model';
 import { QuizSubmission } from 'app/entities/quiz/quiz-submission.model';
 import { AnswerOption } from 'app/entities/quiz/answer-option.model';
 import { DragAndDropMapping } from 'app/entities/quiz/drag-and-drop-mapping.model';
@@ -13,6 +13,7 @@ import { QuizExerciseService } from 'app/exercises/quiz/manage/quiz-exercise.ser
 import { Exam } from 'app/entities/exam.model';
 import { ArtemisServerDateService } from 'app/shared/server-date.service';
 import { Result } from 'app/entities/result.model';
+import { ShortAnswerQuestion } from 'app/entities/quiz/short-answer-question.model';
 
 @Component({
     selector: 'jhi-quiz-exam-summary',
@@ -133,5 +134,12 @@ export class QuizExamSummaryComponent implements OnInit {
             );
         }
         return false;
+    }
+
+    /**
+     * Converts a QuizQuestion into a ShortAnswerQuestion
+     */
+    asShortAnswerQuestion(question: QuizQuestion): ShortAnswerQuestion {
+        return question as ShortAnswerQuestion;
     }
 }

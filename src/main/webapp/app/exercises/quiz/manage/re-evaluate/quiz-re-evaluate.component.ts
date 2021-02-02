@@ -12,6 +12,7 @@ import { QuizExercise } from 'app/entities/quiz/quiz-exercise.model';
 import { QuizExercisePopupService } from 'app/exercises/quiz/manage/quiz-exercise-popup.service';
 import { Duration } from 'app/exercises/quiz/manage/quiz-exercise-interfaces';
 import { cloneDeep } from 'lodash';
+import { ShortAnswerQuestion } from 'app/entities/quiz/short-answer-question.model';
 
 @Component({
     selector: 'jhi-quiz-re-evaluate',
@@ -215,5 +216,12 @@ export class QuizReEvaluateComponent implements OnInit, OnChanges, OnDestroy {
 
     ngOnDestroy(): void {
         this.subscription.unsubscribe();
+    }
+
+    /**
+     * Converts a QuizQuestion into a ShortAnswerQuestion
+     */
+    asShortAnswerQuestion(question: QuizQuestion): ShortAnswerQuestion {
+        return question as ShortAnswerQuestion;
     }
 }

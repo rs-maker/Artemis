@@ -59,7 +59,7 @@
             </div>
             <div *ngIf="question.type === SHORT_ANSWER">
                 <jhi-re-evaluate-short-answer-question
-                    [question]="question"
+                    [question]="asShortAnswerQuestion(question)"
                     [questionIndex]="i + 1"
                     (questionUpdated)="onQuestionUpdated()"
                     (questionDeleted)="deleteQuestion(question)"
