@@ -215,16 +215,11 @@ export class ResultComponent implements OnInit, OnChanges {
         return ResultTemplateStatus.NO_RESULT;
     }
 
-<<<<<<< HEAD
-    private dateAsMoment(date: any) {
-        return date ? (moment.isMoment(date) ? date : moment(date)) : undefined;
-=======
     private static dateAsMoment(date: any) {
         if (date == undefined) {
             return undefined;
         }
         return moment.isMoment(date) ? date : moment(date);
->>>>>>> 5dc160b8dbd7700d8acd8f71a78e7ea01ec9d341
     }
 
     /**
@@ -265,17 +260,10 @@ export class ResultComponent implements OnInit, OnChanges {
     getHasFeedback(): boolean {
         if (this.submission && this.submission.submissionExerciseType === SubmissionExerciseType.PROGRAMMING && (this.submission as ProgrammingSubmission).buildFailed) {
             return true;
-<<<<<<< HEAD
-        } else if (this.result!.hasFeedback === undefined) {
-            return false;
-        }
-        return this.result!.hasFeedback;
-=======
         } else if (this.result?.hasFeedback === undefined) {
             return false;
         }
         return this.result.hasFeedback;
->>>>>>> 5dc160b8dbd7700d8acd8f71a78e7ea01ec9d341
     }
 
     /**
