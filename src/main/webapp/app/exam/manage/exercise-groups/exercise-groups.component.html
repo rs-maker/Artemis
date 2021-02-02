@@ -148,7 +148,7 @@
                         <th>
                             <span>{{ 'artemisApp.exercise.includedInOverallScore' | artemisTranslate }}</span>
                         </th>
-                        <ng-container *ngIf="exerciseGroupToExerciseTypesDict.get(exerciseGroup.id)?.includes(exerciseType.PROGRAMMING)">
+                        <ng-container *ngIf="exerciseGroupToExerciseTypesDict.get(exerciseGroup.id!)?.includes(exerciseType.PROGRAMMING)">
                             <th>
                                 <span>{{ 'artemisApp.exercise.shortName' | artemisTranslate }}</span>
                             </th>
@@ -162,17 +162,17 @@
                                 <span>{{ 'artemisApp.programmingExercise.participationMode' | artemisTranslate }}</span>
                             </th>
                         </ng-container>
-                        <th *ngIf="exerciseGroupToExerciseTypesDict.get(exerciseGroup.id)?.includes(exerciseType.QUIZ)">
+                        <th *ngIf="exerciseGroupToExerciseTypesDict.get(exerciseGroup.id!)?.includes(exerciseType.QUIZ)">
                             <span>{{ 'artemisApp.quizExercise.numberOfQuestions' | artemisTranslate }}</span>
                         </th>
-                        <th *ngIf="exerciseGroupToExerciseTypesDict.get(exerciseGroup.id)?.includes(exerciseType.MODELING)">
+                        <th *ngIf="exerciseGroupToExerciseTypesDict.get(exerciseGroup.id!)?.includes(exerciseType.MODELING)">
                             <span>{{ 'artemisApp.modelingExercise.diagramType' | artemisTranslate }}</span>
                         </th>
                         <th
                             *ngIf="
-                                exerciseGroupToExerciseTypesDict.get(exerciseGroup.id)?.includes(exerciseType.PROGRAMMING) ||
-                                exerciseGroupToExerciseTypesDict.get(exerciseGroup.id)?.includes(exerciseType.TEXT) ||
-                                exerciseGroupToExerciseTypesDict.get(exerciseGroup.id)?.includes(exerciseType.MODELING)
+                                exerciseGroupToExerciseTypesDict.get(exerciseGroup.id!)?.includes(exerciseType.PROGRAMMING) ||
+                                exerciseGroupToExerciseTypesDict.get(exerciseGroup.id!)?.includes(exerciseType.TEXT) ||
+                                exerciseGroupToExerciseTypesDict.get(exerciseGroup.id!)?.includes(exerciseType.MODELING)
                             "
                         >
                             <span>{{ 'artemisApp.assessmentMode' | artemisTranslate }}</span>
@@ -197,7 +197,7 @@
                         <td>{{ exercise.bonusPoints }}</td>
                         <td>{{ exerciseService.isIncludedInScore(exercise) }}</td>
                         <!-- Programming exercise specific cells -->
-                        <ng-container *ngIf="exerciseGroupToExerciseTypesDict.get(exerciseGroup.id)?.includes(exerciseType.PROGRAMMING)">
+                        <ng-container *ngIf="exerciseGroupToExerciseTypesDict.get(exerciseGroup.id!)?.includes(exerciseType.PROGRAMMING)">
                             <ng-container *ngIf="exercise.type === exerciseType.PROGRAMMING; else emptyProgrammingCells">
                                 <td class="align-middle">
                                     {{ exercise.shortName }}
