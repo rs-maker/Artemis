@@ -11,7 +11,7 @@ import { Result } from 'app/entities/result.model';
 })
 export class ResultHistoryComponent {
     @Input() results: Result[];
-    @Input() maxScore: number;
+    @Input() maxScore?: number;
     @Input() showPreviousDivider = false;
 
     /**
