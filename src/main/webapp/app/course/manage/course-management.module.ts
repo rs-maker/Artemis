@@ -44,6 +44,7 @@ import { CourseManagementExerciseRowComponent } from './overview/course-manageme
 import { CourseManagementStatisticsComponent } from './overview/course-management-statistics.component';
 import { ArtemisTutorParticipationGraphModule } from 'app/shared/dashboards/tutor-participation-graph/tutor-participation-graph.module';
 import { ArtemisMarkdownModule } from 'app/shared/markdown.module';
+import { CourseDetailDoughnutChartComponent } from 'app/course/manage/course-detail-doughnut-chart.component';
 
 @NgModule({
     imports: [
@@ -86,6 +87,7 @@ import { ArtemisMarkdownModule } from 'app/shared/markdown.module';
     declarations: [
         CourseManagementComponent,
         CourseDetailComponent,
+        CourseDetailDoughnutChartComponent,
         CourseUpdateComponent,
         CourseExerciseCardComponent,
         CourseManagementExercisesComponent,

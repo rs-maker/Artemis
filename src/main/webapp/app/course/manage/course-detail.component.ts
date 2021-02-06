@@ -7,6 +7,7 @@ import { Course } from 'app/entities/course.model';
 import { CourseManagementService } from './course-management.service';
 import { CachingStrategy } from 'app/shared/image/secured-image.component';
 import { JhiAlertService } from 'ng-jhipster';
+import { isOrion } from 'app/shared/orion/orion';
 
 @Component({
     selector: 'jhi-course-detail',
@@ -14,6 +15,9 @@ import { JhiAlertService } from 'ng-jhipster';
     styleUrls: ['./course-detail.component.scss'],
 })
 export class CourseDetailComponent implements OnInit, OnDestroy {
+    readonly isOrion = isOrion;
+    public refreshingCourse = false;
+
     CachingStrategy = CachingStrategy;
     course: Course;
     private eventSubscriber: Subscription;
@@ -73,5 +77,13 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
                 this.course = courseResponse.body!;
             });
         });
+    }
+
+    hasVisibleExams(): boolean {
+        return true;
+    }
+
+    loadCourse(refresh = false) {
+        this.refreshingCourse = refresh;
     }
 }
