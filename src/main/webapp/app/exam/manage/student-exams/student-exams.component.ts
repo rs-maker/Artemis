@@ -329,6 +329,7 @@ export class StudentExamsComponent implements OnInit {
         if (studentExam.user) {
             return `${studentExam.user.login} (${studentExam.user.name})`;
         }
+        return '';
     };
 
     /**
