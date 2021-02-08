@@ -1,14 +1,17 @@
-<div>
-    <canvas
-        baseChart
-        id="complete-chart"
-        height="200"
-        width="200"
-        [legend]="false"
-        [datasets]="doughnutChartData"
-        [options]="totalScoreOptions"
-        [colors]="doughnutChartColors"
-        [labels]="doughnutChartLabels"
-        [chartType]="doughnutChartType"
-    ></canvas>
+<div class="mx-3">
+    <h4 class="text-center">{{ doughnutChartTitle }}</h4>
+    <div class="doughnut-chart-container">
+        <canvas
+            baseChart
+            id="doughnut"
+            height="200"
+            width="200"
+            [legend]="false"
+            [datasets]="doughnutChartData"
+            [options]="totalScoreOptions"
+            [colors]="doughnutChartColors"
+            [labels]="doughnutChartLabels"
+            [chartType]="doughnutChartType"
+        ></canvas>
+    </div>
 </div>

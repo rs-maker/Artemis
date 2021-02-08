@@ -22,6 +22,11 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     course: Course;
     private eventSubscriber: Subscription;
 
+    firstTitle = 'Total Assessments';
+    secondTitle = 'Total Complaints';
+    thirdTitle = 'More Feedback Requests';
+    fourthTitle = 'Average Student Score';
+
     constructor(
         private eventManager: JhiEventManager,
         private courseService: CourseManagementService,

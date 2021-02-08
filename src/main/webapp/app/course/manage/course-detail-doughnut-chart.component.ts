@@ -1,16 +1,17 @@
-import { Component } from '@angular/core';
-import { ChartOptions, ChartType } from 'chart.js';
+import { Component, Input, OnInit } from '@angular/core';
 import { CourseStatisticsDataSet } from 'app/overview/course-statistics/course-statistics.component';
 
 @Component({
     selector: 'jhi-course-detail-doughnut-chart',
     templateUrl: './course-detail-doughnut-chart.component.html',
+    styleUrls: ['./course-detail-doughnut-chart.component.scss'],
 })
-export class CourseDetailDoughnutChartComponent {
-    barChartOptions: ChartOptions = {};
-    barChartType: ChartType = 'bar';
+export class CourseDetailDoughnutChartComponent implements OnInit {
+    @Input() doughnutChartTitle: string;
+
+    // Chart.js data
     doughnutChartType = 'doughnut';
-    doughnutChartColors = ['red', 'green'];
+    doughnutChartColors = ['rgba(219, 0, 0, 1)', 'rgba(122, 204, 69, 1)'];
     doughnutChartLabels: string[] = ['Done', 'Not Done'];
     totalScoreOptions: object = {
         cutoutPercentage: 75,
@@ -26,4 +27,8 @@ export class CourseDetailDoughnutChartComponent {
             backgroundColor: this.doughnutChartColors,
         },
     ];
+
+    ngOnInit(): void {
+        this.doughnutChartData[0].data = [10, 20];
+    }
 }
