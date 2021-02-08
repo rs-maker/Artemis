@@ -32,7 +32,7 @@
                 <div *ngIf="course.lectures" jhiOrionFilter [showInOrionWindow]="false" class="tab-item lectures" routerLink="lectures" routerLinkActive="active">
                     <b jhiTranslate="artemisApp.courseOverview.menu.lectures">Lectures</b>
                 </div>
-                <div jhiOrionFilter [showInOrionWindow]="false" class="guided-tour tab-item statistics" routerLink="statistics" routerLinkActive="active">
+                <div jhiOrionFilter [showInOrionWindow]="false" class="tab-item statistics" routerLink="statistics" routerLinkActive="active">
                     <b jhiTranslate="artemisApp.courseOverview.menu.statistics">Statistics</b>
                 </div>
                 <button class="btn btn-primary btn-md ml-1" (click)="loadCourse(true)" [disabled]="refreshingCourse">
@@ -51,7 +51,7 @@
                         <jhi-course-detail-doughnut-chart class="col-md-6" [doughnutChartTitle]="fourthTitle"></jhi-course-detail-doughnut-chart>
                     </div>
                 </div>
-                <div class="col-md-8"></div>
+                <jhi-course-detail-bar-chart class="col-md-8" [courseId]="course.id" [amountOfStudentsInCourse]="250"></jhi-course-detail-bar-chart>
             </div>
             <div>
                 <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.id, 'edit']" class="btn btn-warning mr-1 mb-1">

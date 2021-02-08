@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import * as moment from 'moment';
 import { filter, map, tap } from 'rxjs/operators';
 import { SERVER_API_URL } from 'app/app.constants';
@@ -452,6 +452,12 @@ export class CourseManagementService {
             .get<Course[]>(`${this.resourceUrl}/for-notifications`, { observe: 'response' })
             .pipe(map((res: EntityArrayResponseType) => this.convertDateArrayFromServer(res)))
             .pipe(map((res: EntityArrayResponseType) => this.setCoursesForNotifications(res)));
+    }
+
+    getStatisticsData(courseId: number, periodIndex: number): Observable<number[]> {
+        return of([Math.floor(Math.random() * 100 + courseId), Math.floor(Math.random() * 100 + periodIndex), Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)]);
+        // const params = new HttpParams().set('periodIndex', '' + periodIndex);
+        // return this.http.get<number[]>(`${this.resourceUrl}/${courseId}/statistics`, { params });
     }
 }
 
