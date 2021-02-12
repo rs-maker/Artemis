@@ -2,7 +2,7 @@
     <div class="container">
         <div class="row">
             <div class="col row details-container">
-                <div class="col-4 row-flex pointer-row">
+                <div class="col-5 row-flex pointer-row">
                     <div class="ml-2 mr-1" *ngIf="hasLeftoverAssessments">
                         <fa-icon
                             [icon]="'exclamation-triangle'"
@@ -32,52 +32,52 @@
                     </div>
                 </div>
 
-                <div class="col-5 row-flex hide-1400 exercise-date-container">
-                    <div class="exercise-date">
+                <div class="col-4 row-flex hide-1400 exercise-date-container">
+                    <div [ngClass]="!!details.releaseDate ? 'exercise-date' : 'exercise-date exercise-no-date'">
                         <div class="exercise-date-timeline"></div>
                         <span class="small">{{ 'artemisApp.course.releaseDate' | translate }}</span>
-                        <div *ngIf="!details.releaseDate" style="display: block">
+                        <div *ngIf="!details.releaseDate">
                             <div class="calender-icon-container">
-                                <fa-icon class="calender-icon" [icon]="'calendar-minus'"></fa-icon>
+                                <fa-icon class="calender-icon" [icon]="'times'"></fa-icon>
                             </div>
                         </div>
-                        <div *ngIf="details.releaseDate" style="display: block" [ngbTooltip]="details.releaseDate | artemisDate">
+                        <div *ngIf="details.releaseDate" [ngbTooltip]="details.releaseDate | artemisDate">
                             <div class="calender-icon-container">
-                                <fa-icon class="calender-icon" [icon]="'calendar-check'"></fa-icon>
+                                <fa-icon class="calender-icon" [icon]="'calendar-alt'"></fa-icon>
                             </div>
                             <span class="small">{{ details.releaseDate! | amTimeAgo }}</span>
                         </div>
                         <div *ngIf="!details.releaseDate"><p></p></div>
                     </div>
 
-                    <div class="exercise-date">
+                    <div [ngClass]="!!details.dueDate ? 'exercise-date' : 'exercise-date exercise-no-date'">
                         <div class="exercise-date-timeline"></div>
                         <span class="small">{{ 'artemisApp.course.dueDate' | translate }}</span>
                         <div *ngIf="!details.dueDate">
-                            <div class="calender-icon-container" style="display: block">
-                                <fa-icon class="calender-icon" [icon]="'calendar-minus'"></fa-icon>
+                            <div class="calender-icon-container">
+                                <fa-icon class="calender-icon" [icon]="'times'"></fa-icon>
                             </div>
                         </div>
                         <div *ngIf="details.dueDate" [ngbTooltip]="details.dueDate | artemisDate">
-                            <div class="calender-icon-container" style="display: block">
-                                <fa-icon class="calender-icon" [icon]="'calendar-check'"></fa-icon>
+                            <div class="calender-icon-container">
+                                <fa-icon class="calender-icon" [icon]="'calendar-alt'"></fa-icon>
                             </div>
                             <span class="small">{{ details.dueDate! | amTimeAgo }}</span>
                         </div>
                         <div *ngIf="!details.dueDate"><p></p></div>
                     </div>
 
-                    <div class="exercise-date">
+                    <div [ngClass]="!!details.assessmentDueDate ? 'exercise-date' : 'exercise-date exercise-no-date'">
                         <div class="exercise-date-timeline"></div>
                         <span class="small">{{ 'artemisApp.course.assessmentDueDate' | translate }}</span>
                         <div *ngIf="!details.assessmentDueDate">
-                            <div class="calender-icon-container" style="display: block">
-                                <fa-icon class="calender-icon" [icon]="'calendar-minus'"></fa-icon>
+                            <div class="calender-icon-container">
+                                <fa-icon class="calender-icon" [icon]="'times'"></fa-icon>
                             </div>
                         </div>
                         <div *ngIf="details.assessmentDueDate" [ngbTooltip]="details.assessmentDueDate | artemisDate">
-                            <div class="calender-icon-container" style="display: block">
-                                <fa-icon class="calender-icon" [icon]="'calendar-check'"></fa-icon>
+                            <div class="calender-icon-container">
+                                <fa-icon class="calender-icon" [icon]="'calendar-alt'"></fa-icon>
                             </div>
                             <span class="small">{{ details.assessmentDueDate! | amTimeAgo }}</span>
                         </div>
@@ -85,7 +85,7 @@
                     </div>
                 </div>
 
-                <div class="col-3 row-flex hide-1680 exercise-score-container">
+                <div class="col-2 row-flex hide-1680 exercise-score-container">
                     <div class="exercise-score" *ngIf="statistic && rowType == exerciseRowType.CURRENT">
                         <span class="bold">{{ 'artemisApp.course.participations' | translate }}</span>
                         <jhi-progress-bar

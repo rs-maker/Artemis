@@ -50,18 +50,18 @@
     }
 
     .calender-icon-container {
-        width: 30px;
-        height: 30px;
+        width: 24px;
+        height: 24px;
         background-color: $light-border-color;
         border-radius: 25px;
         border-color: #3e8acc;
         border-width: 2px;
         margin: auto;
+        display: block;
     }
 
     .calender-icon {
-        position: relative;
-        top: 3px;
+        font-size: 0.8em;
     }
 
     .exercise-date-timeline {
@@ -76,21 +76,25 @@
     }
 
     .exercise-date-container {
-        justify-content: end;
+        justify-content: center;
         min-width: 340px;
         max-width: max-content;
         padding: 0;
+        margin: auto;
     }
 
     .exercise-date {
         text-align: center;
         z-index: 1;
-        min-width: 130px;
+        min-width: 95px;
+    }
+
+    .exercise-no-date {
+        opacity: 0.4;
     }
 
     .exercise-score-container {
         padding-left: 0;
-        margin: auto;
     }
 
     .exercise-score {
@@ -131,10 +135,6 @@
 
     .pointer-row {
         min-width: 45%;
-    }
-
-    .details-container {
-        justify-content: space-between !important;
     }
 
     .exercise-date-container {
