@@ -47,6 +47,7 @@ export class CourseDetailBarChartComponent implements OnChanges {
     constructor(private service: CourseManagementService, private translateService: TranslateService) {}
 
     ngOnChanges() {
+        this.amountOfStudentsInCourse = 250;
         this.chartName = this.translateService.instant('courseStatistics.activeStudents');
         this.amountOfStudents = this.translateService.instant('courseStatistics.amountOfStudents');
         // Only use the pre-loaded stats once

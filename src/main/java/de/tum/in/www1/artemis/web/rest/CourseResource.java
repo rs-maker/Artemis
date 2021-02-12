@@ -632,7 +632,7 @@ public class CourseResource {
      */
     @GetMapping("/courses/{courseId}")
     @PreAuthorize("hasAnyRole('TA', 'INSTRUCTOR', 'ADMIN')")
-    public ResponseEntity<Course> getCourse(@PathVariable Long courseId) {
+    public ResponseEntity<Course> getCourseDTOForDetailView(@PathVariable Long courseId) {
         log.debug("REST request to get Course : {}", courseId);
         Course course = courseService.findOne(courseId);
         course.setNumberOfInstructors(userService.countUserInGroup(course.getInstructorGroupName()));

@@ -9,9 +9,11 @@ import { CourseStatisticsDataSet } from 'app/overview/course-statistics/course-s
 export class CourseDetailDoughnutChartComponent implements OnInit {
     @Input() doughnutChartTitle: string;
 
-    currentPercentage = 50;
-    currentAbsolute = 20;
-    currentMax = 40;
+    @Input() currentPercentage: number;
+    @Input() currentAbsolute: number;
+    @Input() currentMax: number;
+
+    @Input() stats: number[];
 
     // Chart.js data
     doughnutChartType = 'doughnut';
@@ -33,6 +35,11 @@ export class CourseDetailDoughnutChartComponent implements OnInit {
     ];
 
     ngOnInit(): void {
-        this.doughnutChartData[0].data = [10, 20];
+        // mock
+        this.currentPercentage = 50;
+        this.currentAbsolute = 20;
+        this.currentMax = 40;
+        this.stats = [10, 20];
+        this.doughnutChartData[0].data = this.stats;
     }
 }
