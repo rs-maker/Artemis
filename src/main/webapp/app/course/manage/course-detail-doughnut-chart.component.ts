@@ -9,6 +9,10 @@ import { CourseStatisticsDataSet } from 'app/overview/course-statistics/course-s
 export class CourseDetailDoughnutChartComponent implements OnInit {
     @Input() doughnutChartTitle: string;
 
+    currentPercentage = 50;
+    currentAbsolute = 20;
+    currentMax = 40;
+
     // Chart.js data
     doughnutChartType = 'doughnut';
     doughnutChartColors = ['rgba(219, 0, 0, 1)', 'rgba(122, 204, 69, 1)'];
