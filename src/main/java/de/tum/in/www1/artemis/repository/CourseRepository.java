@@ -129,4 +129,25 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             where c.id = :courseId
             """)
     Map<String, Object> findGroupNames(@Param("courseId") long courseId);
+
+    /**
+     * Fetches the average score of all exercises in the course
+     *
+     * @param courseId - course to get the average score for
+     * @return The average score
+     */
+    @Query("""
+            SELECT AVG(r.score)
+            FROM Exercise e JOIN e.studentParticipations p JOIN p.submissions s JOIN s.results r
+            WHERE e.course.id = :courseId
+                AND e.course.studentGroupName member of p.student.groups
+                AND s.id = (
+                    SELECT max(s2.id)
+                    FROM Submission s2 JOIN s2.results r2
+                    WHERE s2.participation.id = s.participation.id
+                    AND r2.score IS NOT NULL
+                )
+            GROUP BY e.id
+            """)
+    Double getAverageStudentScoreForCourse(@Param("courseId") Long courseId);
 }

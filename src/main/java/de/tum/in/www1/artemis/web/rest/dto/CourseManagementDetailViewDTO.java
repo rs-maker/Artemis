@@ -61,7 +61,7 @@ public class CourseManagementDetailViewDTO {
     // Average Student Score
     private Double currentPercentageAverageScore;
 
-    private Long currentAbsoluteAverageScore;
+    private Double currentAbsoluteAverageScore;
 
     private Long currentMaxAverageScore;
 
@@ -253,11 +253,11 @@ public class CourseManagementDetailViewDTO {
         this.currentPercentageAverageScore = currentPercentageAverageScore;
     }
 
-    public Long getCurrentAbsoluteAverageScore() {
+    public Double getCurrentAbsoluteAverageScore() {
         return currentAbsoluteAverageScore;
     }
 
-    public void setCurrentAbsoluteAverageScore(Long currentAbsoluteAverageScore) {
+    public void setCurrentAbsoluteAverageScore(Double currentAbsoluteAverageScore) {
         this.currentAbsoluteAverageScore = currentAbsoluteAverageScore;
     }
 

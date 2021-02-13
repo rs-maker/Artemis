@@ -639,6 +639,38 @@ public class CourseResource {
             return forbidden();
         }
         CourseManagementDetailViewDTO dto = courseService.getStatsForDetailView(courseId);
+
+        // TODO Check max values for zero
+        // Only counting assessments and submissions which are handed in in time
+        long numberOfAssessments = resultService.countNumberOfAssessments(courseId).getInTime();
+        dto.setCurrentAbsoluteAssessments(numberOfAssessments);
+        long numberOfSubmissions = submissionService.countInTimeSubmissionsForCourse(courseId) + programmingExerciseService.countSubmissionsByCourseIdSubmitted(courseId);
+        dto.setCurrentMaxAssessments(numberOfSubmissions);
+        dto.setCurrentPercentageAssessments(Math.round(numberOfAssessments * 1000.0 / numberOfSubmissions) / 10.0);
+
+        // Complaints
+        long numberOfAnsweredComplaints = complaintResponseRepository
+                .countByComplaint_Result_Participation_Exercise_Course_Id_AndComplaint_ComplaintType_AndSubmittedTimeIsNotNull(courseId, ComplaintType.COMPLAINT);
+        dto.setCurrentAbsoluteComplaints(numberOfAnsweredComplaints);
+        long numberOfComplaints = complaintService.countComplaintsByCourseId(courseId);
+        dto.setCurrentMaxComplaints(numberOfComplaints);
+        dto.setCurrentPercentageComplaints(Math.round(numberOfAnsweredComplaints * 1000.0 / numberOfComplaints) / 10.0);
+
+        // More Feedback Requests
+        long numberOfAnsweredFeedbackRequests = complaintResponseRepository
+                .countByComplaint_Result_Participation_Exercise_Course_Id_AndComplaint_ComplaintType_AndSubmittedTimeIsNotNull(courseId, ComplaintType.MORE_FEEDBACK);
+        dto.setCurrentAbsoluteMoreFeedbacks(numberOfAnsweredFeedbackRequests);
+        long numberOfMoreFeedbackRequests = complaintService.countMoreFeedbackRequestsByCourseId(courseId);
+        dto.setCurrentMaxMoreFeedbacks(numberOfMoreFeedbackRequests);
+        dto.setCurrentPercentageComplaints(Math.round(numberOfAnsweredFeedbackRequests * 1000.0 / numberOfMoreFeedbackRequests) / 10.0);
+
+        // Average Student Score
+        double averageStudentScore = courseRepository.getAverageStudentScoreForCourse(courseId);
+        dto.setCurrentAbsoluteAverageScore(averageStudentScore);
+        long maxPointsAchievableInCourse = 10;
+        dto.setCurrentMaxAverageScore(maxPointsAchievableInCourse);
+        dto.setCurrentPercentageAverageScore(Math.round(averageStudentScore * 1000.0 / maxPointsAchievableInCourse) / 10.0);
+
         // return dto;
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(course));
     }

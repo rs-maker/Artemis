@@ -600,8 +600,26 @@ public class CourseService {
      * @return The DTO for the course management detail view
      */
     public CourseManagementDetailViewDTO getStatsForDetailView(Long courseId) {
+        var dto = collectCourseInformation(courseId);
+
+        var groupNames = courseRepository.findGroupNames(courseId);
+        dto.setNumberOfStudentsInCourse(Math.toIntExact(userService.countUserInGroup((String) groupNames.get("studentGroupName"))));
+        dto.setNumberOfTeachingAssistantsInCourse(Math.toIntExact(userService.countUserInGroup((String) groupNames.get("teachingAssistantGroupName"))));
+        dto.setNumberOfInstructorsInCourse(Math.toIntExact(userService.countUserInGroup((String) groupNames.get("instructorGroupName"))));
+
+        dto.setActiveStudents(getActiveStudents(courseId));
+        return dto;
+    }
+
+    /**
+     * Fetches Course Management Detail View data from repository and returns a DTO
+     *
+     * @param courseId id of the course
+     * @return The DTO for the course management detail view
+     */
+    private CourseManagementDetailViewDTO collectCourseInformation(Long courseId) {
         var dto = new CourseManagementDetailViewDTO();
-        var result = courseRepository.getStatsForDetailView(courseId).get(0);
+        var result = courseRepository.getStatsForDetailView(courseId).get(0); // TODO remove list, only map
         dto.setCourseId((Long) result.get("courseId"));
         dto.setPresentationScore((Integer) result.get("presentationScore"));
         dto.setSemester((String) result.get("semester"));
@@ -616,12 +634,6 @@ public class CourseService {
         dto.setTeachingAssistantGroupName((String) result.get("teachingAssistantGroupName"));
         dto.setInstructorGroupName((String) result.get("instructorGroupName"));
 
-        var groupNames = courseRepository.findGroupNames(courseId);
-        dto.setNumberOfStudentsInCourse(Math.toIntExact(userService.countUserInGroup((String) groupNames.get("studentGroupName"))));
-        dto.setNumberOfTeachingAssistantsInCourse(Math.toIntExact(userService.countUserInGroup((String) groupNames.get("teachingAssistantGroupName"))));
-        dto.setNumberOfInstructorsInCourse(Math.toIntExact(userService.countUserInGroup((String) groupNames.get("instructorGroupName"))));
-
-        dto.setActiveStudents(getActiveStudents(courseId));
         return dto;
     }
 }
