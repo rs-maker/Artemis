@@ -1,7 +1,7 @@
 import { CourseManagementOverviewDetailsDto } from 'app/course/manage/overview/course-management-overview-details-dto.model';
 import { Moment } from 'moment';
 
-export class CourseDetailViewDto {
+export class CourseManagementDetailViewDto {
     courseId: number;
     presentationScore: number;
     semester: string;

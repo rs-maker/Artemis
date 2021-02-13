@@ -36,6 +36,7 @@ import de.tum.in.www1.artemis.repository.LearningGoalRepository;
 import de.tum.in.www1.artemis.repository.UserRepository;
 import de.tum.in.www1.artemis.security.ArtemisAuthenticationProvider;
 import de.tum.in.www1.artemis.security.SecurityUtils;
+import de.tum.in.www1.artemis.web.rest.dto.CourseManagementDetailViewDTO;
 import de.tum.in.www1.artemis.web.rest.dto.CourseManagementOverviewDetailsDTO;
 import de.tum.in.www1.artemis.web.rest.errors.AccessForbiddenException;
 import de.tum.in.www1.artemis.web.rest.errors.EntityNotFoundException;
@@ -590,5 +591,37 @@ public class CourseService {
         });
 
         log.info("The course {} has been cleaned up!", courseId);
+    }
+
+    /**
+     * Fetches Course Management Detail View data from repository and returns a DTO
+     *
+     * @param courseId id of the course
+     * @return The DTO for the course management detail view
+     */
+    public CourseManagementDetailViewDTO getStatsForDetailView(Long courseId) {
+        var dto = new CourseManagementDetailViewDTO();
+        var result = courseRepository.getStatsForDetailView(courseId).get(0);
+        dto.setCourseId((Long) result.get("courseId"));
+        dto.setPresentationScore((Integer) result.get("presentationScore"));
+        dto.setSemester((String) result.get("semester"));
+        dto.setStartDate((ZonedDateTime) result.get("startDate"));
+        dto.setEndDate((ZonedDateTime) result.get("endDate"));
+        dto.setDescription((String) result.get("description"));
+        dto.setTitle((String) result.get("title"));
+        dto.setTestCourse((Boolean) result.get("testCourse"));
+        dto.setShortName((String) result.get("shortName"));
+        dto.setColor((String) result.get("color"));
+        dto.setStudentGroupName((String) result.get("studentGroupName"));
+        dto.setTeachingAssistantGroupName((String) result.get("teachingAssistantGroupName"));
+        dto.setInstructorGroupName((String) result.get("instructorGroupName"));
+
+        var groupNames = courseRepository.findGroupNames(courseId);
+        dto.setNumberOfStudentsInCourse(Math.toIntExact(userService.countUserInGroup((String) groupNames.get("studentGroupName"))));
+        dto.setNumberOfTeachingAssistantsInCourse(Math.toIntExact(userService.countUserInGroup((String) groupNames.get("teachingAssistantGroupName"))));
+        dto.setNumberOfInstructorsInCourse(Math.toIntExact(userService.countUserInGroup((String) groupNames.get("instructorGroupName"))));
+
+        dto.setActiveStudents(getActiveStudents(courseId));
+        return dto;
     }
 }

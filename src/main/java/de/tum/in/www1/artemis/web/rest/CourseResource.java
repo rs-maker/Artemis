@@ -633,16 +633,13 @@ public class CourseResource {
     @GetMapping("/courses/{courseId}")
     @PreAuthorize("hasAnyRole('TA', 'INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<Course> getCourseDTOForDetailView(@PathVariable Long courseId) {
-        log.debug("REST request to get Course : {}", courseId);
-        Course course = courseService.findOne(courseId);
-        course.setNumberOfInstructors(userService.countUserInGroup(course.getInstructorGroupName()));
-        course.setNumberOfTeachingAssistants(userService.countUserInGroup(course.getTeachingAssistantGroupName()));
-        course.setNumberOfStudents(userService.countUserInGroup(course.getStudentGroupName()));
+        Course course = courseService.findOne(courseId); // Should be removed
         User user = userService.getUserWithGroupsAndAuthorities();
         if (!authCheckService.isAtLeastTeachingAssistantInCourse(course, user)) {
             return forbidden();
         }
-
+        CourseManagementDetailViewDTO dto = courseService.getStatsForDetailView(courseId);
+        // return dto;
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(course));
     }
 

@@ -17,7 +17,7 @@ import { Subject } from 'rxjs';
 import { ButtonSize } from 'app/shared/components/button.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { CourseDetailViewDto } from 'app/course/manage/course-detail-view-dto.model';
+import { CourseManagementDetailViewDto } from 'app/course/manage/course-management-detail-view-dto.model';
 
 type CourseArchiveState = {
     exportState: 'COMPLETED' | 'RUNNING';
@@ -49,7 +49,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     secondTitle = 'Total Complaints';
     thirdTitle = 'More Feedback Requests';
     fourthTitle = 'Average Student Score';
-    courseDTO = new CourseDetailViewDto();
+    courseDTO = new CourseManagementDetailViewDto();
 
     constructor(
         private eventManager: JhiEventManager,
