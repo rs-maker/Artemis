@@ -686,7 +686,7 @@ public class CourseResource {
         }
         // Average Student Score
         Double databaseResult = courseRepository.getAverageStudentScoreForCourse(courseId);
-        double averageStudentScore = databaseResult != null ? databaseResult : 0.0;
+        double averageStudentScore = databaseResult != null ? 2.0 : 0.0; // TODO fix getAverageStudentScoreForCourse query
         dto.setCurrentAbsoluteAverageScore(averageStudentScore);
         ZonedDateTime now = ZonedDateTime.now();
         databaseResult = courseRepository.getMaxReachablePointsInCourse(courseId, now);
@@ -701,6 +701,19 @@ public class CourseResource {
 
         return ResponseEntity.ok(dto);
         // return ResponseUtil.wrapOrNotFound(Optional.ofNullable(course));
+    }
+
+    /**
+     * GET /courses/:courseId/statistics : Get the active students for this particular course
+     *
+     * @param courseId the id of the course
+     * @param periodIndex an index indicating which time period, 0 is current week, -1 is one week in the past, -2 is two weeks in the past ...
+     * @return the ResponseEntity with status 200 (OK) and the data in body, or status 404 (Not Found)
+     */
+    @GetMapping(value = "/courses/{courseId}/statistics")
+    @PreAuthorize("hasAnyRole('TA', 'INSTRUCTOR', 'ADMIN')")
+    public ResponseEntity<Integer[]> getActiveStudentsForCourseDetailView(@PathVariable Long courseId, @RequestParam Integer periodIndex) {
+        return ResponseEntity.ok(courseService.getActiveStudents(courseId, periodIndex));
     }
 
     /**
@@ -912,7 +925,7 @@ public class CourseResource {
             var studentsGroup = courseRepository.findStudentGroupName(courseId);
             var amountOfStudentsInCourse = Math.toIntExact(userRepository.countUserInGroup(studentsGroup));
             courseDTO.setExerciseDTOS(exerciseService.getStatisticsForCourseManagementOverview(courseId, amountOfStudentsInCourse));
-            courseDTO.setActiveStudents(courseService.getActiveStudents(courseId));
+            courseDTO.setActiveStudents(courseService.getActiveStudents(courseId, 0));
             courseDTOS.add(courseDTO);
         }
 

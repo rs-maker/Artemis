@@ -205,7 +205,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
                     WHERE s2.participation.id = s.participation.id
                     AND r2.score IS NOT NULL
                 )
-            GROUP BY e.id
             """)
     Double getAverageStudentScoreForCourse(@Param("courseId") Long courseId);
 

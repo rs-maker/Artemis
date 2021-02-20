@@ -15,10 +15,10 @@ export class CourseDetailBarChartComponent implements OnChanges {
     @Input()
     courseId: number;
     @Input()
-    amountOfStudentsInCourse: number;
-    // @Input()
-    // initialStats: number[];
-    // initialStatsReceived = false;
+    numberOfStudentsInCourse: number;
+    @Input()
+    initialStats: number[];
+    initialStatsReceived = false;
 
     currentSpan: SpanType;
     graphType: Graphs = Graphs.ACTIVE_STUDENTS;
@@ -39,7 +39,7 @@ export class CourseDetailBarChartComponent implements OnChanges {
     // Data
     barChartLabels: Label[] = [];
     chartData: ChartDataSets[] = [];
-    dataForSpanType: number[];
+    dataForSpanType: number[] = [];
 
     // Left arrow -> decrease, right arrow -> increase
     private currentPeriod = 0;
@@ -47,17 +47,17 @@ export class CourseDetailBarChartComponent implements OnChanges {
     constructor(private service: CourseManagementService, private translateService: TranslateService) {}
 
     ngOnChanges() {
-        this.amountOfStudentsInCourse = 250;
         this.chartName = this.translateService.instant('courseStatistics.activeStudents');
         this.amountOfStudents = this.translateService.instant('courseStatistics.amountOfStudents');
         // Only use the pre-loaded stats once
-        // if (this.initialStatsReceived || !this.initialStats) {
-        //     return;
-        // }
-        this.reloadChart();
-        /*this.initialStatsReceived = true;
+        if (this.initialStatsReceived || !this.initialStats) {
+            return;
+        }
+        this.initialStatsReceived = true;
         this.createLabels();
-        this.dataForSpanType = this.initialStats;
+        for (const value of this.initialStats) {
+            this.dataForSpanType.push(Math.round((value / this.numberOfStudentsInCourse) * 100));
+        }
         this.chartData = [
             {
                 label: this.amountOfStudents,
@@ -69,7 +69,7 @@ export class CourseDetailBarChartComponent implements OnChanges {
                 pointHoverBorderColor: 'rgba(53,61,71,1)',
             },
         ];
-        this.createChart();*/
+        this.createChart();
     }
 
     private reloadChart() {
@@ -113,6 +113,7 @@ export class CourseDetailBarChartComponent implements OnChanges {
     }
 
     private createChart() {
+        const self = this;
         this.barChartOptions = {
             layout: {
                 padding: {
@@ -125,19 +126,6 @@ export class CourseDetailBarChartComponent implements OnChanges {
             },
             animation: {
                 duration: 1,
-                onComplete() {
-                    const chartInstance = this.chart,
-                        ctx = chartInstance.ctx;
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'bottom';
-                    this.data.datasets.forEach(function (dataset: DataSet, j: number) {
-                        const meta = chartInstance.controller.getDatasetMeta(j);
-                        meta.data.forEach(function (bar: any, index: number) {
-                            const data = dataset.data[index];
-                            ctx.fillText(String(data), bar._model.x, bar._model.y - 5);
-                        });
-                    });
-                },
             },
             scales: {
                 yAxes: [
@@ -145,11 +133,23 @@ export class CourseDetailBarChartComponent implements OnChanges {
                         ticks: {
                             beginAtZero: true,
                             min: 0,
-                            max: this.amountOfStudentsInCourse ?? undefined,
+                            max: 100,
                             precision: 0,
+                            autoSkip: true,
+                            callback(value: number) {
+                                return value + '%';
+                            },
                         },
                     },
                 ],
+            },
+            tooltips: {
+                enabled: true,
+                callbacks: {
+                    label(tooltipItem: any) {
+                        return ' ' + self.initialStats[tooltipItem.index];
+                    },
+                },
             },
         };
     }
