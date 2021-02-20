@@ -210,4 +210,17 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             GROUP BY e.id
             """)
     Double getAverageStudentScoreForCourse(@Param("courseId") Long courseId);
+
+    /**
+     * Fetches the maximum amount of points a student could possibly get at the moment
+     *
+     * @param courseId - courseId of the course
+     * @return max points
+     */
+    @Query("""
+            SELECT SUM(e.maxPoints)
+            FROM Exercise e
+            WHERE e.course.id = :courseId AND e.assessmentDueDate < :#{#now}
+            """)
+    Double getMaxReachablePointsInCourse(@Param("courseId") Long courseId, @Param("now") ZonedDateTime now);
 }

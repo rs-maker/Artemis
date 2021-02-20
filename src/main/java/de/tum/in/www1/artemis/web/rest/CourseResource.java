@@ -633,22 +633,26 @@ public class CourseResource {
      */
     @GetMapping("/courses/{courseId}")
     @PreAuthorize("hasAnyRole('TA', 'INSTRUCTOR', 'ADMIN')")
-    public ResponseEntity<Course> getCourseDTOForDetailView(@PathVariable Long courseId) {
-        Course course = courseRepository.findByIdElseThrow(courseId); // Should be removed
+    public ResponseEntity<CourseManagementDetailViewDTO> getCourseDTOForDetailView(@PathVariable Long courseId) {
+        Course course = courseRepository.findByIdElseThrow(courseId);
         User user = userRepository.getUserWithGroupsAndAuthorities();
         if (!authCheckService.isAtLeastTeachingAssistantInCourse(course, user)) {
             return forbidden();
         }
         CourseManagementDetailViewDTO dto = courseService.getStatsForDetailView(courseId);
 
-        // TODO Check max values for zero
         // Only counting assessments and submissions which are handed in in time
         long numberOfAssessments = resultRepository.countNumberOfAssessments(courseId).getInTime();
         dto.setCurrentAbsoluteAssessments(numberOfAssessments);
         long numberOfSubmissions = submissionRepository.countByCourseIdSubmittedBeforeDueDate(courseId)
                 + programmingExerciseRepository.countSubmissionsByCourseIdSubmitted(courseId);
         dto.setCurrentMaxAssessments(numberOfSubmissions);
-        dto.setCurrentPercentageAssessments(Math.round(numberOfAssessments * 1000.0 / numberOfSubmissions) / 10.0);
+        if (numberOfSubmissions > 0) {
+            dto.setCurrentPercentageAssessments(Math.round(numberOfAssessments * 1000.0 / numberOfSubmissions) / 10.0);
+        }
+        else {
+            dto.setCurrentPercentageAssessments(0.0);
+        }
 
         // Complaints
         long numberOfAnsweredComplaints = complaintResponseRepository
@@ -656,7 +660,12 @@ public class CourseResource {
         dto.setCurrentAbsoluteComplaints(numberOfAnsweredComplaints);
         long numberOfComplaints = complaintService.countComplaintsByCourseId(courseId);
         dto.setCurrentMaxComplaints(numberOfComplaints);
-        dto.setCurrentPercentageComplaints(Math.round(numberOfAnsweredComplaints * 1000.0 / numberOfComplaints) / 10.0);
+        if (numberOfComplaints > 0) {
+            dto.setCurrentPercentageComplaints(Math.round(numberOfAnsweredComplaints * 1000.0 / numberOfComplaints) / 10.0);
+        }
+        else {
+            dto.setCurrentPercentageComplaints(0.0);
+        }
 
         // More Feedback Requests
         long numberOfAnsweredFeedbackRequests = complaintResponseRepository
@@ -664,17 +673,27 @@ public class CourseResource {
         dto.setCurrentAbsoluteMoreFeedbacks(numberOfAnsweredFeedbackRequests);
         long numberOfMoreFeedbackRequests = complaintService.countMoreFeedbackRequestsByCourseId(courseId);
         dto.setCurrentMaxMoreFeedbacks(numberOfMoreFeedbackRequests);
-        dto.setCurrentPercentageComplaints(Math.round(numberOfAnsweredFeedbackRequests * 1000.0 / numberOfMoreFeedbackRequests) / 10.0);
-
+        if (numberOfMoreFeedbackRequests > 0) {
+            dto.setCurrentPercentageMoreFeedbacks(Math.round(numberOfAnsweredFeedbackRequests * 1000.0 / numberOfMoreFeedbackRequests) / 10.0);
+        }
+        else {
+            dto.setCurrentPercentageMoreFeedbacks(0.0);
+        }
         // Average Student Score
         double averageStudentScore = courseRepository.getAverageStudentScoreForCourse(courseId);
         dto.setCurrentAbsoluteAverageScore(averageStudentScore);
-        long maxPointsAchievableInCourse = 10;
+        ZonedDateTime now = ZonedDateTime.now();
+        double maxPointsAchievableInCourse = courseRepository.getMaxReachablePointsInCourse(courseId, now);
         dto.setCurrentMaxAverageScore(maxPointsAchievableInCourse);
-        dto.setCurrentPercentageAverageScore(Math.round(averageStudentScore * 1000.0 / maxPointsAchievableInCourse) / 10.0);
+        if (maxPointsAchievableInCourse > 0) {
+            dto.setCurrentPercentageAverageScore(Math.round(averageStudentScore * 1000.0 / maxPointsAchievableInCourse) / 10.0);
+        }
+        else {
+            dto.setCurrentPercentageAverageScore(0.0);
+        }
 
-        // return dto;
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(course));
+        return ResponseEntity.ok(dto);
+        // return ResponseUtil.wrapOrNotFound(Optional.ofNullable(course));
     }
 
     /**

@@ -63,7 +63,7 @@ public class CourseManagementDetailViewDTO {
 
     private Double currentAbsoluteAverageScore;
 
-    private Long currentMaxAverageScore;
+    private Double currentMaxAverageScore;
 
     private Integer[] activeStudents;
 
@@ -261,11 +261,11 @@ public class CourseManagementDetailViewDTO {
         this.currentAbsoluteAverageScore = currentAbsoluteAverageScore;
     }
 
-    public Long getCurrentMaxAverageScore() {
+    public Double getCurrentMaxAverageScore() {
         return currentMaxAverageScore;
     }
 
-    public void setCurrentMaxAverageScore(Long currentMaxAverageScore) {
+    public void setCurrentMaxAverageScore(Double currentMaxAverageScore) {
         this.currentMaxAverageScore = currentMaxAverageScore;
     }
 
