@@ -9,16 +9,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.tum.in.www1.artemis.domain.*;
 import de.tum.in.www1.artemis.domain.modeling.ModelingExercise;
 import de.tum.in.www1.artemis.domain.quiz.QuizExercise;
 import de.tum.in.www1.artemis.repository.CourseRepository;
+import de.tum.in.www1.artemis.repository.ExamRepository;
+import de.tum.in.www1.artemis.service.programming.ProgrammingExerciseExportService;
 import de.tum.in.www1.artemis.web.rest.dto.SubmissionExportOptionsDTO;
 
 /**
@@ -43,13 +45,13 @@ public class CourseExportService {
 
     private final ModelingSubmissionExportService modelingSubmissionExportService;
 
-    private ExamService examService;
+    private final ExamRepository examRepository;
 
     private final WebsocketMessagingService websocketMessagingService;
 
     public CourseExportService(ProgrammingExerciseExportService programmingExerciseExportService, ZipFileService zipFileService, FileService fileService,
             CourseRepository courseRepository, FileUploadSubmissionExportService fileUploadSubmissionExportService, TextSubmissionExportService textSubmissionExportService,
-            ModelingSubmissionExportService modelingSubmissionExportService, WebsocketMessagingService websocketMessagingService) {
+            ModelingSubmissionExportService modelingSubmissionExportService, WebsocketMessagingService websocketMessagingService, ExamRepository examRepository) {
         this.programmingExerciseExportService = programmingExerciseExportService;
         this.zipFileService = zipFileService;
         this.fileService = fileService;
@@ -58,12 +60,7 @@ public class CourseExportService {
         this.textSubmissionExportService = textSubmissionExportService;
         this.modelingSubmissionExportService = modelingSubmissionExportService;
         this.websocketMessagingService = websocketMessagingService;
-    }
-
-    @Autowired
-    // break the dependency cycle
-    public void setExamService(ExamService examService) {
-        this.examService = examService;
+        this.examRepository = examRepository;
     }
 
     /**
@@ -76,10 +73,11 @@ public class CourseExportService {
      * @return Path to the zip file
      */
     public Optional<Path> exportCourse(Course course, String outputDir, List<String> exportErrors) {
-        var courseDirName = course.getShortName() + "-" + course.getTitle() + "-" + ZonedDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        var timestamp = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-Hmss"));
+        var courseDirName = course.getShortName() + "-" + course.getTitle() + "-" + timestamp;
 
         // Create a temporary directory that will contain the files that will be zipped
-        var courseDirPath = Path.of("./exports", courseDirName);
+        var courseDirPath = Path.of("./exports", courseDirName, courseDirName);
         try {
             Files.createDirectories(courseDirPath);
         }
@@ -90,16 +88,26 @@ public class CourseExportService {
             return Optional.empty();
         }
 
-        // Export course exercises and exams
-        exportCourseExercises(course, courseDirPath.toString(), exportErrors);
-        exportCourseExams(course, courseDirPath.toString(), exportErrors);
+        try {
+            // Export course exercises and exams
+            exportCourseExercises(course, courseDirPath.toString(), exportErrors);
+            exportCourseExams(course, courseDirPath.toString(), exportErrors);
 
-        // Zip them together
-        var exportedCoursePath = createCourseZipFile(courseDirPath, Path.of(outputDir), exportErrors);
+            // Zip them together
+            var exportedCoursePath = createCourseZipFile(courseDirPath.getParent(), Path.of(outputDir), exportErrors);
 
-        notifyUserAboutCourseExportState(course.getId(), CourseExportState.COMPLETED, "");
-        log.info("Successfully exported course {}. The zip file is located at: {}", course.getId(), exportedCoursePath);
-        return exportedCoursePath;
+            log.info("Successfully exported course {}. The zip file is located at: {}", course.getId(), exportedCoursePath);
+            return exportedCoursePath;
+        }
+        catch (Exception e) {
+            var error = "Failed to export the entire course " + course.getTitle();
+            exportErrors.add(error);
+            log.info(error);
+            return Optional.empty();
+        }
+        finally {
+            notifyUserAboutCourseExportState(course.getId(), CourseExportState.COMPLETED, "");
+        }
     }
 
     /**
@@ -111,7 +119,7 @@ public class CourseExportService {
      * @param exportErrors List of failures that occurred during the export
      */
     private void exportCourseExercises(Course course, String outputDir, List<String> exportErrors) {
-        Path exercisesDir = Path.of(outputDir, "exercises");
+        Path exercisesDir = Path.of(outputDir, "course-exercises");
         try {
             Files.createDirectory(exercisesDir);
             exportExercises(course.getId(), course.getExercises(), exercisesDir.toString(), exportErrors);
@@ -163,12 +171,12 @@ public class CourseExportService {
      * @param exportErrors List of failures that occurred during the export
      */
     private void exportExam(long examId, String outputDir, List<String> exportErrors) {
-        var exam = examService.findOneWithExerciseGroupsAndExercises(examId);
+        var exam = examRepository.findByIdElseThrow(examId);
         Path examDir = Path.of(outputDir, exam.getId() + "-" + exam.getTitle());
         try {
             Files.createDirectory(examDir);
             // We retrieve every exercise from each exercise group and flatten the list.
-            var exercises = examService.getAllExercisesOfExam(examId);
+            var exercises = examRepository.findAllExercisesByExamId(examId);
             exportExercises(exam.getCourse().getId(), exercises, examDir.toString(), exportErrors);
         }
         catch (IOException e) {
@@ -221,7 +229,7 @@ public class CourseExportService {
                     exportedSubmissionsFileOrEmpty = modelingSubmissionExportService.exportStudentSubmissions(exercise.getId(), submissionsExportOptions);
                 }
                 else if (exercise instanceof QuizExercise) {
-                    // TODO: Quiz submssions aren't supported yet
+                    // TODO: Quiz submissions aren't supported yet
                     return;
                 }
                 else {
@@ -241,6 +249,8 @@ public class CourseExportService {
                 var exportedSubmissionsFile = exportedSubmissionsFileOrEmpty.get();
                 try {
                     Files.move(exportedSubmissionsFile.toPath(), Path.of(outputDir, exportedSubmissionsFile.getName()));
+                    // Delete the directory where the zip was located before it was moved
+                    FileUtils.deleteDirectory(Path.of(exportedSubmissionsFile.getParent()).toFile());
                 }
                 catch (IOException e) {
                     var error = "Failed to move file " + exportedSubmissionsFile.toPath() + " to " + outputDir + ".";

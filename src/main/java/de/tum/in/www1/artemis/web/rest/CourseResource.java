@@ -40,9 +40,7 @@ import de.tum.in.www1.artemis.domain.participation.StudentParticipation;
 import de.tum.in.www1.artemis.domain.participation.TutorParticipation;
 import de.tum.in.www1.artemis.exception.ArtemisAuthenticationException;
 import de.tum.in.www1.artemis.exception.GroupAlreadyExistsException;
-import de.tum.in.www1.artemis.repository.ComplaintRepository;
-import de.tum.in.www1.artemis.repository.ComplaintResponseRepository;
-import de.tum.in.www1.artemis.repository.CourseRepository;
+import de.tum.in.www1.artemis.repository.*;
 import de.tum.in.www1.artemis.security.ArtemisAuthenticationProvider;
 import de.tum.in.www1.artemis.service.*;
 import de.tum.in.www1.artemis.service.connectors.VcsUserManagementService;
@@ -74,53 +72,57 @@ public class CourseResource {
     @Value("${artemis.user-management.course-registration.allowed-username-pattern:#{null}}")
     private Optional<Pattern> allowedCourseRegistrationUsernamePattern;
 
-    private final UserService userService;
+    private final ArtemisAuthenticationProvider artemisAuthenticationProvider;
+
+    private final UserRepository userRepository;
 
     private final CourseService courseService;
 
-    private final ParticipationService participationService;
+    private final StudentParticipationRepository studentParticipationRepository;
 
     private final AuthorizationCheckService authCheckService;
 
-    private final CourseRepository courseRepository;
-
     private final ExerciseService exerciseService;
-
-    private final ArtemisAuthenticationProvider artemisAuthenticationProvider;
 
     private final TutorParticipationService tutorParticipationService;
 
-    private final ComplaintRepository complaintRepository;
-
-    private final ComplaintResponseRepository complaintResponseRepository;
-
     private final SubmissionService submissionService;
-
-    private final ResultService resultService;
 
     private final ComplaintService complaintService;
 
     private final TutorLeaderboardService tutorLeaderboardService;
 
-    private final ProgrammingExerciseService programmingExerciseService;
+    private final ProgrammingExerciseRepository programmingExerciseRepository;
 
     private final AssessmentDashboardService assessmentDashboardService;
-
-    private final AuditEventRepository auditEventRepository;
 
     private final Optional<VcsUserManagementService> vcsUserManagementService;
 
     private final Environment env;
 
-    public CourseResource(UserService userService, CourseService courseService, ParticipationService participationService, CourseRepository courseRepository,
-            ExerciseService exerciseService, AuthorizationCheckService authCheckService, TutorParticipationService tutorParticipationService, Environment env,
-            ArtemisAuthenticationProvider artemisAuthenticationProvider, ComplaintRepository complaintRepository, ComplaintResponseRepository complaintResponseRepository,
-            SubmissionService submissionService, ResultService resultService, ComplaintService complaintService, TutorLeaderboardService tutorLeaderboardService,
-            ProgrammingExerciseService programmingExerciseService, AuditEventRepository auditEventRepository, Optional<VcsUserManagementService> vcsUserManagementService,
-            AssessmentDashboardService assessmentDashboardService) {
-        this.userService = userService;
+    private final CourseRepository courseRepository;
+
+    private final ComplaintRepository complaintRepository;
+
+    private final ComplaintResponseRepository complaintResponseRepository;
+
+    private final AuditEventRepository auditEventRepository;
+
+    private final ExerciseRepository exerciseRepository;
+
+    private final SubmissionRepository submissionRepository;
+
+    private final ResultRepository resultRepository;
+
+    public CourseResource(UserRepository userRepository, CourseService courseService, StudentParticipationRepository studentParticipationRepository,
+            CourseRepository courseRepository, ExerciseService exerciseService, AuthorizationCheckService authCheckService, TutorParticipationService tutorParticipationService,
+            Environment env, ArtemisAuthenticationProvider artemisAuthenticationProvider, ComplaintRepository complaintRepository,
+            ComplaintResponseRepository complaintResponseRepository, SubmissionService submissionService, ComplaintService complaintService,
+            TutorLeaderboardService tutorLeaderboardService, ProgrammingExerciseRepository programmingExerciseRepository, AuditEventRepository auditEventRepository,
+            Optional<VcsUserManagementService> vcsUserManagementService, AssessmentDashboardService assessmentDashboardService, ExerciseRepository exerciseRepository,
+            SubmissionRepository submissionRepository, ResultRepository resultRepository) {
         this.courseService = courseService;
-        this.participationService = participationService;
+        this.studentParticipationRepository = studentParticipationRepository;
         this.courseRepository = courseRepository;
         this.exerciseService = exerciseService;
         this.authCheckService = authCheckService;
@@ -129,14 +131,17 @@ public class CourseResource {
         this.complaintRepository = complaintRepository;
         this.complaintResponseRepository = complaintResponseRepository;
         this.submissionService = submissionService;
-        this.resultService = resultService;
         this.complaintService = complaintService;
         this.tutorLeaderboardService = tutorLeaderboardService;
-        this.programmingExerciseService = programmingExerciseService;
+        this.programmingExerciseRepository = programmingExerciseRepository;
         this.vcsUserManagementService = vcsUserManagementService;
         this.auditEventRepository = auditEventRepository;
         this.env = env;
         this.assessmentDashboardService = assessmentDashboardService;
+        this.userRepository = userRepository;
+        this.exerciseRepository = exerciseRepository;
+        this.submissionRepository = submissionRepository;
+        this.resultRepository = resultRepository;
     }
 
     /**
@@ -208,7 +213,7 @@ public class CourseResource {
             // a specified group does not exist, notify the client
             throw new BadRequestAlertException(ex.getMessage(), ENTITY_NAME, "groupNotFound", true);
         }
-        Course result = courseService.save(course);
+        Course result = courseRepository.save(course);
         return ResponseEntity.created(new URI("/api/courses/" + result.getId()))
                 .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getTitle())).body(result);
     }
@@ -227,32 +232,28 @@ public class CourseResource {
         if (updatedCourse.getId() == null) {
             return createCourse(updatedCourse);
         }
-        Optional<Course> existingCourse = courseRepository.findById(updatedCourse.getId());
-        if (existingCourse.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        if (!Objects.equals(existingCourse.get().getShortName(), updatedCourse.getShortName())) {
+        var existingCourse = courseRepository.findByIdElseThrow(updatedCourse.getId());
+        if (!Objects.equals(existingCourse.getShortName(), updatedCourse.getShortName())) {
             throw new BadRequestAlertException("The course short name cannot be changed", ENTITY_NAME, "shortNameCannotChange", true);
         }
 
-        User user = userService.getUserWithGroupsAndAuthorities();
+        User user = userRepository.getUserWithGroupsAndAuthorities();
         // only allow admins or instructors of the existing course to change it
         // this is important, otherwise someone could put himself into the instructor group of the updated course
-        if (!authCheckService.isAtLeastInstructorInCourse(existingCourse.get(), user)) {
+        if (!authCheckService.isAtLeastInstructorInCourse(existingCourse, user)) {
             return forbidden();
         }
 
         if (authCheckService.isAdmin(user)) {
             // if an admin changes a group, we need to check that the changed group exists
             try {
-                if (!Objects.equals(existingCourse.get().getStudentGroupName(), updatedCourse.getStudentGroupName())) {
+                if (!Objects.equals(existingCourse.getStudentGroupName(), updatedCourse.getStudentGroupName())) {
                     checkIfGroupsExists(updatedCourse.getStudentGroupName());
                 }
-                if (!Objects.equals(existingCourse.get().getTeachingAssistantGroupName(), updatedCourse.getTeachingAssistantGroupName())) {
+                if (!Objects.equals(existingCourse.getTeachingAssistantGroupName(), updatedCourse.getTeachingAssistantGroupName())) {
                     checkIfGroupsExists(updatedCourse.getTeachingAssistantGroupName());
                 }
-                if (!Objects.equals(existingCourse.get().getInstructorGroupName(), updatedCourse.getInstructorGroupName())) {
+                if (!Objects.equals(existingCourse.getInstructorGroupName(), updatedCourse.getInstructorGroupName())) {
                     checkIfGroupsExists(updatedCourse.getInstructorGroupName());
                 }
             }
@@ -265,13 +266,13 @@ public class CourseResource {
             // this means the user must be an instructor, who has NOT Admin rights.
             // instructors are not allowed to change group names, because this would lead to security problems
 
-            if (!Objects.equals(existingCourse.get().getStudentGroupName(), updatedCourse.getStudentGroupName())) {
+            if (!Objects.equals(existingCourse.getStudentGroupName(), updatedCourse.getStudentGroupName())) {
                 throw new BadRequestAlertException("The student group name cannot be changed", ENTITY_NAME, "studentGroupNameCannotChange", true);
             }
-            if (!Objects.equals(existingCourse.get().getTeachingAssistantGroupName(), updatedCourse.getTeachingAssistantGroupName())) {
+            if (!Objects.equals(existingCourse.getTeachingAssistantGroupName(), updatedCourse.getTeachingAssistantGroupName())) {
                 throw new BadRequestAlertException("The teaching assistant group name cannot be changed", ENTITY_NAME, "teachingAssistantGroupNameCannotChange", true);
             }
-            if (!Objects.equals(existingCourse.get().getInstructorGroupName(), updatedCourse.getInstructorGroupName())) {
+            if (!Objects.equals(existingCourse.getInstructorGroupName(), updatedCourse.getInstructorGroupName())) {
                 throw new BadRequestAlertException("The instructor group name cannot be changed", ENTITY_NAME, "instructorGroupNameCannotChange", true);
             }
         }
@@ -284,9 +285,9 @@ public class CourseResource {
         // Based on the old instructors and TAs, we can update all exercises in the course in the VCS (if necessary)
         // We need the old instructors and TAs, so that the VCS user management service can determine which
         // users no longer have TA or instructor rights in the related exercise repositories.
-        final var oldInstructorGroup = existingCourse.get().getInstructorGroupName();
-        final var oldTeachingAssistantGroup = existingCourse.get().getTeachingAssistantGroupName();
-        Course result = courseService.save(updatedCourse);
+        final var oldInstructorGroup = existingCourse.getInstructorGroupName();
+        final var oldTeachingAssistantGroup = existingCourse.getTeachingAssistantGroupName();
+        Course result = courseRepository.save(updatedCourse);
         vcsUserManagementService.ifPresent(userManagementService -> userManagementService.updateCoursePermissions(result, oldInstructorGroup, oldTeachingAssistantGroup));
         return ResponseEntity.ok().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, updatedCourse.getTitle())).body(result);
     }
@@ -365,8 +366,8 @@ public class CourseResource {
     @PostMapping("/courses/{courseId}/register")
     @PreAuthorize("hasAnyRole('USER', 'TA', 'INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<User> registerForCourse(@PathVariable Long courseId) {
-        Course course = courseService.findOne(courseId);
-        User user = userService.getUserWithGroupsAndAuthorities();
+        Course course = courseRepository.findByIdElseThrow(courseId);
+        User user = userRepository.getUserWithGroupsAndAuthorities();
         log.debug("REST request to register {} for Course {}", user.getName(), course.getTitle());
         if (allowedCourseRegistrationUsernamePattern.isPresent() && !allowedCourseRegistrationUsernamePattern.get().matcher(user.getLogin()).matches()) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(applicationName, false, ENTITY_NAME, "registrationNotAllowed",
@@ -401,8 +402,8 @@ public class CourseResource {
     @PreAuthorize("hasAnyRole('TA', 'INSTRUCTOR', 'ADMIN')")
     public List<Course> getAllCourses(@RequestParam(defaultValue = "false") boolean onlyActive) {
         log.debug("REST request to get all Courses the user has access to");
-        User user = userService.getUserWithGroupsAndAuthorities();
-        List<Course> courses = courseService.findAll();
+        User user = userRepository.getUserWithGroupsAndAuthorities();
+        List<Course> courses = courseRepository.findAll();
         Stream<Course> userCourses = courses.stream().filter(course -> user.getGroups().contains(course.getTeachingAssistantGroupName())
                 || user.getGroups().contains(course.getInstructorGroupName()) || authCheckService.isAdmin(user));
         if (onlyActive) {
@@ -425,9 +426,9 @@ public class CourseResource {
         long start = System.currentTimeMillis();
         List<Course> courses = getAllCourses(onlyActive);
         for (Course course : courses) {
-            course.setNumberOfInstructors(userService.countUserInGroup(course.getInstructorGroupName()));
-            course.setNumberOfTeachingAssistants(userService.countUserInGroup(course.getTeachingAssistantGroupName()));
-            course.setNumberOfStudents(userService.countUserInGroup(course.getStudentGroupName()));
+            course.setNumberOfInstructors(userRepository.countUserInGroup(course.getInstructorGroupName()));
+            course.setNumberOfTeachingAssistants(userRepository.countUserInGroup(course.getTeachingAssistantGroupName()));
+            course.setNumberOfStudents(userRepository.countUserInGroup(course.getStudentGroupName()));
         }
         long end = System.currentTimeMillis();
         log.debug("getAllCoursesWithUserStats took " + (end - start) + "ms for " + courses.size() + " courses");
@@ -455,7 +456,7 @@ public class CourseResource {
     @PreAuthorize("hasAnyRole('USER', 'TA', 'INSTRUCTOR', 'ADMIN')")
     public List<Course> getAllCoursesToRegister() {
         log.debug("REST request to get all currently active Courses that are not online courses");
-        return courseService.findAllCurrentlyActiveNotOnlineAndRegistrationEnabled();
+        return courseRepository.findAllCurrentlyActiveNotOnlineAndRegistrationEnabled();
     }
 
     /**
@@ -468,7 +469,7 @@ public class CourseResource {
     @PreAuthorize("hasAnyRole('USER', 'TA', 'INSTRUCTOR', 'ADMIN')")
     public Course getCourseForDashboard(@PathVariable long courseId) {
         long start = System.currentTimeMillis();
-        User user = userService.getUserWithGroupsAndAuthorities();
+        User user = userRepository.getUserWithGroupsAndAuthorities();
 
         Course course = courseService.findOneWithExercisesAndLecturesForUser(courseId, user);
         fetchParticipationsWithSubmissionsAndResultsForCourses(List.of(course), user, start);
@@ -495,11 +496,11 @@ public class CourseResource {
         // would lead to a SQL statement that cannot be optimized
 
         // 1st: fetch participations, submissions and results for individual exercises
-        List<StudentParticipation> individualParticipations = participationService.findByStudentIdAndIndividualExercisesWithEagerSubmissionsResultIgnoreTestRuns(user.getId(),
-                activeIndividualExercises);
+        List<StudentParticipation> individualParticipations = studentParticipationRepository
+                .findByStudentIdAndIndividualExercisesWithEagerSubmissionsResultIgnoreTestRuns(user.getId(), activeIndividualExercises);
 
         // 2nd: fetch participations, submissions and results for team exercises
-        List<StudentParticipation> teamParticipations = participationService.findByStudentIdAndTeamExercisesWithEagerSubmissionsResult(user.getId(), activeTeamExercises);
+        List<StudentParticipation> teamParticipations = studentParticipationRepository.findByStudentIdAndTeamExercisesWithEagerSubmissionsResult(user.getId(), activeTeamExercises);
 
         // 3rd: merge both into one list for further processing
         List<StudentParticipation> participations = Stream.concat(individualParticipations.stream(), teamParticipations.stream()).collect(Collectors.toList());
@@ -529,7 +530,7 @@ public class CourseResource {
     public List<Course> getAllCoursesForDashboard() {
         long start = System.currentTimeMillis();
         log.debug("REST request to get all Courses the user has access to with exercises, participations and results");
-        User user = userService.getUserWithGroupsAndAuthorities();
+        User user = userRepository.getUserWithGroupsAndAuthorities();
 
         // get all courses with exercises for this user
         List<Course> courses = courseService.findAllActiveWithExercisesAndLecturesForUser(user);
@@ -546,7 +547,7 @@ public class CourseResource {
     @PreAuthorize("hasAnyRole('USER', 'TA', 'INSTRUCTOR', 'ADMIN')")
     public List<Course> getAllCoursesForNotifications() {
         log.debug("REST request to get all Courses the user has access to");
-        User user = userService.getUserWithGroupsAndAuthorities();
+        User user = userRepository.getUserWithGroupsAndAuthorities();
 
         return courseService.findAllActiveForUser(user);
     }
@@ -561,18 +562,18 @@ public class CourseResource {
     @PreAuthorize("hasAnyRole('TA', 'INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<Course> getCourseForAssessmentDashboard(@PathVariable long courseId) {
         log.debug("REST request /courses/{courseId}/for-tutor-dashboard");
-        Course course = courseService.findOneWithExercises(courseId);
-        User user = userService.getUserWithGroupsAndAuthorities();
+        Course course = courseRepository.findWithEagerExercisesById(courseId);
+        User user = userRepository.getUserWithGroupsAndAuthorities();
         if (!authCheckService.isAtLeastTeachingAssistantInCourse(course, user)) {
             return forbidden();
         }
 
-        Set<Exercise> interestingExercises = courseService.getInterestingExercisesForAssessmentDashboards(course.getExercises());
+        Set<Exercise> interestingExercises = courseRepository.getInterestingExercisesForAssessmentDashboards(course.getExercises());
         course.setExercises(interestingExercises);
 
         List<TutorParticipation> tutorParticipations = tutorParticipationService.findAllByCourseAndTutor(course, user);
 
-        assessmentDashboardService.prepareExercisesForAssessmentDashboard(course.getExercises(), tutorParticipations, false);
+        assessmentDashboardService.generateStatisticsForExercisesForAssessmentDashboard(course.getExercises(), tutorParticipations, false);
 
         return ResponseUtil.wrapOrNotFound(Optional.of(course));
     }
@@ -589,18 +590,18 @@ public class CourseResource {
     public ResponseEntity<StatsForInstructorDashboardDTO> getStatsForAssessmentDashboard(@PathVariable long courseId) {
         log.debug("REST request /courses/{courseId}/stats-for-tutor-dashboard");
 
-        Course course = courseService.findOne(courseId);
-        User user = userService.getUserWithGroupsAndAuthorities();
+        Course course = courseRepository.findByIdElseThrow(courseId);
+        User user = userRepository.getUserWithGroupsAndAuthorities();
         if (!authCheckService.isAtLeastTeachingAssistantInCourse(course, user)) {
             return forbidden();
         }
         StatsForInstructorDashboardDTO stats = new StatsForInstructorDashboardDTO();
 
-        final long numberOfInTimeSubmissions = submissionService.countInTimeSubmissionsForCourse(courseId)
-                + programmingExerciseService.countSubmissionsByCourseIdSubmitted(courseId);
-        final long numberOfLateSubmissions = submissionService.countLateSubmissionsForCourse(courseId);
+        final long numberOfInTimeSubmissions = submissionRepository.countByCourseIdSubmittedBeforeDueDate(courseId)
+                + programmingExerciseRepository.countSubmissionsByCourseIdSubmitted(courseId);
+        final long numberOfLateSubmissions = submissionRepository.countByCourseIdSubmittedAfterDueDate(courseId);
 
-        DueDateStat totalNumberOfAssessments = resultService.countNumberOfAssessments(courseId);
+        DueDateStat totalNumberOfAssessments = resultRepository.countNumberOfAssessments(courseId);
         stats.setTotalNumberOfAssessments(totalNumberOfAssessments);
 
         // no examMode here, so its the same as totalNumberOfAssessments
@@ -615,7 +616,7 @@ public class CourseResource {
         final long numberOfComplaints = complaintService.countComplaintsByCourseId(courseId);
         stats.setNumberOfComplaints(numberOfComplaints);
 
-        final long numberOfAssessmentLocks = submissionService.countSubmissionLocks(courseId);
+        final long numberOfAssessmentLocks = submissionRepository.countLockedSubmissionsByUserIdAndCourseId(userRepository.getUserWithGroupsAndAuthorities().getId(), courseId);
         stats.setNumberOfAssessmentLocks(numberOfAssessmentLocks);
 
         List<TutorLeaderboardDTO> leaderboardEntries = tutorLeaderboardService.getCourseLeaderboard(course);
@@ -633,8 +634,8 @@ public class CourseResource {
     @GetMapping("/courses/{courseId}")
     @PreAuthorize("hasAnyRole('TA', 'INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<Course> getCourseDTOForDetailView(@PathVariable Long courseId) {
-        Course course = courseService.findOne(courseId); // Should be removed
-        User user = userService.getUserWithGroupsAndAuthorities();
+        Course course = courseRepository.findByIdElseThrow(courseId); // Should be removed
+        User user = userRepository.getUserWithGroupsAndAuthorities();
         if (!authCheckService.isAtLeastTeachingAssistantInCourse(course, user)) {
             return forbidden();
         }
@@ -685,8 +686,8 @@ public class CourseResource {
     @PreAuthorize("hasAnyRole('TA', 'INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<Course> getCourseWithExercises(@PathVariable Long courseId) {
         log.debug("REST request to get Course : {}", courseId);
-        Course course = courseService.findOneWithExercises(courseId);
-        User user = userService.getUserWithGroupsAndAuthorities();
+        Course course = courseRepository.findWithEagerExercisesById(courseId);
+        User user = userRepository.getUserWithGroupsAndAuthorities();
         if (!authCheckService.isAtLeastTeachingAssistantInCourse(course, user)) {
             return forbidden();
         }
@@ -706,13 +707,13 @@ public class CourseResource {
     public ResponseEntity<Course> getCourseWithExercisesAndRelevantParticipations(@PathVariable Long courseId) throws AccessForbiddenException {
         log.debug("REST request to get Course with exercises and relevant participations : {}", courseId);
         long start = System.currentTimeMillis();
-        Course course = courseService.findOneWithExercises(courseId);
-        User user = userService.getUserWithGroupsAndAuthorities();
+        Course course = courseRepository.findWithEagerExercisesById(courseId);
+        User user = userRepository.getUserWithGroupsAndAuthorities();
         if (!authCheckService.isAtLeastInstructorInCourse(course, user)) {
             throw new AccessForbiddenException("You are not allowed to access this resource");
         }
 
-        Set<Exercise> interestingExercises = courseService.getInterestingExercisesForAssessmentDashboards(course.getExercises());
+        Set<Exercise> interestingExercises = courseRepository.getInterestingExercisesForAssessmentDashboards(course.getExercises());
         course.setExercises(interestingExercises);
 
         for (Exercise exercise : interestingExercises) {
@@ -721,12 +722,12 @@ public class CourseResource {
             DueDateStat totalNumberOfAssessments;
 
             if (exercise instanceof ProgrammingExercise) {
-                numberOfSubmissions = new DueDateStat(programmingExerciseService.countSubmissionsByExerciseIdSubmitted(exercise.getId(), false), 0L);
-                totalNumberOfAssessments = new DueDateStat(programmingExerciseService.countAssessmentsByExerciseIdSubmitted(exercise.getId(), false), 0L);
+                numberOfSubmissions = new DueDateStat(programmingExerciseRepository.countSubmissionsByExerciseIdSubmitted(exercise.getId(), false), 0L);
+                totalNumberOfAssessments = new DueDateStat(programmingExerciseRepository.countAssessmentsByExerciseIdSubmitted(exercise.getId(), false), 0L);
             }
             else {
-                numberOfSubmissions = submissionService.countSubmissionsForExercise(exercise.getId(), false);
-                totalNumberOfAssessments = resultService.countNumberOfFinishedAssessmentsForExercise(exercise.getId(), false);
+                numberOfSubmissions = submissionRepository.countSubmissionsForExercise(exercise.getId(), false);
+                totalNumberOfAssessments = resultRepository.countNumberOfFinishedAssessmentsForExercise(exercise.getId(), false);
             }
 
             exercise.setNumberOfSubmissions(numberOfSubmissions);
@@ -755,8 +756,8 @@ public class CourseResource {
     public ResponseEntity<List<Submission>> getLockedSubmissionsForCourse(@PathVariable Long courseId) throws AccessForbiddenException {
         log.debug("REST request to get all locked submissions for course : {}", courseId);
         long start = System.currentTimeMillis();
-        Course course = courseService.findOneWithExercises(courseId);
-        User user = userService.getUserWithGroupsAndAuthorities();
+        Course course = courseRepository.findWithEagerExercisesById(courseId);
+        User user = userRepository.getUserWithGroupsAndAuthorities();
         if (!authCheckService.isAtLeastTeachingAssistantInCourse(course, user)) {
             throw new AccessForbiddenException("You are not allowed to access this resource");
         }
@@ -787,15 +788,15 @@ public class CourseResource {
     public ResponseEntity<StatsForInstructorDashboardDTO> getStatsForInstructorDashboard(@PathVariable Long courseId) throws AccessForbiddenException {
         log.debug("REST request /courses/{courseId}/stats-for-instructor-dashboard");
         final long start = System.currentTimeMillis();
-        final Course course = courseService.findOne(courseId);
-        final User user = userService.getUserWithGroupsAndAuthorities();
+        final Course course = courseRepository.findByIdElseThrow(courseId);
+        final User user = userRepository.getUserWithGroupsAndAuthorities();
         if (!authCheckService.isAtLeastTeachingAssistantInCourse(course, user)) {
             throw new AccessForbiddenException("You are not allowed to access this resource");
         }
 
         StatsForInstructorDashboardDTO stats = new StatsForInstructorDashboardDTO();
 
-        DueDateStat totalNumberOfAssessments = resultService.countNumberOfAssessments(courseId);
+        DueDateStat totalNumberOfAssessments = resultRepository.countNumberOfAssessments(courseId);
         stats.setTotalNumberOfAssessments(totalNumberOfAssessments);
 
         // no examMode here, so its the same as totalNumberOfAssessments
@@ -816,14 +817,14 @@ public class CourseResource {
 
         stats.setNumberOfStudents(courseService.countNumberOfStudentsForCourse(course));
 
-        final long numberOfInTimeSubmissions = submissionService.countInTimeSubmissionsForCourse(courseId)
-                + programmingExerciseService.countSubmissionsByCourseIdSubmitted(courseId);
-        final long numberOfLateSubmissions = submissionService.countLateSubmissionsForCourse(courseId);
+        final long numberOfInTimeSubmissions = submissionRepository.countByCourseIdSubmittedBeforeDueDate(courseId)
+                + programmingExerciseRepository.countSubmissionsByCourseIdSubmitted(courseId);
+        final long numberOfLateSubmissions = submissionRepository.countByCourseIdSubmittedAfterDueDate(courseId);
 
         stats.setNumberOfSubmissions(new DueDateStat(numberOfInTimeSubmissions, numberOfLateSubmissions));
-        stats.setTotalNumberOfAssessments(resultService.countNumberOfAssessments(courseId));
+        stats.setTotalNumberOfAssessments(resultRepository.countNumberOfAssessments(courseId));
 
-        final long numberOfAssessmentLocks = submissionService.countSubmissionLocks(courseId);
+        final long numberOfAssessmentLocks = submissionRepository.countLockedSubmissionsByUserIdAndCourseId(userRepository.getUserWithGroupsAndAuthorities().getId(), courseId);
         stats.setNumberOfAssessmentLocks(numberOfAssessmentLocks);
 
         final long startT = System.currentTimeMillis();
@@ -845,10 +846,10 @@ public class CourseResource {
     @GetMapping("/courses/exercises-for-management-overview")
     @PreAuthorize("hasAnyRole('TA', 'INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<List<CourseManagementOverviewDTO>> getExercisesForCourseOverview(@RequestParam("courseIds[]") Long[] courseIds) {
-        final User user = userService.getUserWithGroupsAndAuthorities();
+        final User user = userRepository.getUserWithGroupsAndAuthorities();
         final List<CourseManagementOverviewDTO> courseDTOS = new ArrayList<>();
         for (final var courseId : courseIds) {
-            final Course course = courseService.findOne(courseId);
+            final Course course = courseRepository.findByIdElseThrow(courseId);
             if (!authCheckService.isAtLeastTeachingAssistantInCourse(course, user)) {
                 continue;
             }
@@ -871,18 +872,18 @@ public class CourseResource {
     @GetMapping("/courses/stats-for-management-overview")
     @PreAuthorize("hasAnyRole('TA', 'INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<List<CourseManagementOverviewStatisticsDTO>> getExerciseStatsForCourseOverview(@RequestParam("courseIds[]") Long[] courseIds) {
-        final User user = userService.getUserWithGroupsAndAuthorities();
+        final User user = userRepository.getUserWithGroupsAndAuthorities();
         final List<CourseManagementOverviewStatisticsDTO> courseDTOS = new ArrayList<>();
         for (final var courseId : courseIds) {
-            final Course course = courseService.findOne(courseId);
+            final Course course = courseRepository.findByIdElseThrow(courseId);
             if (!authCheckService.isAtLeastTeachingAssistantInCourse(course, user)) {
                 continue;
             }
 
             final var courseDTO = new CourseManagementOverviewStatisticsDTO();
             courseDTO.setCourseId(courseId);
-            var studentsGroup = courseService.findStudentGroupName(courseId);
-            var amountOfStudentsInCourse = Math.toIntExact(userService.countUserInGroup(studentsGroup));
+            var studentsGroup = courseRepository.findStudentGroupName(courseId);
+            var amountOfStudentsInCourse = Math.toIntExact(userRepository.countUserInGroup(studentsGroup));
             courseDTO.setExerciseDTOS(exerciseService.getStatisticsForCourseManagementOverview(courseId, amountOfStudentsInCourse));
             courseDTO.setActiveStudents(courseService.getActiveStudents(courseId));
             courseDTOS.add(courseDTO);
@@ -901,8 +902,8 @@ public class CourseResource {
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<Void> deleteCourse(@PathVariable long courseId) {
         log.info("REST request to delete Course : {}", courseId);
-        Course course = courseService.findOneWithExercisesAndLecturesAndLectureUnitsAndLearningGoals(courseId);
-        User user = userService.getUserWithGroupsAndAuthorities();
+        Course course = courseRepository.findWithEagerExercisesAndLecturesAndLectureUnitsAndLearningGoalsById(courseId);
+        User user = userRepository.getUserWithGroupsAndAuthorities();
         if (course == null) {
             return notFound();
         }
@@ -927,9 +928,9 @@ public class CourseResource {
         log.info("REST request to archive Course : {}", courseId);
 
         // Get the course with all exercises
-        final Course course = courseService.findOneWithExercisesAndLectures(courseId);
+        final Course course = courseRepository.findWithEagerExercisesAndLecturesById(courseId);
 
-        final User user = userService.getUserWithGroupsAndAuthorities();
+        final User user = userRepository.getUserWithGroupsAndAuthorities();
         if (!authCheckService.isAtLeastInstructorInCourse(course, user)) {
             throw new AccessForbiddenException("You are not allowed to access this resource");
         }
@@ -964,9 +965,9 @@ public class CourseResource {
     public ResponseEntity<Resource> downloadCourseArchive(@PathVariable Long courseId) throws FileNotFoundException {
         log.info("REST request to download archive of Course : {}", courseId);
 
-        final Course course = courseService.findOne(courseId);
+        final Course course = courseRepository.findByIdElseThrow(courseId);
 
-        final User user = userService.getUserWithGroupsAndAuthorities();
+        final User user = userRepository.getUserWithGroupsAndAuthorities();
         if (!authCheckService.isAtLeastInstructorInCourse(course, user)) {
             throw new AccessForbiddenException("You are not allowed to access this resource");
         }
@@ -992,9 +993,9 @@ public class CourseResource {
     public ResponseEntity<Resource> cleanup(@PathVariable Long courseId) {
         log.info("REST request to cleanup the Course : {}", courseId);
 
-        final Course course = courseService.findOne(courseId);
+        final Course course = courseRepository.findByIdElseThrow(courseId);
 
-        final User user = userService.getUserWithGroupsAndAuthorities();
+        final User user = userRepository.getUserWithGroupsAndAuthorities();
         if (!authCheckService.isAtLeastInstructorInCourse(course, user)) {
             throw new AccessForbiddenException("You are not allowed to access this resource");
         }
@@ -1019,10 +1020,10 @@ public class CourseResource {
     public ResponseEntity<Set<String>> getCategoriesInCourse(@PathVariable Long courseId) {
         log.debug("REST request to get categories of Course : {}", courseId);
 
-        User user = userService.getUserWithGroupsAndAuthorities();
-        Course course = courseService.findOne(courseId);
+        User user = userRepository.getUserWithGroupsAndAuthorities();
+        Course course = courseRepository.findByIdElseThrow(courseId);
         if (authCheckService.isAdmin(user) || authCheckService.isInstructorInCourse(course, user)) {
-            Set<String> categories = exerciseService.findAllExerciseCategoriesForCourse(course);
+            Set<String> categories = exerciseRepository.findAllCategoryNames(course.getId());
             return ResponseEntity.ok().body(categories);
         }
         else {
@@ -1040,7 +1041,7 @@ public class CourseResource {
     @PreAuthorize("hasAnyRole('INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<List<User>> getAllStudentsInCourse(@PathVariable Long courseId) {
         log.debug("REST request to get all students in course : {}", courseId);
-        Course course = courseService.findOne(courseId);
+        Course course = courseRepository.findByIdElseThrow(courseId);
         return getAllUsersInGroup(course, course.getStudentGroupName());
     }
 
@@ -1054,7 +1055,7 @@ public class CourseResource {
     @PreAuthorize("hasAnyRole('INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<List<User>> getAllTutorsInCourse(@PathVariable Long courseId) {
         log.debug("REST request to get all tutors in course : {}", courseId);
-        Course course = courseService.findOne(courseId);
+        Course course = courseRepository.findByIdElseThrow(courseId);
         return getAllUsersInGroup(course, course.getTeachingAssistantGroupName());
     }
 
@@ -1068,7 +1069,7 @@ public class CourseResource {
     @PreAuthorize("hasAnyRole('INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<List<User>> getAllInstructorsInCourse(@PathVariable Long courseId) {
         log.debug("REST request to get all instructors in course : {}", courseId);
-        Course course = courseService.findOne(courseId);
+        Course course = courseRepository.findByIdElseThrow(courseId);
         return getAllUsersInGroup(course, course.getInstructorGroupName());
     }
 
@@ -1081,11 +1082,11 @@ public class CourseResource {
      */
     @NotNull
     public ResponseEntity<List<User>> getAllUsersInGroup(Course course, String groupName) {
-        User user = userService.getUserWithGroupsAndAuthorities();
+        User user = userRepository.getUserWithGroupsAndAuthorities();
         if (!authCheckService.isAtLeastInstructorInCourse(course, user)) {
             return forbidden();
         }
-        return ResponseEntity.ok().body(userService.findAllUsersInGroupWithAuthorities(groupName));
+        return ResponseEntity.ok().body(userRepository.findAllInGroupWithAuthorities(groupName));
     }
 
     /**
@@ -1099,8 +1100,8 @@ public class CourseResource {
     @PreAuthorize("hasAnyRole('INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<Void> addStudentToCourse(@PathVariable Long courseId, @PathVariable String studentLogin) {
         log.debug("REST request to add {} as student to course : {}", studentLogin, courseId);
-        var course = courseService.findOne(courseId);
-        return addUserToCourseGroup(studentLogin, userService.getUserWithGroupsAndAuthorities(), course, course.getStudentGroupName());
+        var course = courseRepository.findByIdElseThrow(courseId);
+        return addUserToCourseGroup(studentLogin, userRepository.getUserWithGroupsAndAuthorities(), course, course.getStudentGroupName());
     }
 
     /**
@@ -1114,8 +1115,8 @@ public class CourseResource {
     @PreAuthorize("hasAnyRole('INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<Void> addTutorToCourse(@PathVariable Long courseId, @PathVariable String tutorLogin) {
         log.debug("REST request to add {} as tutors to course : {}", tutorLogin, courseId);
-        var course = courseService.findOne(courseId);
-        return addUserToCourseGroup(tutorLogin, userService.getUserWithGroupsAndAuthorities(), course, course.getTeachingAssistantGroupName());
+        var course = courseRepository.findByIdElseThrow(courseId);
+        return addUserToCourseGroup(tutorLogin, userRepository.getUserWithGroupsAndAuthorities(), course, course.getTeachingAssistantGroupName());
     }
 
     /**
@@ -1129,8 +1130,8 @@ public class CourseResource {
     @PreAuthorize("hasAnyRole('INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<Void> addInstructorToCourse(@PathVariable Long courseId, @PathVariable String instructorLogin) {
         log.debug("REST request to add {} as instructors to course : {}", instructorLogin, courseId);
-        var course = courseService.findOne(courseId);
-        return addUserToCourseGroup(instructorLogin, userService.getUserWithGroupsAndAuthorities(), course, course.getInstructorGroupName());
+        var course = courseRepository.findByIdElseThrow(courseId);
+        return addUserToCourseGroup(instructorLogin, userRepository.getUserWithGroupsAndAuthorities(), course, course.getInstructorGroupName());
     }
 
     /**
@@ -1145,11 +1146,11 @@ public class CourseResource {
     @NotNull
     public ResponseEntity<Void> addUserToCourseGroup(String userLogin, User instructorOrAdmin, Course course, String group) {
         if (authCheckService.isAtLeastInstructorInCourse(course, instructorOrAdmin)) {
-            Optional<User> userToAddToGroup = userService.getUserWithGroupsAndAuthoritiesByLogin(userLogin);
+            Optional<User> userToAddToGroup = userRepository.findOneWithGroupsAndAuthoritiesByLogin(userLogin);
             if (userToAddToGroup.isEmpty()) {
                 return notFound();
             }
-            userService.addUserToGroup(userToAddToGroup.get(), group);
+            courseService.addUserToGroup(userToAddToGroup.get(), group);
             return ResponseEntity.ok().body(null);
         }
         else {
@@ -1168,8 +1169,8 @@ public class CourseResource {
     @PreAuthorize("hasAnyRole('INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<Void> removeStudentFromCourse(@PathVariable Long courseId, @PathVariable String studentLogin) {
         log.debug("REST request to remove {} as student from course : {}", studentLogin, courseId);
-        var course = courseService.findOne(courseId);
-        return removeUserFromCourseGroup(studentLogin, userService.getUserWithGroupsAndAuthorities(), course, course.getStudentGroupName());
+        var course = courseRepository.findByIdElseThrow(courseId);
+        return removeUserFromCourseGroup(studentLogin, userRepository.getUserWithGroupsAndAuthorities(), course, course.getStudentGroupName());
     }
 
     /**
@@ -1183,8 +1184,8 @@ public class CourseResource {
     @PreAuthorize("hasAnyRole('INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<Void> removeTutorFromCourse(@PathVariable Long courseId, @PathVariable String tutorLogin) {
         log.debug("REST request to remove {} as tutor from course : {}", tutorLogin, courseId);
-        var course = courseService.findOne(courseId);
-        return removeUserFromCourseGroup(tutorLogin, userService.getUserWithGroupsAndAuthorities(), course, course.getTeachingAssistantGroupName());
+        var course = courseRepository.findByIdElseThrow(courseId);
+        return removeUserFromCourseGroup(tutorLogin, userRepository.getUserWithGroupsAndAuthorities(), course, course.getTeachingAssistantGroupName());
     }
 
     /**
@@ -1198,8 +1199,8 @@ public class CourseResource {
     @PreAuthorize("hasAnyRole('INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<Void> removeInstructorFromCourse(@PathVariable Long courseId, @PathVariable String instructorLogin) {
         log.debug("REST request to remove {} as instructor from course : {}", instructorLogin, courseId);
-        var course = courseService.findOne(courseId);
-        return removeUserFromCourseGroup(instructorLogin, userService.getUserWithGroupsAndAuthorities(), course, course.getInstructorGroupName());
+        var course = courseRepository.findByIdElseThrow(courseId);
+        return removeUserFromCourseGroup(instructorLogin, userRepository.getUserWithGroupsAndAuthorities(), course, course.getInstructorGroupName());
     }
 
     /**
@@ -1214,11 +1215,11 @@ public class CourseResource {
     @NotNull
     public ResponseEntity<Void> removeUserFromCourseGroup(String userLogin, User instructorOrAdmin, Course course, String group) {
         if (authCheckService.isAtLeastInstructorInCourse(course, instructorOrAdmin)) {
-            Optional<User> userToRemoveFromGroup = userService.getUserWithGroupsAndAuthoritiesByLogin(userLogin);
+            Optional<User> userToRemoveFromGroup = userRepository.findOneWithGroupsAndAuthoritiesByLogin(userLogin);
             if (userToRemoveFromGroup.isEmpty()) {
                 return notFound();
             }
-            userService.removeUserFromGroup(userToRemoveFromGroup.get(), group);
+            courseService.removeUserFromGroup(userToRemoveFromGroup.get(), group);
             return ResponseEntity.ok().body(null);
         }
         else {

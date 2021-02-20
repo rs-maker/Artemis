@@ -1,4 +1,4 @@
-package de.tum.in.www1.artemis.service;
+package de.tum.in.www1.artemis.service.exam;
 
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -18,9 +18,12 @@ import de.tum.in.www1.artemis.domain.exam.StudentExam;
 import de.tum.in.www1.artemis.domain.participation.StudentParticipation;
 import de.tum.in.www1.artemis.domain.quiz.QuizExercise;
 import de.tum.in.www1.artemis.domain.quiz.QuizSubmission;
+import de.tum.in.www1.artemis.repository.QuizExerciseRepository;
 import de.tum.in.www1.artemis.repository.ResultRepository;
 import de.tum.in.www1.artemis.repository.StudentParticipationRepository;
 import de.tum.in.www1.artemis.repository.SubmissionRepository;
+import de.tum.in.www1.artemis.service.QuizStatisticService;
+import de.tum.in.www1.artemis.service.ResultService;
 import de.tum.in.www1.artemis.service.util.TimeLogUtil;
 import de.tum.in.www1.artemis.web.rest.errors.EntityNotFoundException;
 
@@ -29,24 +32,24 @@ public class ExamQuizService {
 
     static final Logger log = LoggerFactory.getLogger(ExamQuizService.class);
 
+    private final QuizExerciseRepository quizExerciseRepository;
+
+    private final QuizStatisticService quizStatisticService;
+
+    private final ResultService resultService;
+
     private final StudentParticipationRepository studentParticipationRepository;
 
     private final ResultRepository resultRepository;
 
     private final SubmissionRepository submissionRepository;
 
-    private final QuizExerciseService quizExerciseService;
-
-    private final QuizStatisticService quizStatisticService;
-
-    private final ResultService resultService;
-
     public ExamQuizService(StudentParticipationRepository studentParticipationRepository, ResultRepository resultRepository, SubmissionRepository submissionRepository,
-            QuizExerciseService quizExerciseService, QuizStatisticService quizStatisticService, ResultService resultService) {
+            QuizExerciseRepository quizExerciseRepository, QuizStatisticService quizStatisticService, ResultService resultService) {
         this.studentParticipationRepository = studentParticipationRepository;
         this.resultRepository = resultRepository;
         this.submissionRepository = submissionRepository;
-        this.quizExerciseService = quizExerciseService;
+        this.quizExerciseRepository = quizExerciseRepository;
         this.quizStatisticService = quizStatisticService;
         this.resultService = resultService;
     }
@@ -61,7 +64,7 @@ public class ExamQuizService {
         log.info("Starting quiz evaluation for quiz " + quizExerciseId);
         // We have to load the questions and statistics so that we can evaluate and update and we also need the participations and submissions that exist for this exercise so that
         // they can be evaluated
-        var quizExercise = quizExerciseService.findOneWithQuestionsAndStatistics(quizExerciseId);
+        var quizExercise = quizExerciseRepository.findOneWithQuestionsAndStatistics(quizExerciseId);
         Set<Result> createdResults = evaluateSubmissions(quizExercise);
         log.info("Quiz evaluation for quiz {} finished after {} with {} created results", quizExercise.getId(), TimeLogUtil.formatDurationFrom(start), createdResults.size());
         quizStatisticService.updateStatistics(createdResults, quizExercise);
@@ -81,7 +84,7 @@ public class ExamQuizService {
             if (optionalExistingSubmission.isPresent()) {
                 QuizSubmission submission = (QuizSubmission) submissionRepository.findWithEagerResultAndFeedbackById(optionalExistingSubmission.get().getId())
                         .orElseThrow(() -> new EntityNotFoundException("Submission with id \"" + optionalExistingSubmission.get().getId() + "\" does not exist"));
-                participation.setExercise(quizExerciseService.findOneWithQuestions(participation.getExercise().getId()));
+                participation.setExercise(quizExerciseRepository.findOneWithQuestions(participation.getExercise().getId()));
                 Result result;
                 if (submission.getLatestResult() == null) {
                     result = new Result();

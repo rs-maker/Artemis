@@ -18,6 +18,7 @@ import de.tum.in.www1.artemis.repository.TeamRepository;
 import de.tum.in.www1.artemis.repository.UserRepository;
 import de.tum.in.www1.artemis.service.connectors.VersionControlService;
 import de.tum.in.www1.artemis.service.dto.TeamSearchUserDTO;
+import de.tum.in.www1.artemis.service.programming.ProgrammingExerciseParticipationService;
 import de.tum.in.www1.artemis.service.team.TeamImportStrategy;
 import de.tum.in.www1.artemis.service.team.strategies.CreateOnlyStrategy;
 import de.tum.in.www1.artemis.service.team.strategies.PurgeExistingStrategy;
@@ -88,15 +89,6 @@ public class TeamService {
         else {
             return teamRepository.findAllByExerciseIdWithEagerStudents(exercise.getId());
         }
-    }
-
-    /**
-     * Returns the amount of teams for an exercise
-     * @param exerciseId ExerciseId for which to return the team amount
-     * @return The amount of teams as Integer
-     */
-    public Integer getAmountByExerciseId(Long exerciseId) {
-        return teamRepository.getAmountByExerciseId(exerciseId);
     }
 
     /**

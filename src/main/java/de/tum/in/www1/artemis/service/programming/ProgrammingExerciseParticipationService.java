@@ -1,4 +1,4 @@
-package de.tum.in.www1.artemis.service;
+package de.tum.in.www1.artemis.service.programming;
 
 import java.security.Principal;
 import java.time.ZonedDateTime;
@@ -21,6 +21,8 @@ import de.tum.in.www1.artemis.domain.enumeration.RepositoryType;
 import de.tum.in.www1.artemis.domain.participation.*;
 import de.tum.in.www1.artemis.exception.VersionControlException;
 import de.tum.in.www1.artemis.repository.*;
+import de.tum.in.www1.artemis.repository.UserRepository;
+import de.tum.in.www1.artemis.service.AuthorizationCheckService;
 import de.tum.in.www1.artemis.service.connectors.GitService;
 import de.tum.in.www1.artemis.service.connectors.VersionControlService;
 import de.tum.in.www1.artemis.web.rest.errors.EntityNotFoundException;
@@ -29,8 +31,6 @@ import de.tum.in.www1.artemis.web.rest.errors.EntityNotFoundException;
 public class ProgrammingExerciseParticipationService {
 
     private final Logger log = LoggerFactory.getLogger(ProgrammingExerciseParticipationService.class);
-
-    private final ParticipationService participationService;
 
     private final ProgrammingExerciseStudentParticipationRepository studentParticipationRepository;
 
@@ -46,15 +46,14 @@ public class ProgrammingExerciseParticipationService {
 
     private final AuthorizationCheckService authCheckService;
 
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     private final GitService gitService;
 
-    public ProgrammingExerciseParticipationService(ParticipationService participationService, SolutionProgrammingExerciseParticipationRepository solutionParticipationRepository,
+    public ProgrammingExerciseParticipationService(SolutionProgrammingExerciseParticipationRepository solutionParticipationRepository,
             ProgrammingExerciseStudentParticipationRepository studentParticipationRepository, ParticipationRepository participationRepository, TeamRepository teamRepository,
-            TemplateProgrammingExerciseParticipationRepository templateParticipationRepository, Optional<VersionControlService> versionControlService, UserService userService,
-            AuthorizationCheckService authCheckService, GitService gitService) {
-        this.participationService = participationService;
+            TemplateProgrammingExerciseParticipationRepository templateParticipationRepository, Optional<VersionControlService> versionControlService,
+            UserRepository userRepository, AuthorizationCheckService authCheckService, GitService gitService) {
         this.studentParticipationRepository = studentParticipationRepository;
         this.solutionParticipationRepository = solutionParticipationRepository;
         this.templateParticipationRepository = templateParticipationRepository;
@@ -62,12 +61,12 @@ public class ProgrammingExerciseParticipationService {
         this.teamRepository = teamRepository;
         this.versionControlService = versionControlService;
         this.authCheckService = authCheckService;
-        this.userService = userService;
+        this.userRepository = userRepository;
         this.gitService = gitService;
     }
 
     public Participation findParticipation(Long participationId) throws EntityNotFoundException {
-        return participationService.findOne(participationId);
+        return participationRepository.findByIdElseThrow(participationId);
     }
 
     public Optional<ProgrammingExerciseStudentParticipation> findStudentParticipation(Long participationId) {
@@ -136,9 +135,7 @@ public class ProgrammingExerciseParticipationService {
         return participation.get();
     }
 
-    public List<ProgrammingExerciseStudentParticipation> findByExerciseId(Long exerciseId) {
-        return studentParticipationRepository.findByExerciseId(exerciseId);
-    }
+    // TODO move as default methods into ProgrammingExerciseStudentParticipationRepository
 
     public Optional<ProgrammingExerciseStudentParticipation> findByExerciseIdAndTeamId(Long exerciseId, Long teamId) {
         return studentParticipationRepository.findByExerciseIdAndTeamId(exerciseId, teamId);
@@ -154,7 +151,7 @@ public class ProgrammingExerciseParticipationService {
 
     /**
      *
-     * @param participationId
+     * @param participationId the participation
      * @return the participation with all its manual/semi-automatic results
      */
     public Optional<ProgrammingExerciseStudentParticipation> findStudentParticipationWithAllManualOrSemiAutomaticResultsAndFeedbacksAndRelatedSubmissionAndAssessor(
@@ -200,13 +197,13 @@ public class ProgrammingExerciseParticipationService {
     }
 
     private boolean canAccessParticipation(@NotNull ProgrammingExerciseStudentParticipation participation) {
-        User user = userService.getUserWithGroupsAndAuthorities();
+        User user = userRepository.getUserWithGroupsAndAuthorities();
         Course course = participation.getExercise().getCourseViaExerciseGroupOrCourseMember();
         return participation.isOwnedBy(user) || authCheckService.isAtLeastTeachingAssistantInCourse(course, user);
     }
 
     private boolean canAccessParticipation(@NotNull SolutionProgrammingExerciseParticipation participation) {
-        User user = userService.getUserWithGroupsAndAuthorities();
+        User user = userRepository.getUserWithGroupsAndAuthorities();
         // Note: if this participation was retrieved as Participation (abstract super class) from the database, the programming exercise might not be correctly initialized
         // To prevent null pointer exceptions, we therefore retrieve it again as concrete solution programming exercise participation
         if (participation.getProgrammingExercise() == null || !Hibernate.isInitialized(participation.getProgrammingExercise())) {
@@ -217,7 +214,7 @@ public class ProgrammingExerciseParticipationService {
     }
 
     private boolean canAccessParticipation(@NotNull TemplateProgrammingExerciseParticipation participation) {
-        User user = userService.getUserWithGroupsAndAuthorities();
+        User user = userRepository.getUserWithGroupsAndAuthorities();
         // Note: if this participation was retrieved as Participation (abstract super class) from the database, the programming exercise might not be correctly initialized
         // To prevent null pointer exceptions, we therefore retrieve it again as concrete template programming exercise participation
         if (participation.getProgrammingExercise() == null || !Hibernate.isInitialized(participation.getProgrammingExercise())) {
@@ -255,12 +252,12 @@ public class ProgrammingExerciseParticipationService {
     }
 
     private boolean canAccessParticipation(SolutionProgrammingExerciseParticipation participation, Principal principal) {
-        User user = userService.getUserWithGroupsAndAuthorities(principal.getName());
+        User user = userRepository.getUserWithGroupsAndAuthorities(principal.getName());
         return authCheckService.isAtLeastInstructorForExercise(participation.getExercise(), user);
     }
 
     private boolean canAccessParticipation(TemplateProgrammingExerciseParticipation participation, Principal principal) {
-        User user = userService.getUserWithGroupsAndAuthorities(principal.getName());
+        User user = userRepository.getUserWithGroupsAndAuthorities(principal.getName());
         return authCheckService.isAtLeastInstructorForExercise(participation.getExercise(), user);
     }
 
