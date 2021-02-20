@@ -13,11 +13,11 @@ export class CourseDetailDoughnutChartComponent implements OnInit {
     @Input() currentAbsolute: number;
     @Input() currentMax: number;
 
-    @Input() stats: number[];
+    stats: number[];
 
     // Chart.js data
     doughnutChartType = 'doughnut';
-    doughnutChartColors = ['rgba(219, 0, 0, 1)', 'rgba(122, 204, 69, 1)'];
+    doughnutChartColors = ['rgba(122, 204, 69, 1)', 'rgba(219, 0, 0, 1)'];
     doughnutChartLabels: string[] = ['Done', 'Not Done'];
     totalScoreOptions: object = {
         cutoutPercentage: 75,
@@ -25,6 +25,12 @@ export class CourseDetailDoughnutChartComponent implements OnInit {
         responsive: false,
         tooltips: {
             backgroundColor: 'rgba(0, 0, 0, 1)',
+            callbacks: {
+                label(tooltipItem: any, data: any) {
+                    const value = data['datasets'][0]['data'][tooltipItem['index']];
+                    return '' + (value === -1 ? 0 : value);
+                },
+            },
         },
     };
     doughnutChartData: CourseStatisticsDataSet[] = [
@@ -35,11 +41,11 @@ export class CourseDetailDoughnutChartComponent implements OnInit {
     ];
 
     ngOnInit(): void {
-        // mock
-        this.currentPercentage = 50;
-        this.currentAbsolute = 20;
-        this.currentMax = 40;
-        this.stats = [10, 20];
+        this.stats = [this.currentAbsolute, this.currentMax - this.currentAbsolute];
         this.doughnutChartData[0].data = this.stats;
+        if (this.currentMax === 0) {
+            // [0, 0] will lead to the chart not being displayed - is further handled in the option tooltips
+            this.doughnutChartData[0].data = [-1, 0];
+        }
     }
 }

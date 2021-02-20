@@ -640,7 +640,12 @@ public class CourseResource {
             return forbidden();
         }
         CourseManagementDetailViewDTO dto = courseService.getStatsForDetailView(courseId);
-
+        if (authCheckService.isAtLeastInstructorInCourse(course, user)) {
+            dto.setAtLeastInstructor(true);
+        }
+        else {
+            dto.setAtLeastInstructor(false);
+        }
         // Only counting assessments and submissions which are handed in in time
         long numberOfAssessments = resultRepository.countNumberOfAssessments(courseId).getInTime();
         dto.setCurrentAbsoluteAssessments(numberOfAssessments);
@@ -651,7 +656,7 @@ public class CourseResource {
             dto.setCurrentPercentageAssessments(Math.round(numberOfAssessments * 1000.0 / numberOfSubmissions) / 10.0);
         }
         else {
-            dto.setCurrentPercentageAssessments(0.0);
+            dto.setCurrentPercentageAssessments(100.0);
         }
 
         // Complaints
@@ -664,7 +669,7 @@ public class CourseResource {
             dto.setCurrentPercentageComplaints(Math.round(numberOfAnsweredComplaints * 1000.0 / numberOfComplaints) / 10.0);
         }
         else {
-            dto.setCurrentPercentageComplaints(0.0);
+            dto.setCurrentPercentageComplaints(100.0);
         }
 
         // More Feedback Requests
@@ -677,19 +682,21 @@ public class CourseResource {
             dto.setCurrentPercentageMoreFeedbacks(Math.round(numberOfAnsweredFeedbackRequests * 1000.0 / numberOfMoreFeedbackRequests) / 10.0);
         }
         else {
-            dto.setCurrentPercentageMoreFeedbacks(0.0);
+            dto.setCurrentPercentageMoreFeedbacks(100.0);
         }
         // Average Student Score
-        double averageStudentScore = courseRepository.getAverageStudentScoreForCourse(courseId);
+        Double databaseResult = courseRepository.getAverageStudentScoreForCourse(courseId);
+        double averageStudentScore = databaseResult != null ? databaseResult : 0.0;
         dto.setCurrentAbsoluteAverageScore(averageStudentScore);
         ZonedDateTime now = ZonedDateTime.now();
-        double maxPointsAchievableInCourse = courseRepository.getMaxReachablePointsInCourse(courseId, now);
+        databaseResult = courseRepository.getMaxReachablePointsInCourse(courseId, now);
+        double maxPointsAchievableInCourse = databaseResult != null ? databaseResult : 0.0;
         dto.setCurrentMaxAverageScore(maxPointsAchievableInCourse);
-        if (maxPointsAchievableInCourse > 0) {
+        if (maxPointsAchievableInCourse > 0.0) {
             dto.setCurrentPercentageAverageScore(Math.round(averageStudentScore * 1000.0 / maxPointsAchievableInCourse) / 10.0);
         }
         else {
-            dto.setCurrentPercentageAverageScore(0.0);
+            dto.setCurrentPercentageAverageScore(100.0);
         }
 
         return ResponseEntity.ok(dto);

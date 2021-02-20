@@ -160,8 +160,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
         return findWithEagerLecturesAndExamsById(courseId).orElseThrow(() -> new EntityNotFoundException("Course", courseId));
     }
 
-    List<Map<String, Object>> getAllDTOsForOverview(@Param("now") ZonedDateTime now);
-
     @Query("""
             select c.id as courseId,
             c.presentationScore as presentationScore,

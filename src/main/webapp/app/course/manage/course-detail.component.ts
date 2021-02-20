@@ -36,7 +36,8 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     public refreshingCourse = false;
 
     CachingStrategy = CachingStrategy;
-    course: Course;
+    course: CourseManagementDetailViewDto;
+    oldCourse: Course; // TODO Delete when handling the course archival
     private eventSubscriber: Subscription;
 
     courseIsBeingArchived = false;
@@ -49,7 +50,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     secondTitle = 'Total Complaints';
     thirdTitle = 'More Feedback Requests';
     fourthTitle = 'Average Student Score';
-    courseDTO = new CourseManagementDetailViewDto();
 
     constructor(
         private eventManager: JhiEventManager,
@@ -69,7 +69,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
         this.route.data.subscribe(({ course }) => {
             this.course = course;
 
-            this.registerChangeInCourses();
+            // this.registerChangeInCourses();
             this.registerCourseArchiveWebsocket();
         });
 
@@ -86,14 +86,14 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
      */
     registerChangeInCourses() {
         this.eventSubscriber = this.eventManager.subscribe('courseListModification', () => {
-            this.courseService.find(this.course.id!).subscribe((courseResponse: HttpResponse<Course>) => {
-                this.course = courseResponse.body!;
+            this.courseService.find(this.course.courseId!).subscribe((courseResponse: HttpResponse<Course>) => {
+                this.oldCourse = courseResponse.body!;
             });
         });
     }
 
     private registerCourseArchiveWebsocket() {
-        const topic = CourseDetailComponent.getCourseArchiveStateTopic(this.course.id!);
+        const topic = CourseDetailComponent.getCourseArchiveStateTopic(this.course.courseId);
         this.websocketService.subscribe(topic);
         this.websocketService
             .receive(topic)
@@ -120,7 +120,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
      * Register for the currently loaded course.
      */
     registerForCourse() {
-        this.courseService.registerForCourse(this.course.id!).subscribe(
+        this.courseService.registerForCourse(this.course.courseId).subscribe(
             (userResponse) => {
                 if (userResponse.body != undefined) {
                     const message = 'Registered user for course ' + this.course.title;
@@ -143,7 +143,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         this.eventManager.destroy(this.eventSubscriber);
         this.dialogErrorSource.unsubscribe();
-        this.websocketService.unsubscribe(CourseDetailComponent.getCourseArchiveStateTopic(this.course.id!));
+        this.websocketService.unsubscribe(CourseDetailComponent.getCourseArchiveStateTopic(this.course.courseId!));
     }
 
     private static getCourseArchiveStateTopic(courseId: number) {
@@ -153,7 +153,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     canArchiveCourse() {
         // A course can only be archived if it's over.
         const isCourseOver = this.course.endDate?.isBefore(moment()) ?? false;
-        return !!this.course.isAtLeastInstructor && isCourseOver;
+        return this.course.isAtLeastInstructor && isCourseOver;
     }
 
     /**
@@ -172,11 +172,11 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     }
 
     archiveCourse() {
-        this.courseService.archiveCourse(this.course.id!).subscribe();
+        this.courseService.archiveCourse(this.course.courseId).subscribe();
     }
 
     downloadCourseArchive() {
-        this.courseService.downloadCourseArchive(this.course.id!).subscribe(
+        this.courseService.downloadCourseArchive(this.course.courseId).subscribe(
             (response) => downloadZipFileFromResponse(response),
             () => this.jhiAlertService.error('artemisApp.course.archive.archiveDownloadError'),
         );
@@ -185,17 +185,17 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     canDownloadArchive() {
         const hasArchive = !!this.course.courseArchivePath && this.course.courseArchivePath.length > 0;
         // You can only download one if the path to the archive is present
-        return !!this.course.isAtLeastInstructor && hasArchive;
+        return this.course.isAtLeastInstructor && hasArchive;
     }
 
     canCleanupCourse() {
         // A course can only be cleaned up if the course has been archived.
         const canCleanup = !!this.course.courseArchivePath && this.course.courseArchivePath.length > 0;
-        return !!this.course.isAtLeastInstructor && canCleanup;
+        return this.course.isAtLeastInstructor && canCleanup;
     }
 
     cleanupCourse() {
-        this.courseService.cleanupCourse(this.course.id!).subscribe(
+        this.courseService.cleanupCourse(this.course.courseId).subscribe(
             () => {
                 this.jhiAlertService.success('artemisApp.programmingExercise.cleanup.successMessage');
                 this.dialogErrorSource.next('');

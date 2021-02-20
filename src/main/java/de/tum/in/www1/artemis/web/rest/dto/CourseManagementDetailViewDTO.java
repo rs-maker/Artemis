@@ -37,6 +37,8 @@ public class CourseManagementDetailViewDTO {
 
     private Integer numberOfInstructorsInCourse;
 
+    private Boolean isAtLeastInstructor;
+
     // Total Assessment
     private Double currentPercentageAssessments;
 
@@ -299,5 +301,13 @@ public class CourseManagementDetailViewDTO {
 
     public void setNumberOfInstructorsInCourse(Integer numberOfInstructorsInCourse) {
         this.numberOfInstructorsInCourse = numberOfInstructorsInCourse;
+    }
+
+    public Boolean getAtLeastInstructor() {
+        return isAtLeastInstructor;
+    }
+
+    public void setAtLeastInstructor(Boolean atLeastInstructor) {
+        isAtLeastInstructor = atLeastInstructor;
     }
 }

@@ -1,5 +1,7 @@
 import { CourseManagementOverviewDetailsDto } from 'app/course/manage/overview/course-management-overview-details-dto.model';
 import { Moment } from 'moment';
+import { Lecture } from 'app/entities/lecture.model';
+import { Exam } from 'app/entities/exam.model';
 
 export class CourseManagementDetailViewDto {
     courseId: number;
@@ -8,6 +10,27 @@ export class CourseManagementDetailViewDto {
     startDate: Moment;
     endDate: Moment;
     description: string;
+    title: string;
+    testCourse: boolean;
+    shortName: string;
+    color: string;
+
+    studentGroupName: string;
+    teachingAssistantGroupName: string;
+    instructorGroupName: string;
+    numberOfStudentsInCourse: number;
+    numberOfTeachingAssistantsInCourse: number;
+    numberOfInstructorsInCourse: number;
+
+    // helper && temporal variables
+    isAtLeastInstructor: boolean;
+    courseArchivePath?: string;
+    studentQuestionsEnabled?: boolean;
+    isAtLeastTutor?: boolean;
+    registrationEnabled?: boolean;
+    courseIcon?: string;
+    lectures?: Lecture[];
+    exams?: Exam[];
 
     // Total Assessment
     currentPercentageAssessments: number;
@@ -30,7 +53,6 @@ export class CourseManagementDetailViewDto {
     currentMaxAverageScore: number;
 
     activeStudents: number[];
-    amountOfStudentsInCourse: number;
 
     exercises: CourseManagementOverviewDetailsDto;
 
