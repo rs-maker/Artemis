@@ -472,9 +472,9 @@ public class CourseService {
         var dto = collectCourseInformation(courseId);
 
         var groupNames = courseRepository.findGroupNames(courseId);
-        dto.setNumberOfStudentsInCourse(Math.toIntExact(userService.countUserInGroup((String) groupNames.get("studentGroupName"))));
-        dto.setNumberOfTeachingAssistantsInCourse(Math.toIntExact(userService.countUserInGroup((String) groupNames.get("teachingAssistantGroupName"))));
-        dto.setNumberOfInstructorsInCourse(Math.toIntExact(userService.countUserInGroup((String) groupNames.get("instructorGroupName"))));
+        dto.setNumberOfStudentsInCourse(Math.toIntExact(userRepository.countUserInGroup((String) groupNames.get("studentGroupName"))));
+        dto.setNumberOfTeachingAssistantsInCourse(Math.toIntExact(userRepository.countUserInGroup((String) groupNames.get("teachingAssistantGroupName"))));
+        dto.setNumberOfInstructorsInCourse(Math.toIntExact(userRepository.countUserInGroup((String) groupNames.get("instructorGroupName"))));
 
         dto.setActiveStudents(getActiveStudents(courseId));
         return dto;

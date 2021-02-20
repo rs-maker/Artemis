@@ -643,9 +643,10 @@ public class CourseResource {
 
         // TODO Check max values for zero
         // Only counting assessments and submissions which are handed in in time
-        long numberOfAssessments = resultService.countNumberOfAssessments(courseId).getInTime();
+        long numberOfAssessments = resultRepository.countNumberOfAssessments(courseId).getInTime();
         dto.setCurrentAbsoluteAssessments(numberOfAssessments);
-        long numberOfSubmissions = submissionService.countInTimeSubmissionsForCourse(courseId) + programmingExerciseService.countSubmissionsByCourseIdSubmitted(courseId);
+        long numberOfSubmissions = submissionRepository.countByCourseIdSubmittedBeforeDueDate(courseId)
+                + programmingExerciseRepository.countSubmissionsByCourseIdSubmitted(courseId);
         dto.setCurrentMaxAssessments(numberOfSubmissions);
         dto.setCurrentPercentageAssessments(Math.round(numberOfAssessments * 1000.0 / numberOfSubmissions) / 10.0);
 
