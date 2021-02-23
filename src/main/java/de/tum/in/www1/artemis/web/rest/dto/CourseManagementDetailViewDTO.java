@@ -17,6 +17,8 @@ public class CourseManagementDetailViewDTO {
 
     private String description;
 
+    private String courseIcon;
+
     private String title;
 
     private Boolean testCourse;
@@ -309,5 +311,13 @@ public class CourseManagementDetailViewDTO {
 
     public void setAtLeastInstructor(Boolean atLeastInstructor) {
         isAtLeastInstructor = atLeastInstructor;
+    }
+
+    public String getCourseIcon() {
+        return courseIcon;
+    }
+
+    public void setCourseIcon(String courseIcon) {
+        this.courseIcon = courseIcon;
     }
 }

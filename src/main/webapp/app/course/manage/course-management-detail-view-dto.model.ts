@@ -10,6 +10,7 @@ export class CourseManagementDetailViewDto {
     startDate: Moment;
     endDate: Moment;
     description: string;
+    courseIcon: string;
     title: string;
     testCourse: boolean;
     shortName: string;
@@ -28,9 +29,6 @@ export class CourseManagementDetailViewDto {
     studentQuestionsEnabled?: boolean;
     isAtLeastTutor?: boolean;
     registrationEnabled?: boolean;
-    courseIcon?: string;
-    lectures?: Lecture[];
-    exams?: Exam[];
 
     // Total Assessment
     currentPercentageAssessments: number;

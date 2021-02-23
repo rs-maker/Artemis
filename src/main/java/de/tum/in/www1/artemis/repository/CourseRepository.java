@@ -174,6 +174,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             c.startDate as startDate,
             c.endDate as endDate,
             c.description as description,
+            c.courseIcon as courseIcon,
             c.title as title,
             c.testCourse as testCourse,
             c.shortName as shortName,

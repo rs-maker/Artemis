@@ -496,6 +496,7 @@ public class CourseService {
         dto.setStartDate((ZonedDateTime) result.get("startDate"));
         dto.setEndDate((ZonedDateTime) result.get("endDate"));
         dto.setDescription((String) result.get("description"));
+        dto.setCourseIcon((String) result.get("courseIcon"));
         dto.setTitle((String) result.get("title"));
         dto.setTestCourse((Boolean) result.get("testCourse"));
         dto.setShortName((String) result.get("shortName"));
