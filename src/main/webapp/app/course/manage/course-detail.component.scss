@@ -26,6 +26,8 @@ jhi-secured-image {
     .tab-item {
         cursor: pointer;
         margin: 0 0.5em;
+        color: black;
+        font-weight: lighter;
 
         &.active {
             box-shadow: 0 2px 0 #353d47;

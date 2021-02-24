@@ -23,20 +23,29 @@
             </div>
             <jhi-alert></jhi-alert>
             <div class="tab-bar tab-bar-course-overview">
-                <div jhiOrionFilter [showInOrionWindow]="false" class="tab-item exams" routerLink="exams" routerLinkActive="active">
+                <a jhiOrionFilter [showInOrionWindow]="false" class="tab-item exams" [routerLink]="['/course-management', course.courseId, 'exams']">
                     <b jhiTranslate="artemisApp.courseOverview.menu.exams">Exams</b>
-                </div>
+                </a>
                 <div class="tab-item exercises" routerLink="exercises" routerLinkActive="active">
                     <b jhiTranslate="artemisApp.courseOverview.menu.exercises">Exercise</b>
                 </div>
                 <div jhiOrionFilter [showInOrionWindow]="false" class="tab-item lectures" routerLink="lectures" routerLinkActive="active">
                     <b jhiTranslate="artemisApp.courseOverview.menu.lectures">Lectures</b>
                 </div>
-                <div jhiOrionFilter [showInOrionWindow]="false" class="tab-item statistics" routerLink="statistics" routerLinkActive="active">
+                <div *ngIf="course.isAtLeastInstructor" jhiOrionFilter [showInOrionWindow]="false" class="tab-item statistics" routerLink="statistics" routerLinkActive="active">
                     <b jhiTranslate="artemisApp.courseOverview.menu.statistics">Statistics</b>
                 </div>
                 <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.courseId, 'goal-management']" class="tab-item learningGoals">
                     <b jhiTranslate="artemisApp.learningGoal.learningGoalButton">Learning Goals</b>
+                </a>
+                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.courseId, 'scores']" class="tab-item scores">
+                    <b jhiTranslate="entity.action.scores">Scores</b>
+                </a>
+                <a [routerLink]="['/course-management', course.courseId, 'tutor-dashboard']" class="tab-item assessmentDashboard">
+                    <b jhiTranslate="entity.action.assessmentDashboard">Assessment Dashboard</b>
+                </a>
+                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.courseId, 'instructor-dashboard']" class="tab-item instructorDashboard">
+                    <b jhiTranslate="artemisApp.course.instructorDashboard">Instructor Dashboard</b>
                 </a>
                 <div class="ml-auto">
                     <button class="btn btn-primary btn-md ml-1" (click)="loadCourse(true)" [disabled]="refreshingCourse">
