@@ -1,7 +1,6 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { ChartDataSets, ChartType } from 'chart.js';
 import { Label } from 'ng2-charts';
-import { DataSet } from 'app/exercises/quiz/manage/statistics/quiz-statistic/quiz-statistic.component';
 import { TranslateService } from '@ngx-translate/core';
 import * as moment from 'moment';
 import { Graphs, SpanType } from 'app/entities/statistics.model';

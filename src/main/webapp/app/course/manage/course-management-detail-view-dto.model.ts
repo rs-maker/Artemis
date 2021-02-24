@@ -1,7 +1,5 @@
-import { CourseManagementOverviewDetailsDto } from 'app/course/manage/overview/course-management-overview-details-dto.model';
 import { Moment } from 'moment';
-import { Lecture } from 'app/entities/lecture.model';
-import { Exam } from 'app/entities/exam.model';
+import { CourseManagementOverviewExerciseStatisticsDTO } from 'app/course/manage/overview/course-management-overview-exercise-statistics-dto.model';
 
 export class CourseManagementDetailViewDto {
     courseId: number;
@@ -52,7 +50,7 @@ export class CourseManagementDetailViewDto {
 
     activeStudents: number[];
 
-    exercises: CourseManagementOverviewDetailsDto;
+    exercises: CourseManagementOverviewExerciseStatisticsDTO;
 
     constructor() {}
 }
