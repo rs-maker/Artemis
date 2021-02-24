@@ -407,7 +407,7 @@ public class ExerciseService {
             }
 
             var dto = new CourseManagementOverviewExerciseDetailsDTO();
-            dto.setExerciseId(exerciseId);
+            dto.setId(exerciseId);
             dto.setExerciseTitle((String) listElement.get("title"));
 
             if (exerciseType == QuizExercise.class) {

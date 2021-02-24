@@ -23,7 +23,7 @@
                             container="body"
                         ></fa-icon>
                     </div>
-                    <p class="item-title" [routerLink]="['/course-management', course.id, details.exerciseType + '-exercises', details.exerciseId]">{{ details.exerciseTitle }}</p>
+                    <p class="item-title" [routerLink]="['/course-management', course.id, details.exerciseType + '-exercises', details.id]">{{ details.exerciseTitle }}</p>
                     <div class="item-category d-flex hide-categories" *ngIf="details.categories?.length > 0">
                         <!-- We only support two categories -->
                         <h4 *ngFor="let category of details.categories">
@@ -122,7 +122,7 @@
             <div class="row-flex button-row">
                 <a
                     *ngIf="course.isAtLeastInstructor"
-                    [routerLink]="['/course-management', course.id, details.exerciseType + '-exercises', details.exerciseId, 'edit']"
+                    [routerLink]="['/course-management', course.id, details.exerciseType + '-exercises', details.id, 'edit']"
                     class="btn btn-warning mr-1 mb-1"
                     [ngbTooltip]="'entity.action.edit' | translate"
                 >
@@ -130,7 +130,7 @@
                 </a>
                 <a
                     *ngIf="course.isAtLeastTutor"
-                    [routerLink]="['/course-management', course.id, 'exercises', details.exerciseId, 'scores']"
+                    [routerLink]="['/course-management', course.id, 'exercises', details.id, 'scores']"
                     class="btn btn-info mr-1 mb-1"
                     [ngbTooltip]="'entity.action.scores' | translate"
                 >
@@ -138,7 +138,7 @@
                 </a>
                 <a
                     *ngIf="course.isAtLeastInstructor && details.exerciseType !== exerciseType.PROGRAMMING && details.exerciseType !== exerciseType.QUIZ"
-                    [routerLink]="['/course-management', course.id, details.exerciseType + '-exercises', details.exerciseId, 'assessment']"
+                    [routerLink]="['/course-management', course.id, details.exerciseType + '-exercises', details.id, 'assessment']"
                     class="btn btn-success mr-1 mb-1"
                     [ngbTooltip]="'artemisApp.courseOverview.exerciseDetails.instructorActions.submissions' | translate"
                 >
@@ -146,7 +146,7 @@
                 </a>
                 <a
                     *ngIf="course.isAtLeastInstructor && details.exerciseType === exerciseType.PROGRAMMING"
-                    [routerLink]="['/course-management', course.id, 'programming-exercises', details.exerciseId, 'grading', 'test-cases']"
+                    [routerLink]="['/course-management', course.id, 'programming-exercises', details.id, 'grading', 'test-cases']"
                     class="btn btn-success mr-1 mb-1"
                     [ngbTooltip]="'artemisApp.programmingExercise.configureGrading.shortTitle' | translate"
                 >

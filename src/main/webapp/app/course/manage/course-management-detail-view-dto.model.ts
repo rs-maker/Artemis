@@ -1,8 +1,9 @@
 import { Moment } from 'moment';
 import { CourseManagementOverviewExerciseStatisticsDTO } from 'app/course/manage/overview/course-management-overview-exercise-statistics-dto.model';
+import { CourseManagementOverviewExerciseDetailsDTO } from './overview/course-management-overview-exercise-details-dto.model';
 
 export class CourseManagementDetailViewDto {
-    courseId: number;
+    id: number;
     presentationScore: number;
     semester: string;
     startDate: Moment;
@@ -50,7 +51,8 @@ export class CourseManagementDetailViewDto {
 
     activeStudents: number[];
 
-    exercises: CourseManagementOverviewExerciseStatisticsDTO;
+    exercisesStatistics: CourseManagementOverviewExerciseStatisticsDTO[];
+    exerciseDetails: CourseManagementOverviewExerciseDetailsDTO[];
 
     constructor() {}
 }

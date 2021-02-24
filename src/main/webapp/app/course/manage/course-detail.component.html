@@ -23,34 +23,34 @@
             </div>
             <jhi-alert></jhi-alert>
             <div class="tab-bar tab-bar-course-overview">
-                <a [routerLink]="['/course-management', course.courseId, 'exams']" class="tab-item exams">
+                <a [routerLink]="['/course-management', course.id, 'exams']" class="tab-item exams">
                     <b jhiTranslate="artemisApp.courseOverview.menu.exams">Exams</b>
                 </a>
-                <a [routerLink]="['/course-management', course.courseId, 'exercises']" class="tab-item exercises">
+                <a [routerLink]="['/course-management', course.id, 'exercises']" class="tab-item exercises">
                     <b jhiTranslate="artemisApp.courseOverview.menu.exercises">Exercise</b>
                 </a>
-                <a [routerLink]="['/course-management', course.courseId, 'lectures']" class="tab-item lectures">
+                <a [routerLink]="['/course-management', course.id, 'lectures']" class="tab-item lectures">
                     <b jhiTranslate="artemisApp.courseOverview.menu.lectures">Lectures</b>
                 </a>
-                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.courseId, 'course-statistics']" class="tab-item statistics">
+                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.id, 'course-statistics']" class="tab-item statistics">
                     <b jhiTranslate="artemisApp.courseOverview.menu.statistics">Statistics</b>
                 </a>
-                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.courseId, 'goal-management']" class="tab-item learningGoals">
+                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.id, 'goal-management']" class="tab-item learningGoals">
                     <b jhiTranslate="artemisApp.learningGoal.learningGoalButton">Learning Goals</b>
                 </a>
-                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.courseId, 'scores']" class="tab-item scores">
+                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.id, 'scores']" class="tab-item scores">
                     <b jhiTranslate="entity.action.scores">Scores</b>
                 </a>
-                <a [routerLink]="['/course-management', course.courseId, 'tutor-dashboard']" class="tab-item assessmentDashboard">
+                <a [routerLink]="['/course-management', course.id, 'tutor-dashboard']" class="tab-item assessmentDashboard">
                     <b jhiTranslate="entity.action.assessmentDashboard">Assessment Dashboard</b>
                 </a>
-                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.courseId, 'instructor-dashboard']" class="tab-item instructorDashboard">
+                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.id, 'instructor-dashboard']" class="tab-item instructorDashboard">
                     <b jhiTranslate="artemisApp.course.instructorDashboard">Instructor Dashboard</b>
                 </a>
                 <div class="ml-auto">
                     <a
                         *ngIf="course?.studentQuestionsEnabled && course?.isAtLeastTutor"
-                        [routerLink]="['/course-management', course?.courseId, 'questions']"
+                        [routerLink]="['/course-management', course?.id, 'questions']"
                         class="btn btn-primary btn-md ml-1"
                     >
                         <fa-icon [icon]="'comment'"></fa-icon>
@@ -60,7 +60,7 @@
                         <fa-icon [icon]="'sync'" [spin]="refreshingCourse"></fa-icon>
                         <span class="d-none d-md-inline ml-1" jhiTranslate="artemisApp.exercise.refresh">Refresh</span>
                     </button>
-                    <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.courseId, 'edit']" class="btn btn-warning btn-md ml-1">
+                    <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.id, 'edit']" class="btn btn-warning btn-md ml-1">
                         <fa-icon [icon]="'wrench'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
                     </a>
                     <button
@@ -71,7 +71,7 @@
                         [entityTitle]="course.title"
                         deleteQuestion="artemisApp.course.delete.question"
                         deleteConfirmationText="artemisApp.course.delete.typeNameToConfirm"
-                        (delete)="deleteCourse(course.courseId)"
+                        (delete)="deleteCourse(course.id)"
                         [dialogError]="dialogError$"
                     >
                         <fa-icon [icon]="'times'"></fa-icon>
@@ -115,24 +115,36 @@
                 </div>
                 <jhi-course-detail-bar-chart
                     class="col-md-8"
-                    [courseId]="course.courseId"
+                    [courseId]="course.id"
                     [numberOfStudentsInCourse]="course.numberOfStudentsInCourse"
                     [initialStats]="course.activeStudents"
                 ></jhi-course-detail-bar-chart>
             </div>
+            <jhi-data-table
+                [isLoading]="isLoading"
+                [showPageSizeDropdownAndSearchField]="false"
+                entityType="exercise"
+                [allEntities]="course.exerciseDetails"
+                searchPlaceholderTranslation="artemisApp.noResults"
+                [searchFields]="['exerciseTitle']"
+                [searchTextFromEntity]="searchTextFromExercise"
+                [searchResultFormatter]="searchResultFormatter"
+            >
+            </jhi-data-table>
+
             <div>
-                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.courseId, 'edit']" class="btn btn-warning mr-1 mb-1">
+                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.id, 'edit']" class="btn btn-warning mr-1 mb-1">
                     <fa-icon [icon]="'wrench'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
                 </a>
 
-                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.courseId, 'goal-management']" class="btn btn-primary mr-1 mb-1">
+                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.id, 'goal-management']" class="btn btn-primary mr-1 mb-1">
                     <fa-icon [icon]="'flag'"></fa-icon>
                     <span [innerHTML]="'artemisApp.learningGoal.learningGoalButton' | translate" class="d-none d-md-inline"></span>
                 </a>
 
                 <a
                     *ngIf="course?.studentQuestionsEnabled && course?.isAtLeastTutor"
-                    [routerLink]="['/course-management', course?.courseId, 'questions']"
+                    [routerLink]="['/course-management', course?.id, 'questions']"
                     class="btn btn-primary mr-1 mb-1"
                 >
                     <fa-icon [icon]="'comment'"></fa-icon>
@@ -143,22 +155,20 @@
                     <fa-icon [icon]="'user-plus'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.registerForCourse">Register</span>
                 </button>
 
-                <a [routerLink]="['/course-management', course.courseId, 'exercises']" class="btn btn-primary mr-1 mb-1">
+                <a [routerLink]="['/course-management', course.id, 'exercises']" class="btn btn-primary mr-1 mb-1">
                     <fa-icon [icon]="'list-alt'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.exercise">Exercises</span>
                 </a>
-                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.courseId, 'lectures']" class="btn btn-primary mr-1 mb-1">
+                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.id, 'lectures']" class="btn btn-primary mr-1 mb-1">
                     <fa-icon [icon]="'list-alt'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.lecture">Lectures</span>
                 </a>
-                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.courseId, 'scores']" class="btn btn-info mr-1 mb-1">
+                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.id, 'scores']" class="btn btn-info mr-1 mb-1">
                     <fa-icon [icon]="'eye'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.scores">Scores</span>
                 </a>
-                <a [routerLink]="['/course-management', course.courseId, 'exams']" class="btn btn-info mr-1 mb-1">
-                    <fa-icon [icon]="'list-alt'"></fa-icon>&nbsp;<span>Exams</span>
-                </a>
-                <a [routerLink]="['/course-management', course.courseId, 'tutor-dashboard']" class="btn btn-info mr-1 mb-1">
+                <a [routerLink]="['/course-management', course.id, 'exams']" class="btn btn-info mr-1 mb-1"> <fa-icon [icon]="'list-alt'"></fa-icon>&nbsp;<span>Exams</span> </a>
+                <a [routerLink]="['/course-management', course.id, 'tutor-dashboard']" class="btn btn-info mr-1 mb-1">
                     <fa-icon [icon]="'th-list'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.assessmentDashboard">Assessment Dashboard</span>
                 </a>
-                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.courseId, 'instructor-dashboard']" class="btn btn-info mr-1 mb-1">
+                <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.id, 'instructor-dashboard']" class="btn btn-info mr-1 mb-1">
                     <fa-icon [icon]="'th-list'"></fa-icon>&nbsp;<span jhiTranslate="artemisApp.course.instructorDashboard">Instructor Dashboard</span>
                 </a>
                 <ng-template #archiveCourseWarningPopup let-modal>
@@ -223,7 +233,7 @@
                     [entityTitle]="course.title"
                     deleteQuestion="artemisApp.course.delete.question"
                     deleteConfirmationText="artemisApp.course.delete.typeNameToConfirm"
-                    (delete)="deleteCourse(course.courseId)"
+                    (delete)="deleteCourse(course.id)"
                     [dialogError]="dialogError$"
                 >
                     <fa-icon [icon]="'times'"></fa-icon>
@@ -232,7 +242,7 @@
             <hr />
             <div>
                 <jhi-secured-image *ngIf="course.courseIcon" [cachingStrategy]="CachingStrategy.LOCAL_STORAGE" [src]="course.courseIcon"></jhi-secured-image>
-                <h2><span jhiTranslate="artemisApp.course.detail.title">Course</span> {{ course.courseId }}</h2>
+                <h2><span jhiTranslate="artemisApp.course.detail.title">Course</span> {{ course.id }}</h2>
             </div>
             <hr />
             <jhi-alert></jhi-alert>
@@ -249,17 +259,17 @@
                 <div *ngIf="course.isAtLeastInstructor">
                     <dt><span jhiTranslate="artemisApp.course.studentGroupName">Student Group Name</span></dt>
                     <dd>
-                        <a [routerLink]="['/course-management', course.courseId, 'groups', 'students']"> {{ course.studentGroupName }} ({{ course.numberOfStudentsInCourse }})</a>
+                        <a [routerLink]="['/course-management', course.id, 'groups', 'students']"> {{ course.studentGroupName }} ({{ course.numberOfStudentsInCourse }})</a>
                     </dd>
                     <dt><span jhiTranslate="artemisApp.course.teachingAssistantGroupName">Teaching Assistant Group Name</span></dt>
                     <dd>
-                        <a [routerLink]="['/course-management', course.courseId, 'groups', 'tutors']">
+                        <a [routerLink]="['/course-management', course.id, 'groups', 'tutors']">
                             {{ course.teachingAssistantGroupName }} ({{ course.numberOfTeachingAssistantsInCourse }})</a
                         >
                     </dd>
                     <dt><span jhiTranslate="artemisApp.course.instructorGroupName">Instructor Group Name</span></dt>
                     <dd>
-                        <a [routerLink]="['/course-management', course.courseId, 'groups', 'instructors']">
+                        <a [routerLink]="['/course-management', course.id, 'groups', 'instructors']">
                             {{ course.instructorGroupName }} ({{ course.numberOfInstructorsInCourse }})</a
                         >
                     </dd>

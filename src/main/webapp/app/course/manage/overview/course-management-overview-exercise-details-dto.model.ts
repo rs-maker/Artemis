@@ -2,7 +2,8 @@ import { Moment } from 'moment';
 import { ExerciseType } from 'app/entities/exercise.model';
 
 export class CourseManagementOverviewExerciseDetailsDTO {
-    public exerciseId?: number;
+    // the id of the exercise
+    public id?: number;
     public exerciseTitle?: string;
     public exerciseType?: ExerciseType;
     public categories?: string[];

@@ -739,7 +739,6 @@ public class CourseResource {
         }
 
         return ResponseEntity.ok(dto);
-        // return ResponseUtil.wrapOrNotFound(Optional.ofNullable(course));
     }
 
     /**

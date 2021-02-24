@@ -5,7 +5,7 @@ import java.util.List;
 
 public class CourseManagementDetailViewDTO {
 
-    private Long courseId;
+    private Long id;
 
     private Integer presentationScore;
 
@@ -73,12 +73,12 @@ public class CourseManagementDetailViewDTO {
 
     private List<CourseManagementOverviewExerciseDetailsDTO> exerciseDetails;
 
-    public Long getCourseId() {
-        return courseId;
+    public Long getId() {
+        return id;
     }
 
-    public void setCourseId(Long courseId) {
-        this.courseId = courseId;
+    public void setId(Long courseId) {
+        this.id = courseId;
     }
 
     public Integer getPresentationScore() {

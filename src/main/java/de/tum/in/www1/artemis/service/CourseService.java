@@ -488,8 +488,8 @@ public class CourseService {
      */
     private CourseManagementDetailViewDTO collectCourseInformation(Long courseId) {
         var dto = new CourseManagementDetailViewDTO();
-        var result = courseRepository.getStatsForDetailView(courseId).get(0); // TODO remove list, only map
-        dto.setCourseId((Long) result.get("courseId"));
+        var result = courseRepository.getStatsForDetailView(courseId).get(0);
+        dto.setId((Long) result.get("id"));
         dto.setPresentationScore((Integer) result.get("presentationScore"));
         dto.setSemester((String) result.get("semester"));
         dto.setStartDate((ZonedDateTime) result.get("startDate"));

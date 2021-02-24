@@ -165,7 +165,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     }
 
     @Query("""
-            select c.id as courseId,
+            select c.id as id,
             c.presentationScore as presentationScore,
             c.semester as semester,
             c.startDate as startDate,

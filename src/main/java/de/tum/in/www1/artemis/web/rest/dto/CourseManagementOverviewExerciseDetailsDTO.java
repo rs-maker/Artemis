@@ -5,7 +5,7 @@ import java.util.Set;
 
 public class CourseManagementOverviewExerciseDetailsDTO {
 
-    private Long exerciseId;
+    private Long id;
 
     private String exerciseTitle;
 
@@ -21,12 +21,12 @@ public class CourseManagementOverviewExerciseDetailsDTO {
 
     private boolean isTeamMode;
 
-    public Long getExerciseId() {
-        return exerciseId;
+    public Long getId() {
+        return id;
     }
 
-    public void setExerciseId(Long exerciseId) {
-        this.exerciseId = exerciseId;
+    public void setId(Long exerciseId) {
+        this.id = exerciseId;
     }
 
     public String getExerciseTitle() {
