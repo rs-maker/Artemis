@@ -305,12 +305,12 @@ public class CourseManagementDetailViewDTO {
         this.numberOfInstructorsInCourse = numberOfInstructorsInCourse;
     }
 
-    public Boolean getAtLeastInstructor() {
+    public Boolean getIsAtLeastInstructor() {
         return isAtLeastInstructor;
     }
 
-    public void setAtLeastInstructor(Boolean atLeastInstructor) {
-        isAtLeastInstructor = atLeastInstructor;
+    public void setIsAtLeastInstructor(Boolean isAtLeastInstructor) {
+        this.isAtLeastInstructor = isAtLeastInstructor;
     }
 
     public String getCourseIcon() {

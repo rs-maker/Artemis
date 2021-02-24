@@ -45,6 +45,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
 
     private dialogErrorSource = new Subject<string>();
     dialogError$ = this.dialogErrorSource.asObservable();
+    paramSub: Subscription;
 
     firstTitle = 'Total Assessments';
     secondTitle = 'Total Complaints';
@@ -66,9 +67,13 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
      * On init load the course information and subscribe to listen for changes in courses.
      */
     ngOnInit() {
-        this.route.data.subscribe(({ course }) => {
-            this.course = course;
-
+        // There is no course 0 -> will get no course
+        let courseId = 0;
+        this.paramSub = this.route.params.subscribe((params) => {
+            courseId = params['courseId'];
+        });
+        this.courseService.getCourseForDetailView(courseId).subscribe((courseResponse: HttpResponse<CourseManagementDetailViewDto>) => {
+            this.course = courseResponse.body!;
             // this.registerChangeInCourses();
             this.registerCourseArchiveWebsocket();
         });
@@ -141,7 +146,10 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
      * On destroy unsubscribe all subscriptions.
      */
     ngOnDestroy() {
-        this.eventManager.destroy(this.eventSubscriber);
+        if (this.paramSub) {
+            this.paramSub.unsubscribe();
+        }
+        // this.eventManager.destroy(this.eventSubscriber);
         this.dialogErrorSource.unsubscribe();
         this.websocketService.unsubscribe(CourseDetailComponent.getCourseArchiveStateTopic(this.course.courseId!));
     }

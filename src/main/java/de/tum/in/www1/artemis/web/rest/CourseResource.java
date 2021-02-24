@@ -651,6 +651,27 @@ public class CourseResource {
      */
     @GetMapping("/courses/{courseId}")
     @PreAuthorize("hasAnyRole('TA', 'INSTRUCTOR', 'ADMIN')")
+    public ResponseEntity<Course> getCourse(@PathVariable Long courseId) {
+        log.debug("REST request to get Course : {}", courseId);
+        Course course = courseRepository.findByIdElseThrow(courseId);
+        course.setNumberOfInstructors(userRepository.countUserInGroup(course.getInstructorGroupName()));
+        course.setNumberOfTeachingAssistants(userRepository.countUserInGroup(course.getTeachingAssistantGroupName()));
+        course.setNumberOfStudents(userRepository.countUserInGroup(course.getStudentGroupName()));
+        User user = userRepository.getUserWithGroupsAndAuthorities();
+        if (!authCheckService.isAtLeastTeachingAssistantInCourse(course, user)) {
+            return forbidden();
+        }
+        return ResponseEntity.ok(course);
+    }
+
+    /**
+     * GET /courses/:courseId : get the "id" course.
+     *
+     * @param courseId the id of the course to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the course, or with status 404 (Not Found)
+     */
+    @GetMapping("/courses/{courseId}/management-detail")
+    @PreAuthorize("hasAnyRole('TA', 'INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<CourseManagementDetailViewDTO> getCourseDTOForDetailView(@PathVariable Long courseId) {
         Course course = courseRepository.findByIdElseThrow(courseId);
         User user = userRepository.getUserWithGroupsAndAuthorities();
@@ -659,10 +680,10 @@ public class CourseResource {
         }
         CourseManagementDetailViewDTO dto = courseService.getStatsForDetailView(courseId);
         if (authCheckService.isAtLeastInstructorInCourse(course, user)) {
-            dto.setAtLeastInstructor(true);
+            dto.setIsAtLeastInstructor(true);
         }
         else {
-            dto.setAtLeastInstructor(false);
+            dto.setIsAtLeastInstructor(false);
         }
         // Only counting assessments and submissions which are handed in in time
         long numberOfAssessments = resultRepository.countNumberOfAssessments(courseId).getInTime();

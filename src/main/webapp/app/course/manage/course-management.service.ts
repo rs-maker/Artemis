@@ -23,6 +23,7 @@ import { SubjectObservablePair } from 'app/utils/rxjs.utils';
 import { participationStatus } from 'app/exercises/shared/exercise/exercise-utils';
 import { CourseManagementOverviewDto } from './overview/course-management-overview-dto.model';
 import { CourseManagementOverviewStatisticsDto } from 'app/course/manage/overview/course-management-overview-statistics-dto.model';
+import { CourseManagementDetailViewDto } from 'app/course/manage/course-management-detail-view-dto.model';
 
 export type EntityResponseType = HttpResponse<Course>;
 export type EntityArrayResponseType = HttpResponse<Course[]>;
@@ -239,6 +240,15 @@ export class CourseManagementService {
         return this.http
             .get<Course[]>(`${this.resourceUrl}/course-overview`, { params: options, observe: 'response' })
             .pipe(tap((res: HttpResponse<Course[]>) => res.body!.forEach((c) => this.checkAndSetCourseRights(c))));
+    }
+
+    /**
+     * gets course information required for the course mangement detail page
+     * @param courseId the id of the course of which the detailed data should be fetched
+     */
+    getCourseForDetailView(courseId: number): Observable<HttpResponse<CourseManagementDetailViewDto>> {
+        return this.http.get<CourseManagementDetailViewDto>(`${this.resourceUrl}/${courseId}/management-detail`, { observe: 'response' });
+        // .pipe((res: HttpResponse<CourseManagementDetailViewDto>) => this.checkAndSetCourseRights(res)));
     }
 
     /**
