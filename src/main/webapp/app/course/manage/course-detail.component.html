@@ -36,12 +36,30 @@
                     <b jhiTranslate="artemisApp.courseOverview.menu.statistics">Statistics</b>
                 </div>
                 <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.courseId, 'goal-management']" class="tab-item learningGoals">
-                    <b jhiTranslate="artemisApp.learningGoal.learningGoalButton">Statistics</b>
+                    <b jhiTranslate="artemisApp.learningGoal.learningGoalButton">Learning Goals</b>
                 </a>
-                <button class="btn btn-primary btn-md ml-1" (click)="loadCourse(true)" [disabled]="refreshingCourse">
-                    <fa-icon [icon]="'sync'" [spin]="refreshingCourse"></fa-icon>
-                    <span class="d-none d-md-inline ml-1" jhiTranslate="artemisApp.exercise.refresh">Refresh</span>
-                </button>
+                <div class="ml-auto">
+                    <button class="btn btn-primary btn-md ml-1" (click)="loadCourse(true)" [disabled]="refreshingCourse">
+                        <fa-icon [icon]="'sync'" [spin]="refreshingCourse"></fa-icon>
+                        <span class="d-none d-md-inline ml-1" jhiTranslate="artemisApp.exercise.refresh">Refresh</span>
+                    </button>
+                    <a *ngIf="course.isAtLeastInstructor" [routerLink]="['/course-management', course.courseId, 'edit']" class="btn btn-warning btn-md ml-1">
+                        <fa-icon [icon]="'wrench'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+                    </a>
+                    <button
+                        class="btn btn-md ml-1 mr-1"
+                        *jhiHasAnyAuthority="['ROLE_ADMIN']"
+                        [buttonSize]="ButtonSize.MEDIUM"
+                        jhiDeleteButton
+                        [entityTitle]="course.title"
+                        deleteQuestion="artemisApp.course.delete.question"
+                        deleteConfirmationText="artemisApp.course.delete.typeNameToConfirm"
+                        (delete)="deleteCourse(course.courseId)"
+                        [dialogError]="dialogError$"
+                    >
+                        <fa-icon [icon]="'times'"></fa-icon>
+                    </button>
+                </div>
             </div>
             <div class="row">
                 <div class="col-md-4">
