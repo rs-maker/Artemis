@@ -13,11 +13,14 @@ import { downloadZipFileFromResponse } from 'app/shared/util/download.util';
 import { JhiWebsocketService } from 'app/core/websocket/websocket.service';
 import { tap } from 'rxjs/operators';
 import { ActionType } from 'app/shared/delete-dialog/delete-dialog.model';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { ButtonSize } from 'app/shared/components/button.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CourseManagementDetailViewDto } from 'app/course/manage/course-management-detail-view-dto.model';
+import { User } from 'app/core/user/user.model';
+import { Exercise } from 'app/entities/exercise.model';
+import { CourseManagementOverviewExerciseDetailsDTO } from 'app/course/manage/overview/course-management-overview-exercise-details-dto.model';
 
 type CourseArchiveState = {
     exportState: 'COMPLETED' | 'RUNNING';
@@ -51,6 +54,11 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     secondTitle = 'Total Complaints';
     thirdTitle = 'More Feedback Requests';
     fourthTitle = 'Average Student Score';
+
+    // exercise table
+    isLoading = false;
+    allExercises: Exercise[] = [];
+    filteredUsersSize = 0;
 
     constructor(
         private eventManager: JhiEventManager,
@@ -91,14 +99,14 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
      */
     registerChangeInCourses() {
         this.eventSubscriber = this.eventManager.subscribe('courseListModification', () => {
-            this.courseService.find(this.course.courseId!).subscribe((courseResponse: HttpResponse<Course>) => {
+            this.courseService.find(this.course.id).subscribe((courseResponse: HttpResponse<Course>) => {
                 this.oldCourse = courseResponse.body!;
             });
         });
     }
 
     private registerCourseArchiveWebsocket() {
-        const topic = CourseDetailComponent.getCourseArchiveStateTopic(this.course.courseId);
+        const topic = CourseDetailComponent.getCourseArchiveStateTopic(this.course.id);
         this.websocketService.subscribe(topic);
         this.websocketService
             .receive(topic)
@@ -125,7 +133,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
      * Register for the currently loaded course.
      */
     registerForCourse() {
-        this.courseService.registerForCourse(this.course.courseId).subscribe(
+        this.courseService.registerForCourse(this.course.id).subscribe(
             (userResponse) => {
                 if (userResponse.body != undefined) {
                     const message = 'Registered user for course ' + this.course.title;
@@ -151,7 +159,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
         }
         // this.eventManager.destroy(this.eventSubscriber);
         this.dialogErrorSource.unsubscribe();
-        this.websocketService.unsubscribe(CourseDetailComponent.getCourseArchiveStateTopic(this.course.courseId!));
+        this.websocketService.unsubscribe(CourseDetailComponent.getCourseArchiveStateTopic(this.course.id));
     }
 
     private static getCourseArchiveStateTopic(courseId: number) {
@@ -180,11 +188,11 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     }
 
     archiveCourse() {
-        this.courseService.archiveCourse(this.course.courseId).subscribe();
+        this.courseService.archiveCourse(this.course.id).subscribe();
     }
 
     downloadCourseArchive() {
-        this.courseService.downloadCourseArchive(this.course.courseId).subscribe(
+        this.courseService.downloadCourseArchive(this.course.id).subscribe(
             (response) => downloadZipFileFromResponse(response),
             () => this.jhiAlertService.error('artemisApp.course.archive.archiveDownloadError'),
         );
@@ -203,7 +211,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     }
 
     cleanupCourse() {
-        this.courseService.cleanupCourse(this.course.courseId).subscribe(
+        this.courseService.cleanupCourse(this.course.id).subscribe(
             () => {
                 this.jhiAlertService.success('artemisApp.programmingExercise.cleanup.successMessage');
                 this.dialogErrorSource.next('');
@@ -238,4 +246,35 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     loadCourse(refresh = false) {
         this.refreshingCourse = refresh;
     }
+
+    /**
+     * Converts a exercise object to a string that can be searched for. This is
+     * used by the autocomplete select inside the data table.
+     *
+     * @param exercise: Exercise
+     */
+    searchTextFromExercise = (exercise: CourseManagementOverviewExerciseDetailsDTO): string => {
+        return exercise.exerciseTitle || '';
+    };
+
+    /**
+     * Formats the results in the autocomplete overlay.
+     *
+     * @param exercise: Exercise
+     */
+    searchResultFormatter = (exercise: CourseManagementOverviewExerciseDetailsDTO) => {
+        const { exerciseTitle } = exercise;
+        return `${exerciseTitle}`;
+    };
+
+    searchAllUsers = (stream$: Observable<{ text: string; entities: User[] }>): any => {};
+
+    /**
+     * Update the number of filtered users
+     *
+     * @param filteredUsersSize Total number of users after filters have been applied
+     */
+    handleUsersSizeChange = (filteredUsersSize: number) => {
+        this.filteredUsersSize = filteredUsersSize;
+    };
 }
