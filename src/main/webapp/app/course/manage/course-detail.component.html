@@ -166,6 +166,7 @@
                     <span jhiTranslate="artemisApp.course.archive.downloadCourseArchive">Download Course Archive</span>
                 </button>
                 <button
+                    class="mb-1"
                     *ngIf="canCleanupCourse()"
                     [disabled]="courseIsBeingArchived"
                     jhiDeleteButton
@@ -178,6 +179,19 @@
                     deleteConfirmationText="artemisApp.course.delete.typeNameToConfirm"
                 >
                     <fa-icon [icon]="'eraser'"></fa-icon>
+                </button>
+                <button
+                    class="mb-1"
+                    *jhiHasAnyAuthority="['ROLE_ADMIN']"
+                    [buttonSize]="ButtonSize.MEDIUM"
+                    jhiDeleteButton
+                    [entityTitle]="course.title"
+                    deleteQuestion="artemisApp.course.delete.question"
+                    deleteConfirmationText="artemisApp.course.delete.typeNameToConfirm"
+                    (delete)="deleteCourse(course.id!)"
+                    [dialogError]="dialogError$"
+                >
+                    <fa-icon [icon]="'times'"></fa-icon>
                 </button>
             </div>
             <hr />

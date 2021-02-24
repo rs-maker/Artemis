@@ -33,7 +33,6 @@ import de.tum.in.www1.artemis.security.SecurityUtils;
 import de.tum.in.www1.artemis.service.exam.ExamService;
 import de.tum.in.www1.artemis.service.user.UserService;
 import de.tum.in.www1.artemis.web.rest.dto.CourseManagementDetailViewDTO;
-import de.tum.in.www1.artemis.web.rest.dto.CourseManagementOverviewDetailsDTO;
 import de.tum.in.www1.artemis.web.rest.errors.AccessForbiddenException;
 
 /**
@@ -282,11 +281,11 @@ public class CourseService {
      * @param isOnlyActive Whether or not to include courses with a past endDate
      * @return A list of Course DTOs for the course management overview
      */
-    public List<CourseManagementOverviewDetailsDTO> getAllDTOsForOverview(Boolean isOnlyActive) {
+    public List<Course> getAllCoursesForOverview(Boolean isOnlyActive) {
         var dateTimeNow = isOnlyActive ? ZonedDateTime.now() : null;
         var user = userRepository.getUserWithGroupsAndAuthorities();
         var userGroups = new ArrayList<>(user.getGroups());
-        return courseRepository.getAllDTOsForOverview(dateTimeNow, authCheckService.isAdmin(user), userGroups);
+        return courseRepository.getAllCoursesForOverview(dateTimeNow, authCheckService.isAdmin(user), userGroups);
     }
 
     /**
