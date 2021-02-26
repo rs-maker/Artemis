@@ -12,5 +12,8 @@ export class CourseManagementOverviewExerciseDetailsDTO {
     public assessmentDueDate?: Moment;
     public teamMode?: boolean;
 
+    // for quizExercises
+    public quizStatus?: string;
+
     constructor() {}
 }
