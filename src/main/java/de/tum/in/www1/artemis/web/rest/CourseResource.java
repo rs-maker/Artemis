@@ -737,6 +737,8 @@ public class CourseResource {
         else {
             dto.setCurrentPercentageAverageScore(100.0);
         }
+        dto.setExerciseDetails(exerciseService.getExercisesForCourseManagementOverview(courseId));
+        dto.setExercisesStatistics(exerciseService.getStatisticsForCourseManagementOverview(courseId, dto.getNumberOfStudentsInCourse()));
 
         return ResponseEntity.ok(dto);
     }

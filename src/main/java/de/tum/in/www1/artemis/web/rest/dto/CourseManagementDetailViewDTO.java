@@ -73,6 +73,8 @@ public class CourseManagementDetailViewDTO {
 
     private List<CourseManagementOverviewExerciseDetailsDTO> exerciseDetails;
 
+    private List<CourseManagementOverviewExerciseStatisticsDTO> exercisesStatistics;
+
     public Long getId() {
         return id;
     }
@@ -319,5 +321,21 @@ public class CourseManagementDetailViewDTO {
 
     public void setCourseIcon(String courseIcon) {
         this.courseIcon = courseIcon;
+    }
+
+    public List<CourseManagementOverviewExerciseDetailsDTO> getExerciseDetails() {
+        return exerciseDetails;
+    }
+
+    public void setExerciseDetails(List<CourseManagementOverviewExerciseDetailsDTO> exerciseDetails) {
+        this.exerciseDetails = exerciseDetails;
+    }
+
+    public List<CourseManagementOverviewExerciseStatisticsDTO> getExercisesStatistics() {
+        return exercisesStatistics;
+    }
+
+    public void setExercisesStatistics(List<CourseManagementOverviewExerciseStatisticsDTO> exercisesStatistics) {
+        this.exercisesStatistics = exercisesStatistics;
     }
 }

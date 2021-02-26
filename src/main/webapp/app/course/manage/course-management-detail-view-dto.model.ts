@@ -51,8 +51,8 @@ export class CourseManagementDetailViewDto {
 
     activeStudents: number[];
 
-    exercisesStatistics: CourseManagementOverviewExerciseStatisticsDTO[];
     exerciseDetails: CourseManagementOverviewExerciseDetailsDTO[];
+    exercisesStatistics: CourseManagementOverviewExerciseStatisticsDTO[];
 
     constructor() {}
 }
