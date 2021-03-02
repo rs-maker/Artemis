@@ -20,6 +20,7 @@ import { AlertComponent } from 'app/shared/alert/alert.component';
 import { CircularProgressBarComponent } from 'app/shared/circular-progress-bar/circular-progress-bar.component';
 import { CustomMinDirective } from 'app/shared/validators/custom-min-validator.directive';
 import { CustomMaxDirective } from 'app/shared/validators/custom-max-validator.directive';
+import { StatisticsGraphComponent } from 'app/shared/statistics-graph/statistics-graph.component';
 
 @NgModule({
     imports: [ArtemisSharedLibsModule, ArtemisSharedCommonModule, ArtemisSharedPipesModule],
@@ -38,6 +39,7 @@ import { CustomMaxDirective } from 'app/shared/validators/custom-max-validator.d
         ChartComponent,
         CustomMinDirective,
         CustomMaxDirective,
+        StatisticsGraphComponent,
     ],
     entryComponents: [DeleteDialogComponent],
     exports: [
@@ -61,6 +63,7 @@ import { CustomMaxDirective } from 'app/shared/validators/custom-max-validator.d
         ChartComponent,
         CustomMinDirective,
         CustomMaxDirective,
+        StatisticsGraphComponent,
     ],
     providers: [ArtemisDatePipe],
 })

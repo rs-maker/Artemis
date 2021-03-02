@@ -46,6 +46,7 @@ import { ArtemisTutorParticipationGraphModule } from 'app/shared/dashboards/tuto
 import { ArtemisMarkdownModule } from 'app/shared/markdown.module';
 import { CourseDetailDoughnutChartComponent } from 'app/course/manage/course-detail-doughnut-chart.component';
 import { CourseDetailBarChartComponent } from './course-detail-bar-chart.component';
+import { CourseDetailStatisticsComponent } from 'app/course/manage/course-detail-statistics.component';
 
 @NgModule({
     imports: [
@@ -93,6 +94,7 @@ import { CourseDetailBarChartComponent } from './course-detail-bar-chart.compone
         CourseUpdateComponent,
         CourseExerciseCardComponent,
         CourseManagementExercisesComponent,
+        CourseDetailStatisticsComponent,
         CourseGroupComponent,
         CourseManagementCardComponent,
         CourseManagementExerciseRowComponent,

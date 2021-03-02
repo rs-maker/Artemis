@@ -92,6 +92,7 @@
             "student": "Student",
             "tutor": "Tutor",
             "instructor": "Dozent",
+            "statistics": "Statistiken",
             "form": {
                 "shortname": {
                     "minlength": "Der Kurzname muss mindestens 3 Zeichen lang sein.",
