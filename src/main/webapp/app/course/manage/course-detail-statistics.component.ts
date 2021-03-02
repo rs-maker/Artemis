@@ -1,17 +1,18 @@
-import { Component } from '@angular/core';
-import { Graphs, SpanType } from 'app/entities/statistics.model';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Graphs, SpanType, StatisticsView } from 'app/entities/statistics.model';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'jhi-course-detail-statistics',
     templateUrl: './course-detail-statistics.component.html',
 })
-export class CourseDetailStatisticsComponent {
+export class CourseDetailStatisticsComponent implements OnInit {
     // html properties
     SpanType = SpanType;
     graphTypes = [
         Graphs.SUBMISSIONS,
         Graphs.ACTIVE_USERS,
-        Graphs.LOGGED_IN_USERS,
         Graphs.RELEASED_EXERCISES,
         Graphs.EXERCISES_DUE,
         Graphs.CONDUCTED_EXAMS,
@@ -22,8 +23,17 @@ export class CourseDetailStatisticsComponent {
         Graphs.CREATED_FEEDBACKS,
     ];
     currentSpan: SpanType = SpanType.WEEK;
+    statisticsView: StatisticsView = StatisticsView.COURSEDETAIL;
+    paramSub: Subscription;
+    courseId: number;
 
-    constructor() {}
+    constructor(private route: ActivatedRoute) {}
+
+    ngOnInit() {
+        this.paramSub = this.route.params.subscribe((params) => {
+            this.courseId = params['courseId'];
+        });
+    }
 
     onTabChanged(span: SpanType): void {
         this.currentSpan = span;
