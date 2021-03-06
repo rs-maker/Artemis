@@ -19,7 +19,9 @@
         "exam_registrations": "Klausuranmeldungen",
         "active_tutors": "Aktive Tutoren",
         "created_results": "Erstellte Resultate",
-        "created_feedbacks": "Erstellte Rückmeldungen"
+        "created_feedbacks": "Erstellte Rückmeldungen",
+        "asked_questions": "Gestellte Fragen",
+        "answered_questions": "Beantwortete Fragen"
     },
     "calendar_week": "KW",
     "overview": {

@@ -19,7 +19,9 @@
         "exam_registrations": "Exam registrations",
         "active_tutors": "Active tutors",
         "created_results": "Created results",
-        "created_feedbacks": "Created feedback"
+        "created_feedbacks": "Created feedback",
+        "asked_questions": "Asked questions",
+        "answered_questions": "Answered questions"
     },
     "calendar_week": "CW",
     "overview": {

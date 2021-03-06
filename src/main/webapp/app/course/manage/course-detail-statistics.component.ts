@@ -21,6 +21,8 @@ export class CourseDetailStatisticsComponent implements OnInit {
         Graphs.ACTIVE_TUTORS,
         Graphs.CREATED_RESULTS,
         Graphs.CREATED_FEEDBACKS,
+        Graphs.ASKED_QUESTIONS,
+        Graphs.ANSWERED_QUESTIONS,
     ];
     currentSpan: SpanType = SpanType.WEEK;
     statisticsView: StatisticsView = StatisticsView.COURSEDETAIL;

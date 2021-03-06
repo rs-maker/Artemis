@@ -209,4 +209,22 @@ public interface StatisticsRepository extends JpaRepository<User, Long> {
             order by r.completionDate
             """)
     List<Map<String, Object>> getResultFeedbacksForCourse(@Param("startDate") ZonedDateTime startDate, @Param("endDate") ZonedDateTime endDate, @Param("courseId") Long courseId);
+
+    @Query("""
+            select sq.creationDate as day, sum(sq.id) as amount
+            from StudentQuestion sq
+            where sq.creationDate >= :#{#startDate} and sq.creationDate <= :#{#endDate} and sq.exercise.course.id = :#{#courseId}
+            group by sq.creationDate
+            order by sq.creationDate
+            """)
+    List<Map<String, Object>> getQuestionsAskedForCourse(@Param("startDate") ZonedDateTime startDate, @Param("endDate") ZonedDateTime endDate, @Param("courseId") Long courseId);
+
+    @Query("""
+            select sqa.answerDate as day, sum(sqa.id) as amount
+            from StudentQuestionAnswer sqa
+            where sqa.answerDate >= :#{#startDate} and sqa.answerDate <= :#{#endDate} and sqa.question.exercise.course.id = :#{#courseId}
+            group by sqa.answerDate
+            order by sqa.answerDate
+            """)
+    List<Map<String, Object>> getQuestionsAnsweredForCourse(@Param("startDate") ZonedDateTime startDate, @Param("endDate") ZonedDateTime endDate, @Param("courseId") Long courseId);
 }

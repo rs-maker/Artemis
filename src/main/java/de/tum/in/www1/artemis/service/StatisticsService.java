@@ -145,6 +145,12 @@ public class StatisticsService {
                 return courseId == null ? this.statisticsRepository.getResultFeedbacks(startDate, endDate)
                         : this.statisticsRepository.getResultFeedbacksForCourse(startDate, endDate, courseId);
             }
+            case ASKED_QUESTIONS -> {
+                return this.statisticsRepository.getQuestionsAskedForCourse(startDate, endDate, courseId);
+            }
+            case ANSWERED_QUESTIONS -> {
+                return this.statisticsRepository.getQuestionsAnsweredForCourse(startDate, endDate, courseId);
+            }
             default -> {
                 return new ArrayList<>();
             }
