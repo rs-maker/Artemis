@@ -6,7 +6,6 @@ buildscript {
         mavenLocal()
         mavenCentral()
         maven { url "https://repo.spring.io/plugins-release" }
-        maven { url "https://maven.pkg.github.com/SimoneGianni/auto-bean-info" }
         jcenter()
     }
     dependencies {
@@ -164,6 +163,7 @@ dependencies {
     implementation "org.gitlab4j:gitlab4j-api:4.15.7"
 
     implementation files("libs/jplag-3.0.0.jar")
+    implementation files("libs/auto-bean-info-0.0.1.jar")
 
     // https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit
     implementation "org.eclipse.jgit:org.eclipse.jgit:5.10.0.202012080955-r"
@@ -229,8 +229,6 @@ dependencies {
     implementation "io.netty:netty-all:4.1.60.Final"
     implementation "io.projectreactor.netty:reactor-netty:1.0.4"
     implementation "org.springframework:spring-messaging:5.3.4"
-
-    implementation "it.semeru:auto-bean-info:0.0.1"
 
     implementation "org.springframework.security:spring-security-config:${spring_security_version}"
     implementation "org.springframework.security:spring-security-data:${spring_security_version}"
