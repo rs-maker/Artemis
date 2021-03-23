@@ -1,13 +1,18 @@
 @import '../../../overview/_overview-vars.scss';
 
 .course-item {
-    padding: 5px;
     border: 1px solid $blue-border-color;
     background-color: $light-background-color;
     border-radius: 0.1rem;
-    display: block ruby;
-    overflow: hidden;
-    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    height: 60px;
+
+    .item-title-container {
+        display: flex;
+        align-items: center;
+    }
 
     .item-title {
         font-weight: bold;
@@ -17,16 +22,20 @@
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 40ch;
+        display: block;
     }
 
     .item-category {
         color: gray;
         margin-left: 15px;
+        display: flex;
+        align-items: flex-start;
         flex-direction: column;
-        justify-content: center;
+        justify-content: space-around;
 
         h4 {
-            margin-bottom: 0;
+            margin-bottom: -5px;
+            font-size: 1rem;
 
             .badge {
                 max-width: 150px;
@@ -42,6 +51,9 @@
         float: right;
         height: 40px;
         width: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .row-flex {
@@ -49,19 +61,30 @@
         flex-direction: row;
     }
 
+    .exercise-details-item {
+        z-index: 1;
+        display: flex;
+        align-items: center;
+    }
+
     .calender-icon-container {
-        width: 24px;
-        height: 24px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .calender-icon-circle {
+        width: 19px;
+        height: 19px;
         background-color: $light-border-color;
         border-radius: 25px;
-        border-color: #3e8acc;
-        border-width: 2px;
-        margin: auto;
-        display: block;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .calender-icon {
-        font-size: 0.8em;
+        font-size: x-small;
     }
 
     .exercise-date-timeline {
@@ -87,6 +110,8 @@
         text-align: center;
         z-index: 1;
         min-width: 95px;
+        font-size: x-small;
+        margin-top: -5px;
     }
 
     .exercise-no-date {
@@ -96,6 +121,7 @@
     .exercise-score-container {
         padding-left: 0;
         margin: auto;
+        z-index: 1;
     }
 
     .exercise-score {
@@ -118,8 +144,16 @@
     }
 
     .button-row {
+        z-index: 1;
         min-width: 132px;
         align-items: center;
+        justify-content: start;
+        margin-right: 5px;
+    }
+
+    .grading-icon {
+        font-size: large;
+        margin-left: 5px;
     }
 }
 
@@ -138,8 +172,10 @@
         min-width: 45%;
     }
 
-    .exercise-date-container {
-        padding-right: 10px !important;
+    .course-item {
+        .exercise-date-container {
+            margin-right: unset !important;
+        }
     }
 }
 
@@ -157,8 +193,18 @@
     .details-container {
         max-width: 70% !important;
     }
+
+    .course-item {
+        .item-title {
+            max-width: 20ch;
+        }
+    }
 }
 
-.small {
-    font-size: small;
+@media screen and (max-width: 480px) {
+    .course-item {
+        .item-title {
+            max-width: 15ch;
+        }
+    }
 }

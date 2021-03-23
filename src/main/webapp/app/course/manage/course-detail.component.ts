@@ -238,43 +238,4 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
             (error: HttpErrorResponse) => this.dialogErrorSource.next(error.message),
         );
     }
-
-    hasVisibleExams(): boolean {
-        return true;
-    }
-
-    loadCourse(refresh = false) {
-        this.refreshingCourse = refresh;
-    }
-
-    /**
-     * Converts a exercise object to a string that can be searched for. This is
-     * used by the autocomplete select inside the data table.
-     *
-     * @param exercise: Exercise
-     */
-    searchTextFromExercise = (exercise: CourseManagementOverviewExerciseDetailsDTO): string => {
-        return exercise.exerciseTitle || '';
-    };
-
-    /**
-     * Formats the results in the autocomplete overlay.
-     *
-     * @param exercise: Exercise
-     */
-    searchResultFormatter = (exercise: CourseManagementOverviewExerciseDetailsDTO) => {
-        const { exerciseTitle } = exercise;
-        return `${exerciseTitle}`;
-    };
-
-    searchAllUsers = (stream$: Observable<{ text: string; entities: User[] }>): any => {};
-
-    /**
-     * Update the number of filtered users
-     *
-     * @param filteredUsersSize Total number of users after filters have been applied
-     */
-    handleUsersSizeChange = (filteredUsersSize: number) => {
-        this.filteredUsersSize = filteredUsersSize;
-    };
 }

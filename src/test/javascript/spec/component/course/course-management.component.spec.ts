@@ -17,16 +17,16 @@ import { OrionFilterDirective } from 'app/shared/orion/orion-filter.directive';
 import { AlertComponent } from 'app/shared/alert/alert.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MockHasAnyAuthorityDirective } from '../../helpers/mocks/directive/mock-has-any-authority.directive';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
 import { JhiSortByDirective, JhiSortDirective } from 'ng-jhipster';
 import { ArtemisDatePipe } from 'app/shared/pipes/artemis-date.pipe';
 import { DeleteButtonDirective } from 'app/shared/delete-dialog/delete-button.directive';
 import { MomentModule } from 'ngx-moment';
 import { CourseManagementCardComponent } from 'app/course/manage/overview/course-management-card.component';
-import { CourseManagementOverviewDto } from 'app/course/manage/overview/course-management-overview-dto.model';
-import { CourseManagementOverviewExerciseDetailsDTO } from 'app/course/manage/overview/course-management-overview-exercise-details-dto.model';
 import { CourseManagementOverviewStatisticsDto } from 'app/course/manage/overview/course-management-overview-statistics-dto.model';
 import { CourseManagementOverviewExerciseStatisticsDTO } from 'app/course/manage/overview/course-management-overview-exercise-statistics-dto.model';
+import { ArtemisTranslatePipe } from 'app/shared/pipes/artemis-translate.pipe.ts';
+import { Exercise } from 'app/entities/exercise.model';
 
 chai.use(sinonChai);
 const expect = chai.expect;
@@ -40,30 +40,30 @@ describe('CourseManagementComponent', () => {
     const pastExercise = {
         dueDate: moment().subtract(6, 'days'),
         assessmentDueDate: moment().subtract(1, 'days'),
-    } as CourseManagementOverviewExerciseDetailsDTO;
+    } as Exercise;
 
     const currentExercise = {
         dueDate: moment().add(2, 'days'),
         releaseDate: moment().subtract(2, 'days'),
-    } as CourseManagementOverviewExerciseDetailsDTO;
+    } as Exercise;
 
     const futureExercise1 = {
         releaseDate: moment().add(4, 'days'),
-    } as CourseManagementOverviewExerciseDetailsDTO;
+    } as Exercise;
 
     const futureExercise2 = {
         releaseDate: moment().add(6, 'days'),
-    } as CourseManagementOverviewExerciseDetailsDTO;
+    } as Exercise;
 
-    const courseDTO187 = {
+    const courseWithExercises187 = {
         courseId: 187,
         exerciseDetails: [pastExercise, currentExercise, futureExercise2, futureExercise1],
-    } as CourseManagementOverviewDto;
+    } as Course;
 
-    const courseDTO188 = {
+    const courseWithExercises188 = {
         courseId: 188,
         exerciseDetails: [],
-    } as CourseManagementOverviewDto;
+    } as Course;
 
     const course187 = {
         id: 187,
@@ -101,7 +101,7 @@ describe('CourseManagementComponent', () => {
                 MockComponent(AlertComponent),
                 MockDirective(MockHasAnyAuthorityDirective),
                 MockDirective(JhiSortByDirective),
-                MockPipe(TranslatePipe),
+                MockPipe(ArtemisTranslatePipe),
                 MockDirective(JhiSortDirective),
                 MockPipe(ArtemisDatePipe),
                 MockDirective(DeleteButtonDirective),
@@ -124,7 +124,7 @@ describe('CourseManagementComponent', () => {
 
     it('should initialize', () => {
         sinon.stub(service, 'getCourseOverview').returns(of(new HttpResponse({ body: [courseDetails187, courseDetails188] })));
-        sinon.stub(service, 'getExercisesForManagementOverview').returns(of(new HttpResponse({ body: [courseDTO187, courseDTO188] })));
+        sinon.stub(service, 'getExercisesForManagementOverview').returns(of(new HttpResponse({ body: [courseWithExercises187, courseWithExercises188] })));
         sinon.stub(service, 'getStatsForManagementOverview').returns(of(new HttpResponse({ body: [] })));
         sinon.stub(service, 'getWithUserStats').returns(of(new HttpResponse({ body: [course187, course188] })));
         sinon.stub(guidedTourService, 'enableTourForCourseOverview').returns(course187);

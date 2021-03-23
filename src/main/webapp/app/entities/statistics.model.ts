@@ -31,4 +31,7 @@ export enum Graphs {
 export enum StatisticsView {
     ARTEMIS = 'ARTEMIS',
     COURSEDETAIL = 'COURSEDETAIL',
+
+    // Course overview
+    ACTIVE_STUDENTS = 'ACTIVE_STUDENTS',
 }

@@ -92,7 +92,6 @@
             "student": "Student",
             "tutor": "Tutor",
             "instructor": "Dozent",
-            "statistics": "Statistiken",
             "form": {
                 "shortname": {
                     "minlength": "Der Kurzname muss mindestens 3 Zeichen lang sein.",
@@ -124,8 +123,8 @@
             "currentWorking": "Derzeitig in Bearbeitung",
             "inAssessment": "Derzeitig in Bewertung",
             "pastExercises": "Vergangene Übungen",
-            "noExercises": "Keine Übungen vorhanden",
-            "assessmentProgress": "Bewertungsfortschritt",
+            "noExercises": "Keine aktiven Übungen vorhanden",
+            "assessmentProgress": "Bewertungen",
             "releaseDate": "Veröffentlichung",
             "dueDate": "Einreichungsfrist",
             "assessmentDueDate": "Bewertungsfrist",
@@ -147,6 +146,11 @@
                 "title": "Aufräumen",
                 "question": "Möchtest du den Kurs <strong>{{title}}</strong> wirklich bereinigen? Dadurch werden alle Studenten-Repositories für <strong>Übungen</strong> und <strong>Prüfungen</strong> gelöscht. Diese Aktion kann <strong class='text-danger'>NICHT</strong> rückgängig gemacht werden!"
             }
+        },
+        "courseStatistics": {
+            "statistics": "Statistiken",
+            "amountOfStudents": "# an Studenten",
+            "activeStudents": "Aktive Studenten"
         }
     }
 }

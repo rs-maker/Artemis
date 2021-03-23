@@ -156,10 +156,9 @@ public class ExerciseResource {
      * @param exerciseId the exerciseId of the exercise to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the exercise, or with status 404 (Not Found)
      */
-    @GetMapping("/exercises/{exerciseId}/for-tutor-dashboard")
+    @GetMapping("/exercises/{exerciseId}/for-assessment-dashboard")
     @PreAuthorize("hasAnyRole('TA', 'INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<Exercise> getExerciseForAssessmentDashboard(@PathVariable Long exerciseId) {
-        log.debug("REST request to get Exercise for assessment dashboard : {}", exerciseId);
         Exercise exercise = exerciseService.findOneWithAdditionalElements(exerciseId);
         User user = userRepository.getUserWithGroupsAndAuthorities();
 
@@ -171,7 +170,7 @@ public class ExerciseResource {
             return badRequest();
         }
 
-        Set<ExampleSubmission> exampleSubmissions = this.exampleSubmissionRepository.findAllWithEagerResultByExerciseId(exerciseId);
+        Set<ExampleSubmission> exampleSubmissions = this.exampleSubmissionRepository.findAllWithResultByExerciseId(exerciseId);
         // Do not provide example submissions without any assessment
         exampleSubmissions.removeIf(exampleSubmission -> exampleSubmission.getSubmission().getLatestResult() == null);
         exercise.setExampleSubmissions(exampleSubmissions);
@@ -207,15 +206,14 @@ public class ExerciseResource {
     }
 
     /**
-     * GET /exercises/:exerciseId/stats-for-tutor-dashboard A collection of useful statistics for the tutor exercise dashboard of the exercise with the given exerciseId
+     * GET /exercises/:exerciseId/stats-for-assessment-dashboard A collection of useful statistics for the tutor exercise dashboard of the exercise with the given exerciseId
      *
      * @param exerciseId the exerciseId of the exercise to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the stats, or with status 404 (Not Found)
      */
-    @GetMapping("/exercises/{exerciseId}/stats-for-tutor-dashboard")
+    @GetMapping("/exercises/{exerciseId}/stats-for-assessment-dashboard")
     @PreAuthorize("hasAnyRole('TA', 'INSTRUCTOR', 'ADMIN')")
     public ResponseEntity<StatsForInstructorDashboardDTO> getStatsForExerciseAssessmentDashboard(@PathVariable Long exerciseId) {
-        log.debug("REST request to get exercise statistics for assessment dashboard : {}", exerciseId);
         Exercise exercise = exerciseRepository.findByIdElseThrow(exerciseId);
 
         if (!authCheckService.isAtLeastTeachingAssistantForExercise(exercise)) {
@@ -230,6 +228,7 @@ public class ExerciseResource {
     /**
      * Given an exercise exerciseId, it creates an object node with numberOfSubmissions, totalNumberOfAssessments, numberOfComplaints and numberOfMoreFeedbackRequests, that are used by both
      * stats for assessment dashboard and for instructor dashboard
+     * TODO: refactor and improve this method
      *
      * @param exercise - the exercise we are interested in
      * @param examMode - flag to determine if test run submissions should be deducted from the statistics
@@ -258,7 +257,7 @@ public class ExerciseResource {
         if (examMode) {
             // set number of corrections specific to each correction round
             int numberOfCorrectionRounds = exercise.getExerciseGroup().getExam().getNumberOfCorrectionRoundsInExam();
-            numberOfAssessmentsOfCorrectionRounds = resultRepository.countNumberOfFinishedAssessmentsForExamExerciseForCorrectionRound(exercise, numberOfCorrectionRounds);
+            numberOfAssessmentsOfCorrectionRounds = resultRepository.countNumberOfFinishedAssessmentsForExamExerciseForCorrectionRounds(exercise, numberOfCorrectionRounds);
         }
         else {
             // no examMode here, so correction rounds defaults to 1 and is the same as totalNumberOfAssessments
@@ -292,11 +291,8 @@ public class ExerciseResource {
 
         stats.setNumberOfOpenMoreFeedbackRequests(numberOfMoreFeedbackRequests - numberOfMoreFeedbackComplaintResponses);
 
-        // tutor leaderboards are currently not supported for exams
-        if (!examMode) {
-            List<TutorLeaderboardDTO> leaderboardEntries = tutorLeaderboardService.getExerciseLeaderboard(exercise);
-            stats.setTutorLeaderboardEntries(leaderboardEntries);
-        }
+        List<TutorLeaderboardDTO> leaderboardEntries = tutorLeaderboardService.getExerciseLeaderboard(exercise);
+        stats.setTutorLeaderboardEntries(leaderboardEntries);
 
         return stats;
     }

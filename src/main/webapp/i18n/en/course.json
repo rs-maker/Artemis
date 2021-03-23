@@ -92,7 +92,6 @@
             "student": "Student",
             "tutor": "Tutor",
             "instructor": "Instructor",
-            "statistics": "Statistics",
             "form": {
                 "shortname": {
                     "minlength": "Short Name must have a length of 3 or more characters.",
@@ -121,11 +120,11 @@
             },
             "averageScore": "Average Score",
             "releasedSoon": "Released Soon",
-            "currentWorking": "Current Working",
-            "inAssessment": "In Assessment",
+            "currentWorking": "Currently In Progress",
+            "inAssessment": "Currently In Assessment",
             "pastExercises": "Past Exercises",
-            "noExercises": "No exercises to display",
-            "assessmentProgress": "Assessment progress",
+            "noExercises": "No active exercises to display",
+            "assessmentProgress": "Assessments",
             "releaseDate": "Release",
             "dueDate": "Due",
             "assessmentDueDate": "Assessment Due",
@@ -147,6 +146,11 @@
                 "title": "Cleanup",
                 "question": "Are you sure you want to clean up the course <strong>{{ title }}</strong>? This will delete all student programming exercise repositories for course <strong>exercises</strong> and <strong>exams</strong>. This action can <strong class='text-danger'>NOT</strong> be undone!"
             }
+        },
+        "courseStatistics": {
+            "statistics": "Statistics",
+            "amountOfStudents": "# of students",
+            "activeStudents": "Active students"
         }
     }
 }

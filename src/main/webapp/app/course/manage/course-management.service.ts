@@ -21,8 +21,9 @@ import { createRequestOption } from 'app/shared/util/request-util';
 import { getLatestSubmissionResult, setLatestSubmissionResult, Submission } from 'app/entities/submission.model';
 import { SubjectObservablePair } from 'app/utils/rxjs.utils';
 import { participationStatus } from 'app/exercises/shared/exercise/exercise-utils';
-import { CourseManagementOverviewDto } from './overview/course-management-overview-dto.model';
 import { CourseManagementOverviewStatisticsDto } from 'app/course/manage/overview/course-management-overview-statistics-dto.model';
+import { addUserIndependentRepositoryUrl } from 'app/overview/participation-utils';
+import { ParticipationType } from 'app/entities/participation/participation.model';
 import { CourseManagementDetailViewDto } from 'app/course/manage/course-management-detail-view-dto.model';
 
 export type EntityResponseType = HttpResponse<Course>;
@@ -158,7 +159,7 @@ export class CourseManagementService {
      * @param courseId - the id of the course
      */
     getCourseWithInterestingExercisesForTutors(courseId: number): Observable<EntityResponseType> {
-        const url = `${this.resourceUrl}/${courseId}/for-tutor-dashboard`;
+        const url = `${this.resourceUrl}/${courseId}/for-assessment-dashboard`;
         return this.http
             .get<Course>(url, { observe: 'response' })
             .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
@@ -169,7 +170,7 @@ export class CourseManagementService {
      * @param courseId - the id of the course
      */
     getStatsForTutors(courseId: number): Observable<HttpResponse<StatsForDashboard>> {
-        return this.http.get<StatsForDashboard>(`${this.resourceUrl}/${courseId}/stats-for-tutor-dashboard`, { observe: 'response' });
+        return this.http.get<StatsForDashboard>(`${this.resourceUrl}/${courseId}/stats-for-assessment-dashboard`, { observe: 'response' });
     }
 
     /**
@@ -231,15 +232,15 @@ export class CourseManagementService {
     }
 
     /**
-     * finds all courses as DTOs using a GET request
-     * @param req
+     * finds all courses for the overview using a GET request
+     * @param req a dictionary which is send as request option along the REST call
      */
     getCourseOverview(req?: any): Observable<HttpResponse<Course[]>> {
         const options = createRequestOption(req);
         this.fetchingCoursesForNotifications = true;
         return this.http
-            .get<Course[]>(`${this.resourceUrl}/course-overview`, { params: options, observe: 'response' })
-            .pipe(tap((res: HttpResponse<Course[]>) => res.body!.forEach((c) => this.checkAndSetCourseRights(c))));
+            .get<Course[]>(`${this.resourceUrl}/course-management-overview`, { params: options, observe: 'response' })
+            .pipe(tap((res: HttpResponse<Course[]>) => res.body!.forEach((course) => this.checkAndSetCourseRights(course))));
     }
 
     /**
@@ -269,43 +270,23 @@ export class CourseManagementService {
 
     /**
      * returns the exercise details of the courses for the courses management dashboard
-     * @param courseIds - the ids of the courses
+     * @param onlyActive - if true, only active courses will be considered in the result
      */
-    getExercisesForManagementOverview(courseIds: number[]): Observable<HttpResponse<CourseManagementOverviewDto[]>> {
+    getExercisesForManagementOverview(onlyActive: boolean): Observable<HttpResponse<Course[]>> {
         let httpParams = new HttpParams();
-        courseIds.forEach((id) => {
-            httpParams = httpParams.append('courseIds[]', id.toString());
-        });
+        httpParams = httpParams.append('onlyActive', onlyActive.toString());
         return this.http
-            .get<CourseManagementOverviewDto[]>(`${this.resourceUrl}/exercises-for-management-overview`, { params: httpParams, observe: 'response' })
-            .pipe(
-                map((res: HttpResponse<CourseManagementOverviewDto[]>) => {
-                    if (res.body) {
-                        res.body.forEach((b) => {
-                            if (b.exerciseDetails && b.exerciseDetails.length > 0) {
-                                b.exerciseDetails.forEach((details) => {
-                                    details.assessmentDueDate = details.assessmentDueDate ? moment(details.assessmentDueDate) : undefined;
-                                    details.releaseDate = details.releaseDate ? moment(details.releaseDate) : undefined;
-                                    details.dueDate = details.dueDate ? moment(details.dueDate) : undefined;
-                                });
-                            }
-                        });
-                    }
-
-                    return res;
-                }),
-            );
+            .get<Course[]>(`${this.resourceUrl}/exercises-for-management-overview`, { params: httpParams, observe: 'response' })
+            .pipe(map((res: HttpResponse<Course[]>) => this.convertDateArrayFromServer(res)));
     }
 
     /**
      * returns the stats of the courses for the courses management dashboard
-     * @param courseIds - the ids of the courses
+     * @param onlyActive - if true, only active courses will be considered in the result
      */
-    getStatsForManagementOverview(courseIds: number[]): Observable<HttpResponse<CourseManagementOverviewStatisticsDto[]>> {
+    getStatsForManagementOverview(onlyActive: boolean): Observable<HttpResponse<CourseManagementOverviewStatisticsDto[]>> {
         let httpParams = new HttpParams();
-        courseIds.forEach((id) => {
-            httpParams = httpParams.append('courseIds[]', id.toString());
-        });
+        httpParams = httpParams.append('onlyActive', onlyActive.toString());
         return this.http.get<CourseManagementOverviewStatisticsDto[]>(`${this.resourceUrl}/stats-for-management-overview`, { params: httpParams, observe: 'response' });
     }
 
@@ -563,6 +544,9 @@ export class CourseExerciseService {
      */
     startExercise(courseId: number, exerciseId: number): Observable<StudentParticipation> {
         return this.http.post<StudentParticipation>(`${this.resourceUrl}/${courseId}/exercises/${exerciseId}/participations`, {}).map((participation: StudentParticipation) => {
+            if (participation.type === ParticipationType.PROGRAMMING) {
+                addUserIndependentRepositoryUrl(participation);
+            }
             return this.handleParticipation(participation);
         });
     }
@@ -576,6 +560,9 @@ export class CourseExerciseService {
         return this.http
             .put<StudentParticipation>(`${this.resourceUrl}/${courseId}/exercises/${exerciseId}/resume-programming-participation`, {})
             .map((participation: StudentParticipation) => {
+                if (participation.type === ParticipationType.PROGRAMMING) {
+                    addUserIndependentRepositoryUrl(participation);
+                }
                 return this.handleParticipation(participation);
             });
     }

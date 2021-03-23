@@ -25,10 +25,7 @@ import de.tum.in.www1.artemis.domain.enumeration.NotificationType;
 import de.tum.in.www1.artemis.domain.exam.Exam;
 import de.tum.in.www1.artemis.domain.exam.ExerciseGroup;
 import de.tum.in.www1.artemis.domain.notification.GroupNotification;
-import de.tum.in.www1.artemis.repository.CourseRepository;
-import de.tum.in.www1.artemis.repository.ExamRepository;
-import de.tum.in.www1.artemis.repository.LearningGoalRepository;
-import de.tum.in.www1.artemis.repository.UserRepository;
+import de.tum.in.www1.artemis.repository.*;
 import de.tum.in.www1.artemis.security.SecurityUtils;
 import de.tum.in.www1.artemis.service.exam.ExamService;
 import de.tum.in.www1.artemis.service.user.UserService;
@@ -56,7 +53,7 @@ public class CourseService {
 
     private final UserService userService;
 
-    private final ExerciseGroupService exerciseGroupService;
+    private final ExerciseGroupRepository exerciseGroupRepository;
 
     private final CourseExportService courseExportService;
 
@@ -75,7 +72,7 @@ public class CourseService {
     private final LearningGoalRepository learningGoalRepository;
 
     public CourseService(CourseRepository courseRepository, ExerciseService exerciseService, AuthorizationCheckService authCheckService, UserRepository userRepository,
-            LectureService lectureService, NotificationService notificationService, ExerciseGroupService exerciseGroupService, AuditEventRepository auditEventRepository,
+            LectureService lectureService, NotificationService notificationService, ExerciseGroupRepository exerciseGroupRepository, AuditEventRepository auditEventRepository,
             UserService userService, LearningGoalRepository learningGoalRepository, GroupNotificationService groupNotificationService, ExamService examService,
             ExamRepository examRepository, CourseExportService courseExportService) {
         this.courseRepository = courseRepository;
@@ -84,7 +81,7 @@ public class CourseService {
         this.userRepository = userRepository;
         this.lectureService = lectureService;
         this.notificationService = notificationService;
-        this.exerciseGroupService = exerciseGroupService;
+        this.exerciseGroupRepository = exerciseGroupRepository;
         this.auditEventRepository = auditEventRepository;
         this.userService = userService;
         this.learningGoalRepository = learningGoalRepository;
@@ -95,13 +92,13 @@ public class CourseService {
     }
 
     /**
-     * Get one course with exercises and lectures (filtered for given user)
+     * Get one course with exercises, lectures and exams (filtered for given user)
      *
      * @param courseId the course to fetch
      * @param user     the user entity
-     * @return the course including exercises and lectures for the user
+     * @return the course including exercises, lectures and exams for the user
      */
-    public Course findOneWithExercisesAndLecturesForUser(Long courseId, User user) {
+    public Course findOneWithExercisesAndLecturesAndExamsForUser(Long courseId, User user) {
         Course course = courseRepository.findByIdWithLecturesAndExamsElseThrow(courseId);
         if (!authCheckService.isAtLeastStudentInCourse(course, user)) {
             throw new AccessForbiddenException("You are not allowed to access this resource");
@@ -126,12 +123,12 @@ public class CourseService {
     }
 
     /**
-     * Get all courses with exercises and lectures (filtered for given user)
+     * Get all courses with exercises, lectures  and exams (filtered for given user)
      *
      * @param user the user entity
-     * @return the list of all courses including exercises and lectures for the user
+     * @return the list of all courses including exercises, lectures and exams for the user
      */
-    public List<Course> findAllActiveWithExercisesAndLecturesForUser(User user) {
+    public List<Course> findAllActiveWithExercisesAndLecturesAndExamsForUser(User user) {
         return courseRepository.findAllActiveWithLecturesAndExams().stream()
                 // filter old courses and courses the user should not be able to see
                 // skip old courses that have already finished
@@ -251,7 +248,7 @@ public class CourseService {
     public Course retrieveCourseOverExerciseGroupOrCourseId(Exercise exercise) {
 
         if (exercise.isExamExercise()) {
-            ExerciseGroup exerciseGroup = exerciseGroupService.findOneWithExam(exercise.getExerciseGroup().getId());
+            ExerciseGroup exerciseGroup = exerciseGroupRepository.findByIdElseThrow(exercise.getExerciseGroup().getId());
             exercise.setExerciseGroup(exerciseGroup);
             return exerciseGroup.getExam().getCourse();
         }
@@ -276,86 +273,86 @@ public class CourseService {
     }
 
     /**
-     * Fetches Course Management data from repository and returns a list of Course DTOs
+     * Fetches a list of Courses
      *
-     * @param isOnlyActive Whether or not to include courses with a past endDate
-     * @return A list of Course DTOs for the course management overview
+     * @param onlyActive Whether or not to include courses with a past endDate
+     * @return A list of Courses for the course management overview
      */
-    public List<Course> getAllCoursesForOverview(Boolean isOnlyActive) {
-        var dateTimeNow = isOnlyActive ? ZonedDateTime.now() : null;
+    public List<Course> getAllCoursesForManagementOverview(boolean onlyActive) {
+        var dateTimeNow = onlyActive ? ZonedDateTime.now() : null;
         var user = userRepository.getUserWithGroupsAndAuthorities();
         var userGroups = new ArrayList<>(user.getGroups());
-        return courseRepository.getAllCoursesForOverview(dateTimeNow, authCheckService.isAdmin(user), userGroups);
+        return courseRepository.getAllCoursesForManagementOverview(dateTimeNow, authCheckService.isAdmin(user), userGroups);
     }
 
     /**
-     * Get the active students for this particular course
+     * Get the active students for these particular exercise ids
      *
-     * @param courseId the id of the course
-     * @param periodIndex an index indicating which time period, 0 is current week, -1 is one week in the past, -2 is two weeks in the past ...
-     * @return An Integer array containing active students for each index
+     * @param exerciseIds the ids to get the active students for
+     * @return An Integer array containing active students for each index. An index corresponds to a week
      */
-    public Integer[] getActiveStudents(Long courseId, Integer periodIndex) {
+    public Integer[] getActiveStudents(List<Long> exerciseIds) {
         ZonedDateTime now = ZonedDateTime.now();
         LocalDateTime localStartDate = now.toLocalDateTime().with(DayOfWeek.MONDAY);
         LocalDateTime localEndDate = now.toLocalDateTime().with(DayOfWeek.SUNDAY);
         ZoneId zone = now.getZone();
-        ZonedDateTime startDate = localStartDate.atZone(zone).minusWeeks(3 + (4 * (-periodIndex))).withHour(0).withMinute(0).withSecond(0).withNano(0);
-        ZonedDateTime endDate = periodIndex != 0 ? localEndDate.atZone(zone).minusWeeks(4 * (-periodIndex)).withHour(23).withMinute(59).withSecond(59)
-                : localEndDate.atZone(zone).withHour(23).withMinute(59).withSecond(59);
-        List<Map<String, Object>> outcome = courseRepository.getActiveStudents(courseId, startDate, endDate);
-        List<Map<String, Object>> distinctOutcome = removeDuplicatesFromMapList(outcome, startDate);
-        return createResultArray(distinctOutcome, endDate);
+        ZonedDateTime startDate = localStartDate.atZone(zone).minusWeeks(3).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        ZonedDateTime endDate = localEndDate.atZone(zone).withHour(23).withMinute(59).withSecond(59);
+
+        List<Map<String, Object>> outcome = courseRepository.getActiveStudents(exerciseIds, startDate, endDate);
+        List<Map<String, Object>> distinctOutcome = removeDuplicateActiveUserRows(outcome, startDate);
+        return sortUserIntoWeeks(distinctOutcome, endDate);
     }
 
     /**
-     * the List of maps result contains duplicated entries. This method compares the values and returns a List<Map<String, Object>>
+     * The List of maps contains duplicated entries. This method compares the values and returns a List<Map<String, Object>>
      * without duplicated entries
      *
-     * @param result the result given by the Repository call
+     * @param activeUserRows a list with a map for every submission of an user containing date and the username
      * @param startDate the startDate of the period
-     * @return A List<Map<String, Object>> containing date and amount of active users in this period
+     * @return a List<Map<String, Object>> containing date and amount of active users in this period
      */
-    private List<Map<String, Object>> removeDuplicatesFromMapList(List<Map<String, Object>> result, ZonedDateTime startDate) {
-        Map<Object, List<String>> users = new HashMap<>();
-        for (Map<String, Object> listElement : result) {
+    private List<Map<String, Object>> removeDuplicateActiveUserRows(List<Map<String, Object>> activeUserRows, ZonedDateTime startDate) {
+        Map<Object, List<String>> usersByDate = new HashMap<>();
+        for (Map<String, Object> listElement : activeUserRows) {
             ZonedDateTime date = (ZonedDateTime) listElement.get("day");
             int index = getWeekOfDate(date);
             String username = listElement.get("username").toString();
-            List<String> usersInSameSlot = users.get(index);
+            List<String> usersInSameSlot = usersByDate.get(index);
             // if this index is not yet existing in users
             if (usersInSameSlot == null) {
                 usersInSameSlot = new ArrayList<>();
                 usersInSameSlot.add(username);
-                users.put(index, usersInSameSlot);
+                usersByDate.put(index, usersInSameSlot);
             }   // if the value of the map for this index does not contain this username
             else if (!usersInSameSlot.contains(username)) {
                 usersInSameSlot.add(username);
             }
         }
         List<Map<String, Object>> returnList = new ArrayList<>();
-        users.forEach((k, v) -> {
-            int year = (Integer) k < getWeekOfDate(startDate) ? startDate.getYear() + 1 : startDate.getYear();
+        usersByDate.forEach((date, users) -> {
+            int year = (Integer) date < getWeekOfDate(startDate) ? startDate.getYear() + 1 : startDate.getYear();
             ZonedDateTime firstDateOfYear = ZonedDateTime.of(year, 1, 1, 0, 0, 0, 0, startDate.getZone());
-            ZonedDateTime start = getWeekOfDate(firstDateOfYear) == 1 ? firstDateOfYear.plusWeeks(((Integer) k) - 1) : firstDateOfYear.plusWeeks((Integer) k);
+            ZonedDateTime start = getWeekOfDate(firstDateOfYear) == 1 ? firstDateOfYear.plusWeeks(((Integer) date) - 1) : firstDateOfYear.plusWeeks((Integer) date);
             Map<String, Object> listElement = new HashMap<>();
             listElement.put("day", start);
-            listElement.put("amount", (long) v.size());
+            listElement.put("amount", (long) users.size());
             returnList.add(listElement);
         });
         return returnList;
     }
 
     /**
-     * Gets a list of maps, each map describing an entry in the database. The map has the two keys "day" and "amount",
-     * which map to the date and the amount of the findings. This Map-List is taken and converted into a Integer array,
-     * containing the values for each bar of the graph
+     * Gets a list of maps as parameter, each map describing an entry in the database. The map has the two keys "day" and "amount",
+     * which map to the date and the amount of the findings. This Map-List is taken and converted into an Integer array,
+     * containing the values for each point of the graph. In the course management overview, we want to display the last
+     * 4 weeks, each week represented by one point in the graph. (Beginning with the current week.)
      *
      * @param outcome A List<Map<String, Object>>, containing the content which should be refactored into an array
      * @param endDate the endDate
-     * @return an array, containing the values for each bar in the graph
+     * @return an array, containing the amount of active users. One entry corresponds to one week
      */
-    private Integer[] createResultArray(List<Map<String, Object>> outcome, ZonedDateTime endDate) {
+    private Integer[] sortUserIntoWeeks(List<Map<String, Object>> outcome, ZonedDateTime endDate) {
         Integer[] result = new Integer[4];
         Arrays.fill(result, 0);
         int week;
@@ -372,10 +369,16 @@ public class CourseService {
         return result;
     }
 
+    /**
+     * Gets the week of the given date
+     *
+     * @param date the date to get the week for
+     * @return the calendar week of the given date
+     */
     private Integer getWeekOfDate(ZonedDateTime date) {
         LocalDate localDate = date.toLocalDate();
-        TemporalField woy = WeekFields.of(DayOfWeek.MONDAY, 4).weekOfWeekBasedYear();
-        return localDate.get(woy);
+        TemporalField weekOfYear = WeekFields.of(DayOfWeek.MONDAY, 4).weekOfWeekBasedYear();
+        return localDate.get(weekOfYear);
     }
 
     /**
@@ -393,7 +396,7 @@ public class CourseService {
             return;
         }
 
-        // This contains possible errors encountered during the archve process
+        // This contains possible errors encountered during the archive process
         ArrayList<String> exportErrors = new ArrayList<>();
 
         groupNotificationService.notifyInstructorGroupAboutCourseArchiveState(course, NotificationType.COURSE_ARCHIVE_STARTED, exportErrors);
@@ -439,9 +442,10 @@ public class CourseService {
             return;
         }
 
-        // Clean up exams
-        var exams = courseRepository.findByIdWithLecturesAndExamsElseThrow(course.getId()).getExams();
-        var examExercises = exams.stream().map(exam -> examRepository.findAllExercisesByExamId(exam.getId())).flatMap(Collection::stream).collect(Collectors.toSet());
+        // The Objects::nonNull is needed here because the relationship exam -> exercise groups is ordered and
+        // hibernate sometimes adds nulls to in the list of exercise groups to keep the order
+        Set<Exercise> examExercises = examRepository.findByCourseIdWithExerciseGroupsAndExercises(courseId).stream().map(Exam::getExerciseGroups).flatMap(Collection::stream)
+                .filter(Objects::nonNull).map(ExerciseGroup::getExercises).flatMap(Collection::stream).collect(Collectors.toSet());
 
         var exercisesToCleanup = Stream.concat(course.getExercises().stream(), examExercises.stream()).collect(Collectors.toSet());
         exercisesToCleanup.forEach(exercise -> {

@@ -41,6 +41,7 @@
             "publishResultsDate": "Release Date of Results",
             "examStudentReviewStart": "Begin of Student Review",
             "examStudentReviewEnd": "End of Student Review",
+            "studentReviewEnabled": "Review is open",
             "duration": "Duration",
             "nrOfStudents": "Registered Students",
             "created": "New exam created",
@@ -189,7 +190,22 @@
             "unlockAllRepositoriesSuccess": "Repositories of {{number}} programming exercises were unlocked.",
             "unlockAllRepositoriesFailure": "There was an error during the unlocking of the programming exercises:\n {{message}}",
             "lockAllRepositoriesSuccess": "Repositories of {{number}} programming exercises were locked.",
-            "lockAllRepositoriesFailure": "There was an error during the locking of the programming exercises:\n {{message}}"
+            "lockAllRepositoriesFailure": "There was an error during the locking of the programming exercises:\n {{message}}",
+            "removeAllStudents": {
+                "title": "Remove all students",
+                "question": "Are you sure you want to remove <strong class='text-danger'>all students</strong> from the exam?",
+                "confirmationText": "Please enter the name of the exam to confirm removing all students from the exam!"
+            },
+            "confirmDialog": {
+                "titleToUnsubmitted": "Change Student Exam to Unsubmitted",
+                "titleToSubmitted": "Change Student Exam to Submitted",
+                "question": "Are you sure you want to change the submission state?",
+                "submitText": "This will set the submission date of the exam to this moment, and set the Submitted status to 'Yes'. Un-submitting the student exam later is possible.\n",
+                "unSubmitText": "This will delete the submission date and set the Submitted status to 'No'.",
+                "warningRemove": "<strong class='text-danger'>Recovering the original submission date after the deletion is not possible!</strong>",
+                "submit": "Submit",
+                "unsubmit": "Unsubmit"
+            }
         },
         "examManagement": {
             "title": "Exam Management",
@@ -361,9 +377,11 @@
                     "correctionRound": "Correction Round",
                     "startedExam": "Started Exam",
                     "submittedExam": "Submitted Exam",
-                    "exerciseTable": "Exercise",
+                    "exerciseTablePlural": "Exercises",
+                    "exerciseTableSingular": "Exercise",
                     "points": "Points",
-                    "numberParticipants": "Number of participants"
+                    "numberParticipants": "Participants",
+                    "variants": "Variants"
                 }
             }
         },
@@ -384,9 +402,13 @@
             "reviewer": "Reviewer",
             "openSubmission": "Open Submission",
             "openAssessment": " Open Assessment",
+            "openLatestAssessment": "Open latest Assessment",
             "cancelAssessment": " Cancel Assessment",
             "workingTimeCouldNotBeSaved": "The working time could not be saved.",
-            "saveWorkingTimeSuccessful": "The working time was saved successfully."
+            "saveWorkingTimeSuccessful": "The working time was saved successfully.",
+            "toggleSuccessful": "The submitted status was changed successfully.",
+            "togglefailed": "The submitted status could not be changed!",
+            "hasComplaint": "Has Complaint"
         }
     },
     "studentExam": {
