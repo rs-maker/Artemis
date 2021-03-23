@@ -930,11 +930,103 @@ public class CourseResource {
             var studentsGroup = courseRepository.findStudentGroupName(courseId);
             var amountOfStudentsInCourse = Math.toIntExact(userRepository.countUserInGroup(studentsGroup));
             courseDTO.setExerciseDTOS(exerciseService.getStatisticsForCourseManagementOverview(courseId, amountOfStudentsInCourse, exerciseIds));
-            courseDTO.setActiveStudents(courseService.getActiveStudents(exerciseIds));
+            courseDTO.setActiveStudents(courseService.getActiveStudents(exerciseIds, 0));
             courseDTOs.add(courseDTO);
         }
 
         return ResponseEntity.ok(courseDTOs);
+    }
+
+    /**
+     * GET /courses/:courseId : get the "id" course.
+     *
+     * @param courseId the id of the course to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the course, or with status 404 (Not Found)
+     */
+    @GetMapping("/courses/{courseId}/management-detail")
+    @PreAuthorize("hasAnyRole('TA', 'INSTRUCTOR', 'ADMIN')")
+    public ResponseEntity<CourseManagementDetailViewDTO> getCourseDTOForDetailView(@PathVariable Long courseId) {
+        Course course = courseRepository.findByIdElseThrow(courseId);
+        User user = userRepository.getUserWithGroupsAndAuthorities();
+        if (!authCheckService.isAtLeastTeachingAssistantInCourse(course, user)) {
+            return forbidden();
+        }
+        var exerciseIds = exerciseRepository.getExerciseIdsByCourseId(courseId);
+        CourseManagementDetailViewDTO dto = courseService.getStatsForDetailView(courseId, exerciseIds);
+        if (authCheckService.isAtLeastInstructorInCourse(course, user)) {
+            dto.setIsAtLeastInstructor(true);
+        }
+        else {
+            dto.setIsAtLeastInstructor(false);
+        }
+        // Only counting assessments and submissions which are handed in in time
+        long numberOfAssessments = resultRepository.countNumberOfAssessments(courseId).getInTime();
+        dto.setCurrentAbsoluteAssessments(numberOfAssessments);
+        long numberOfSubmissions = submissionRepository.countByCourseIdSubmittedBeforeDueDate(courseId)
+                + programmingExerciseRepository.countSubmissionsByCourseIdSubmitted(courseId);
+        dto.setCurrentMaxAssessments(numberOfSubmissions);
+        if (numberOfSubmissions > 0) {
+            dto.setCurrentPercentageAssessments(Math.round(numberOfAssessments * 1000.0 / numberOfSubmissions) / 10.0);
+        }
+        else {
+            dto.setCurrentPercentageAssessments(100.0);
+        }
+
+        // Complaints
+        long numberOfAnsweredComplaints = complaintResponseRepository
+                .countByComplaint_Result_Participation_Exercise_Course_Id_AndComplaint_ComplaintType_AndSubmittedTimeIsNotNull(courseId, ComplaintType.COMPLAINT);
+        dto.setCurrentAbsoluteComplaints(numberOfAnsweredComplaints);
+        long numberOfComplaints = complaintService.countComplaintsByCourseId(courseId);
+        dto.setCurrentMaxComplaints(numberOfComplaints);
+        if (numberOfComplaints > 0) {
+            dto.setCurrentPercentageComplaints(Math.round(numberOfAnsweredComplaints * 1000.0 / numberOfComplaints) / 10.0);
+        }
+        else {
+            dto.setCurrentPercentageComplaints(100.0);
+        }
+
+        // More Feedback Requests
+        long numberOfAnsweredFeedbackRequests = complaintResponseRepository
+                .countByComplaint_Result_Participation_Exercise_Course_Id_AndComplaint_ComplaintType_AndSubmittedTimeIsNotNull(courseId, ComplaintType.MORE_FEEDBACK);
+        dto.setCurrentAbsoluteMoreFeedbacks(numberOfAnsweredFeedbackRequests);
+        long numberOfMoreFeedbackRequests = complaintService.countMoreFeedbackRequestsByCourseId(courseId);
+        dto.setCurrentMaxMoreFeedbacks(numberOfMoreFeedbackRequests);
+        if (numberOfMoreFeedbackRequests > 0) {
+            dto.setCurrentPercentageMoreFeedbacks(Math.round(numberOfAnsweredFeedbackRequests * 1000.0 / numberOfMoreFeedbackRequests) / 10.0);
+        }
+        else {
+            dto.setCurrentPercentageMoreFeedbacks(100.0);
+        }
+        // Average Student Score
+        Double databaseResult = courseRepository.getAverageStudentScoreForCourse(courseId);
+        double averageStudentScore = databaseResult != null ? 2.0 : 0.0; // TODO fix getAverageStudentScoreForCourse query
+        dto.setCurrentAbsoluteAverageScore(averageStudentScore);
+        ZonedDateTime now = ZonedDateTime.now();
+        databaseResult = courseRepository.getMaxReachablePointsInCourse(courseId, now);
+        double maxPointsAchievableInCourse = databaseResult != null ? databaseResult : 0.0;
+        dto.setCurrentMaxAverageScore(maxPointsAchievableInCourse);
+        if (maxPointsAchievableInCourse > 0.0) {
+            dto.setCurrentPercentageAverageScore(Math.round(averageStudentScore * 1000.0 / maxPointsAchievableInCourse) / 10.0);
+        }
+        else {
+            dto.setCurrentPercentageAverageScore(100.0);
+        }
+
+        return ResponseEntity.ok(dto);
+    }
+
+    /**
+     * GET /courses/:courseId/statistics : Get the active students for this particular course
+     *
+     * @param courseId the id of the course
+     * @param periodIndex an index indicating which time period, 0 is current week, -1 is one week in the past, -2 is two weeks in the past ...
+     * @return the ResponseEntity with status 200 (OK) and the data in body, or status 404 (Not Found)
+     */
+    @GetMapping(value = "/courses/{courseId}/statistics")
+    @PreAuthorize("hasAnyRole('TA', 'INSTRUCTOR', 'ADMIN')")
+    public ResponseEntity<Integer[]> getActiveStudentsForCourseDetailView(@PathVariable Long courseId, @RequestParam Integer periodIndex) {
+        var exerciseIds = exerciseRepository.getExerciseIdsByCourseId(courseId);
+        return ResponseEntity.ok(courseService.getActiveStudents(exerciseIds, periodIndex));
     }
 
     /**

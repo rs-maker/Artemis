@@ -284,6 +284,13 @@ public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
             """)
     List<Long> getActiveExerciseIdsByCourseId(@Param("courseId") Long courseId, @Param("sevenDaysAgo") ZonedDateTime sevenDaysAgo);
 
+    @Query("""
+            SELECT e.id
+            FROM Exercise e
+            WHERE e.course.id = :courseId
+            """)
+    List<Long> getExerciseIdsByCourseId(@Param("courseId") Long courseId);
+
     @NotNull
     default Exercise findByIdElseThrow(Long exerciseId) throws EntityNotFoundException {
         return findById(exerciseId).orElseThrow(() -> new EntityNotFoundException("Exercise", exerciseId));

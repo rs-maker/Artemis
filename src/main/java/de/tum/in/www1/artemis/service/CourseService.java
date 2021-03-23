@@ -291,13 +291,14 @@ public class CourseService {
      * @param exerciseIds the ids to get the active students for
      * @return An Integer array containing active students for each index. An index corresponds to a week
      */
-    public Integer[] getActiveStudents(List<Long> exerciseIds) {
+    public Integer[] getActiveStudents(List<Long> exerciseIds, Integer periodIndex) {
         ZonedDateTime now = ZonedDateTime.now();
         LocalDateTime localStartDate = now.toLocalDateTime().with(DayOfWeek.MONDAY);
         LocalDateTime localEndDate = now.toLocalDateTime().with(DayOfWeek.SUNDAY);
         ZoneId zone = now.getZone();
-        ZonedDateTime startDate = localStartDate.atZone(zone).minusWeeks(3).withHour(0).withMinute(0).withSecond(0).withNano(0);
-        ZonedDateTime endDate = localEndDate.atZone(zone).withHour(23).withMinute(59).withSecond(59);
+        ZonedDateTime startDate = localStartDate.atZone(zone).minusWeeks(3 + (4 * (-periodIndex))).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        ZonedDateTime endDate = periodIndex != 0 ? localEndDate.atZone(zone).minusWeeks(4 * (-periodIndex)).withHour(23).withMinute(59).withSecond(59)
+                : localEndDate.atZone(zone).withHour(23).withMinute(59).withSecond(59);
 
         List<Map<String, Object>> outcome = courseRepository.getActiveStudents(exerciseIds, startDate, endDate);
         List<Map<String, Object>> distinctOutcome = removeDuplicateActiveUserRows(outcome, startDate);
@@ -473,14 +474,14 @@ public class CourseService {
      * @param courseId id of the course
      * @return The DTO for the course management detail view
      */
-    public CourseManagementDetailViewDTO getStatsForDetailView(Long courseId) {
+    public CourseManagementDetailViewDTO getStatsForDetailView(Long courseId, List<Long> exerciseIds) {
         var dto = collectCourseInformation(courseId);
 
         dto.setNumberOfStudentsInCourse(Math.toIntExact(userRepository.countUserInGroup(dto.getStudentGroupName())));
         dto.setNumberOfTeachingAssistantsInCourse(Math.toIntExact(userRepository.countUserInGroup(dto.getTeachingAssistantGroupName())));
         dto.setNumberOfInstructorsInCourse(Math.toIntExact(userRepository.countUserInGroup(dto.getInstructorGroupName())));
 
-        dto.setActiveStudents(getActiveStudents(courseId, 0));
+        dto.setActiveStudents(getActiveStudents(exerciseIds, 0));
         return dto;
     }
 
