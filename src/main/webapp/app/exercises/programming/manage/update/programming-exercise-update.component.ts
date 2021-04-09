@@ -469,4 +469,11 @@ export class ProgrammingExerciseUpdateComponent implements OnInit {
     validIdeSelection() {
         return this.programmingExercise.allowOnlineEditor || this.programmingExercise.allowOfflineIde;
     }
+
+    isTagName(e: Event): boolean {
+        if (e.target instanceof Element) {
+            return e.target.tagName === 'TEXTAREA';
+        }
+        return false;
+    }
 }
