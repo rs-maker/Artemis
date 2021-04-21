@@ -12,16 +12,8 @@ import { FeedbackCollapseComponent } from 'app/exercises/shared/result/feedback-
 import { MatExpansionModule } from '@angular/material/expansion';
 
 @NgModule({
-    imports: [ArtemisSharedModule, MomentModule, ArtemisProgrammingExerciseActionsModule, ArtemisSharedComponentModule],
-    declarations: [
-        ResultComponent,
-        UpdatingResultComponent,
-        ResultDetailComponent,
-        ResultHistoryComponent,
-        SubmissionResultStatusComponent,
-        FeedbackCollapseComponent,
-        MatExpansionModule,
-    ],
+    imports: [ArtemisSharedModule, MomentModule, ArtemisProgrammingExerciseActionsModule, ArtemisSharedComponentModule, MatExpansionModule],
+    declarations: [ResultComponent, UpdatingResultComponent, ResultDetailComponent, ResultHistoryComponent, SubmissionResultStatusComponent, FeedbackCollapseComponent],
     exports: [ResultComponent, UpdatingResultComponent, ResultDetailComponent, ResultHistoryComponent, SubmissionResultStatusComponent],
 })
 export class ArtemisResultModule {}
