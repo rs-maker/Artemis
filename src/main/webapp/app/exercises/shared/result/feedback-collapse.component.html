@@ -2,7 +2,7 @@
 <ng-template #longText>
     <mat-expansion-panel (opened)="isCollapsed = true" (closed)="isCollapsed = false">
         <mat-expansion-panel-header>
-            <mat-panel-description> {{ isCollapsed ? ' ' : text.substring(0, 80) }}</mat-panel-description>
+            <mat-panel-description> {{ isCollapsed ? text.substring(0, 80) : ' ' }}</mat-panel-description>
         </mat-expansion-panel-header>
         <p>{{ text }}</p>
     </mat-expansion-panel>
