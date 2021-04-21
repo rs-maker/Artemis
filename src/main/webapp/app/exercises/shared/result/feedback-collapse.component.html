@@ -1,14 +1,9 @@
 <p *ngIf="text.length < smallCharacterLimit; else longText">{{ text }}</p>
 <ng-template #longText>
-    <div *ngIf="isCollapsed; else opened">
-        <button (click)="isCollapsed = !isCollapsed"><fa-icon [icon]="'angle-right'"></fa-icon></button>
-        {{ text.substring(0, 100) }} ...
-    </div>
-    <ng-template #opened>
-        <div>
-            <button (click)="isCollapsed = !isCollapsed"><fa-icon [icon]="'angle-down'"></fa-icon></button>
-            {{ text }}
-        </div>
-    </ng-template>
-    &nbsp;
+    <mat-expansion-panel (opened)="isCollapsed = true" (closed)="isCollapsed = false">
+        <mat-expansion-panel-header>
+            <mat-panel-description> Click to read Feedback </mat-panel-description>
+        </mat-expansion-panel-header>
+        <p>{{ text }}</p>
+    </mat-expansion-panel>
 </ng-template>
