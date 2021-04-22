@@ -9,10 +9,10 @@ import { ResultComponent } from 'app/exercises/shared/result/result.component';
 import { ResultDetailComponent } from 'app/exercises/shared/result/result-detail.component';
 import { ArtemisSharedComponentModule } from 'app/shared/components/shared-component.module';
 import { FeedbackCollapseComponent } from 'app/exercises/shared/result/feedback-collapse.component';
-import { MatExpansionModule } from '@angular/material/expansion';
+import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
-    imports: [ArtemisSharedModule, MomentModule, ArtemisProgrammingExerciseActionsModule, ArtemisSharedComponentModule, MatExpansionModule],
+    imports: [ArtemisSharedModule, MomentModule, ArtemisProgrammingExerciseActionsModule, ArtemisSharedComponentModule, NgbCollapse],
     declarations: [ResultComponent, UpdatingResultComponent, ResultDetailComponent, ResultHistoryComponent, SubmissionResultStatusComponent, FeedbackCollapseComponent],
     exports: [ResultComponent, UpdatingResultComponent, ResultDetailComponent, ResultHistoryComponent, SubmissionResultStatusComponent],
 })
