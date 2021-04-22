@@ -2,12 +2,12 @@
 
 <ng-template #longText>
     <div *ngIf="isCollapsed; else opened">
-        <i class="fa fa-angle-right" aria-hidden="true" (click)="isCollapsed = !isCollapsed"></i>
+        <fa-icon class="fa fa-angle-down" [icon]="'angle-right'" (click)="isCollapsed = !isCollapsed"></fa-icon>
         {{ text.substring(0, 100) }} ...
     </div>
     <ng-template #opened>
         <div>
-            <i class="fa fa-angle-down" aria-hidden="true" (click)="isCollapsed = !isCollapsed"></i>
+            <fa-icon class="fa fa-angle-down" [icon]="'angle-down'" (click)="isCollapsed = !isCollapsed"></fa-icon>
             {{ text }}
         </div>
     </ng-template>
