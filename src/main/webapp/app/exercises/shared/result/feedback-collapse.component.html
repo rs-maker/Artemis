@@ -2,26 +2,13 @@
 
 <ng-template #longText>
     <div *ngIf="isCollapsed; else opened">
-        <button (click)="isCollapsed = !isCollapsed">
-            <i class="fa fa-angle-right" aria-hidden="true"></i>
-        </button>
+        <i class="fa fa-angle-right" aria-hidden="true" (click)="isCollapsed = !isCollapsed"></i>
         {{ text.substring(0, 100) }} ...
     </div>
     <ng-template #opened>
         <div>
-            <button (click)="isCollapsed = !isCollapsed">
-                <i class="fa fa-angle-down" aria-hidden="true"></i>
-            </button>
+            <i class="fa fa-angle-down" aria-hidden="true" (click)="isCollapsed = !isCollapsed"></i>
             {{ text }}
         </div>
-    </ng-template></ng-template
->
-
-<!--
- <mat-expansion-panel (opened)="isCollapsed = false" (closed)="isCollapsed = true">
-        <mat-expansion-panel-header>
-            <mat-panel-description> {{ isCollapsed ? text.substring(0, 80) : ' ' }}</mat-panel-description>
-        </mat-expansion-panel-header>
-        <p>{{ text }}</p>
-    </mat-expansion-panel>
- -->
+    </ng-template>
+</ng-template>
